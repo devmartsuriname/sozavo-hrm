@@ -39,11 +39,15 @@ CREATE TABLE IF NOT EXISTS public.hrm_organization_units (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by UUID REFERENCES auth.users(id),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by UUID REFERENCES auth.users(id)
+    updated_by UUID REFERENCES auth.users(id),
+    
+    -- Enforce lowercase codes for consistency
+    CONSTRAINT chk_org_units_code_lowercase CHECK (code = LOWER(code))
 );
 
 COMMENT ON TABLE public.hrm_organization_units IS 'Organization hierarchy (departments, divisions, teams)';
 COMMENT ON COLUMN public.hrm_organization_units.parent_id IS 'Self-reference for org hierarchy';
+COMMENT ON COLUMN public.hrm_organization_units.code IS 'Unique code, must be lowercase';
 
 -- -----------------------------------------------------------------------------
 -- hrm_positions: Job positions/titles
@@ -59,11 +63,15 @@ CREATE TABLE IF NOT EXISTS public.hrm_positions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by UUID REFERENCES auth.users(id),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by UUID REFERENCES auth.users(id)
+    updated_by UUID REFERENCES auth.users(id),
+    
+    -- Enforce lowercase codes for consistency
+    CONSTRAINT chk_positions_code_lowercase CHECK (code = LOWER(code))
 );
 
 COMMENT ON TABLE public.hrm_positions IS 'Job positions/titles within the organization';
 COMMENT ON COLUMN public.hrm_positions.org_unit_id IS 'Primary org unit for this position';
+COMMENT ON COLUMN public.hrm_positions.code IS 'Unique code, must be lowercase';
 
 -- -----------------------------------------------------------------------------
 -- hrm_employees: Core employee records
@@ -77,13 +85,13 @@ CREATE TABLE IF NOT EXISTS public.hrm_employees (
     -- Personal info
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(50),
     
     -- Employment info
     position_id UUID REFERENCES public.hrm_positions(id),
     org_unit_id UUID REFERENCES public.hrm_organization_units(id),
-    manager_id UUID REFERENCES public.hrm_employees(id),
+    manager_id UUID REFERENCES public.hrm_employees(id) ON DELETE SET NULL,
     employment_status public.employment_status NOT NULL DEFAULT 'active',
     hire_date DATE,
     termination_date DATE,
@@ -98,11 +106,12 @@ CREATE TABLE IF NOT EXISTS public.hrm_employees (
 
 COMMENT ON TABLE public.hrm_employees IS 'Core employee records';
 COMMENT ON COLUMN public.hrm_employees.user_id IS 'Link to auth.users for login access';
-COMMENT ON COLUMN public.hrm_employees.manager_id IS 'Self-reference for reporting hierarchy';
+COMMENT ON COLUMN public.hrm_employees.manager_id IS 'Self-reference for reporting hierarchy, SET NULL on delete';
+COMMENT ON COLUMN public.hrm_employees.email IS 'Unique employee email address';
 
 -- =============================================================================
 -- END OF TABLE DEFINITIONS
 -- =============================================================================
 -- TODO: Indexes will be added in a later step
--- TODO: Triggers for updated_at will be added in functions.sql
+-- TODO: Triggers for updated_at will use update_updated_at_column() from functions.sql
 -- =============================================================================
