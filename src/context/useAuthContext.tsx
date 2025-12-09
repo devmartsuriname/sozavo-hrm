@@ -7,7 +7,7 @@ import type { ChildrenType } from '../types/component-props'
 export type AuthContextType = {
   user: UserType | undefined
   isAuthenticated: any
-  saveSession: (session: UserType) => void
+  saveSession: (session: UserType | any) => void
   removeSession: () => void
 }
 

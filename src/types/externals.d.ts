@@ -182,6 +182,15 @@ declare module 'react-bootstrap' {
   export const ToastContainer: ComponentType<any>
   export const ToastHeader: ComponentType<any>
   export const ToastBody: ComponentType<any>
+  
+  // Additional exports needed by Darkone pages
+  export const NavItem: ComponentType<any>
+  export const NavLink: ComponentType<any>
+  export const TabContainer: ComponentType<any>
+  export const TabContent: ComponentType<any>
+  export const TabPane: ComponentType<any>
+  export type ToastContainerProps = any
+  export type OverlayProps = any
 }
 
 declare module 'react-bootstrap/esm/Feedback' {
@@ -393,9 +402,10 @@ declare module 'cookies-next' {
   export function getCookies(options?: any): Record<string, string>
 }
 
-// Yup - with validate method and permissive schemas
+// Yup - with validate method, InferType, and permissive schemas
 declare module 'yup' {
   export type AnySchema = any
+  export type InferType<T> = any
   
   export type ObjectSchema<T extends object = any> = {
     validate: (value: any, options?: any) => Promise<any>
@@ -640,4 +650,83 @@ declare module 'react-apexcharts' {
   
   const ReactApexChart: ComponentType<ApexChartProps>
   export default ReactApexChart
+}
+
+// React Select
+declare module 'react-select' {
+  import { ComponentType } from 'react'
+  export interface SelectOption {
+    value: any
+    label: string
+    [key: string]: any
+  }
+  export interface SelectProps {
+    options?: SelectOption[]
+    value?: any
+    onChange?: (value: any) => void
+    isMulti?: boolean
+    isSearchable?: boolean
+    isClearable?: boolean
+    isDisabled?: boolean
+    placeholder?: string
+    className?: string
+    classNamePrefix?: string
+    [key: string]: any
+  }
+  const Select: ComponentType<SelectProps>
+  export default Select
+}
+
+// React Quill
+declare module 'react-quill' {
+  import { ComponentType } from 'react'
+  export interface ReactQuillProps {
+    value?: string
+    onChange?: (value: string) => void
+    theme?: string
+    modules?: any
+    formats?: string[]
+    placeholder?: string
+    readOnly?: boolean
+    className?: string
+    [key: string]: any
+  }
+  const ReactQuill: ComponentType<ReactQuillProps>
+  export default ReactQuill
+}
+
+// Google Maps React
+declare module 'google-maps-react' {
+  import { ComponentType } from 'react'
+  export const GoogleApiWrapper: (config: any) => (component: any) => any
+  export const Map: ComponentType<any>
+  export const Marker: ComponentType<any>
+  export const InfoWindow: ComponentType<any>
+  export const Polyline: ComponentType<any>
+  export const Polygon: ComponentType<any>
+  export const Circle: ComponentType<any>
+  export const Rectangle: ComponentType<any>
+  export const HeatMap: ComponentType<any>
+}
+
+// GridJS React
+declare module 'gridjs-react' {
+  import { ComponentType } from 'react'
+  export interface GridProps {
+    data?: any[]
+    columns?: any[]
+    search?: boolean | any
+    sort?: boolean | any
+    pagination?: boolean | any
+    className?: any
+    [key: string]: any
+  }
+  export const Grid: ComponentType<GridProps>
+}
+
+// React Bootstrap ESM InputGroupText
+declare module 'react-bootstrap/esm/InputGroupText' {
+  import { ComponentType } from 'react'
+  const InputGroupText: ComponentType<any>
+  export default InputGroupText
 }
