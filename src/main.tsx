@@ -7,6 +7,10 @@ import { basePath } from './context/constants.ts'
 // Darkone React Template SCSS (primary styles)
 import './assets/scss/style.scss'
 
+// HRM Override Layer (must be imported AFTER style.scss)
+// See: docs/theme/Darkone_Theme_Guardrails.md for rules
+import './assets/scss/hrm-overrides.scss'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename={basePath}>
