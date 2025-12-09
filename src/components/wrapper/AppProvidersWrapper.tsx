@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/context/useAuthContext'
+import { SupabaseAuthProvider } from '@/context/SupabaseAuthContext'
 import { LayoutProvider } from '@/context/useLayoutContext'
 import { NotificationProvider } from '@/context/useNotificationContext'
 import { ChildrenType } from '@/types/component-props'
@@ -10,14 +10,14 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
   return (
     <>
       <HelmetProvider>
-        <AuthProvider>
+        <SupabaseAuthProvider>
           <LayoutProvider>
             <NotificationProvider>
               {children}
               <ToastContainer theme="colored" />
             </NotificationProvider>
           </LayoutProvider>
-        </AuthProvider>
+        </SupabaseAuthProvider>
       </HelmetProvider>
     </>
   )
