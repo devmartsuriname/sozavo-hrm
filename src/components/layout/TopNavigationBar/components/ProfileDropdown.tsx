@@ -1,11 +1,17 @@
 import avatar1 from '@/assets/images/users/avatar-1.jpg'
 import IconifyIcon from '@/components/wrapper/IconifyIcon'
-import { useAuthContext } from '@/context/useAuthContext'
+import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
 import { Dropdown, DropdownHeader, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const ProfileDropdown = () => {
-  const { removeSession } = useAuthContext()
+  const { signOut } = useSupabaseAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await signOut()
+    navigate('/auth/sign-in')
+  }
 
   return (
     <Dropdown className=" topbar-item">
@@ -45,11 +51,9 @@ const ProfileDropdown = () => {
           <span className="align-middle">Lock screen</span>
         </DropdownItem>
         <div className="dropdown-divider my-1" />
-        <DropdownItem as={Link} className=" text-danger" to="/auth/sign-in">
+        <DropdownItem as="button" className="text-danger" onClick={handleLogout}>
           <IconifyIcon icon="solar:logout-3-outline" className="align-middle me-2 fs-18" />
-          <span className="align-middle" onClick={removeSession}>
-            Logout
-          </span>
+          <span className="align-middle">Logout</span>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>

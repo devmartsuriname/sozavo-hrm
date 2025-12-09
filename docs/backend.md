@@ -19,9 +19,9 @@ See `/db/hrm/` for version-controlled SQL files:
 
 ## Authentication Architecture
 
-### Current State (Phase 7A - Scaffolded)
+### Current State (Phase 7B - Integrated)
 
-The Supabase auth infrastructure has been scaffolded but is **not yet wired to the runtime**:
+The Supabase auth infrastructure is now **fully wired into the runtime**:
 
 #### 1. Type Definitions (`src/types/supabase-auth.ts`)
 - `AppRole` - Mirrors `public.app_role` enum ('admin' | 'hr_manager' | 'manager' | 'employee')
@@ -38,12 +38,20 @@ The Supabase auth infrastructure has been scaffolded but is **not yet wired to t
 - `useSupabaseAuth()` - Hook to access auth context
 - Implements **hybrid failure mode**: session can exist but access is blocked if roles fail to load
 
-### Legacy Auth (Still Active)
+### Auth Flow (Phase 7B Complete)
 
-The Darkone fake-backend (`src/helpers/fake-backend.ts`) remains active until Phase 7B migration:
-- Cookie-based session management
-- Hardcoded demo users
-- No RLS enforcement
+1. **Login**: Uses `supabase.auth.signInWithPassword()` in `useSignIn.ts`
+2. **Session Management**: `SupabaseAuthProvider` listens to `onAuthStateChange`
+3. **Route Protection**: `router.tsx` checks `status` and `user` from context
+4. **Logout**: `signOut()` method clears session and resets state
+5. **Role Loading**: Roles fetched from `public.user_roles` after authentication
+
+### Legacy Auth (REMOVED in Phase 7B)
+
+The Darkone fake-backend has been fully removed:
+- ~~`src/helpers/fake-backend.ts`~~ - No longer imported or used
+- ~~Cookie-based session management~~ - Replaced by Supabase sessions
+- ~~Hardcoded demo users~~ - Only real Supabase users work
 
 ## Role-Based Access Control
 
@@ -58,9 +66,7 @@ The Darkone fake-backend (`src/helpers/fake-backend.ts`) remains active until Ph
 - Security definer functions prevent privilege escalation
 - See `/db/hrm/rls_policies.sql` for complete policy definitions
 
-## Next Steps (Phase 7B+)
+## Next Steps (Phase 7C+)
 
-- Wire `SupabaseAuthProvider` into `AppProvidersWrapper`
-- Migrate sign-in flow to `supabase.auth.signInWithPassword()`
-- Replace placeholder UUIDs with real `auth.users` IDs
-- Remove fake-backend
+- Phase 7C: Delete `fake-backend.ts` file and unused legacy auth code
+- Phase 7D: Create test users in Supabase, replace placeholder UUIDs

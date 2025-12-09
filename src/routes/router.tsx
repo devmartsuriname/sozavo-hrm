@@ -2,10 +2,24 @@ import { Navigate, Route, Routes, type RouteProps } from 'react-router-dom'
 import AdminLayout from '@/layouts/AdminLayout'
 import AuthLayout from '@/layouts/AuthLayout'
 import { appRoutes, authRoutes } from '@/routes/index'
-import { useAuthContext } from '@/context/useAuthContext'
+import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
 
 const AppRouter = (props: RouteProps) => {
-  const { isAuthenticated } = useAuthContext()
+  const { status, user, isLoading } = useSupabaseAuth()
+
+  // Show loading state while checking authentication
+  if (isLoading || status === 'checking' || status === 'idle') {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    )
+  }
+
+  const isAuthenticated = status === 'authenticated' && user !== null
+
   return (
     <Routes>
       {(authRoutes || []).map((route, idx) => (

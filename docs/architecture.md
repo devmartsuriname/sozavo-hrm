@@ -28,7 +28,7 @@ The SoZaVo HRM system is a React-based admin application built on:
 
 ## Authentication Architecture
 
-### Phase 7A: Scaffolded Components (NOT WIRED YET)
+### Phase 7B: Fully Integrated
 
 ```
 src/
@@ -37,7 +37,7 @@ src/
 ├── services/
 │   └── roleService.ts        # Role fetching service
 └── context/
-    └── SupabaseAuthContext.tsx  # Auth provider (scaffolded)
+    └── SupabaseAuthContext.tsx  # Auth provider (ACTIVE)
 ```
 
 #### Key Design Decisions
@@ -59,17 +59,48 @@ src/
    - Avoids tight coupling with Supabase SDK
    - Contains only fields needed by the app
 
-### Legacy Auth (Still Active)
+### Auth Flow Integration (Phase 7B Complete)
+
+```
+User Login Flow:
+┌──────────────┐    ┌─────────────────┐    ┌──────────────────────┐
+│  SignIn Form │───▶│  useSignIn.ts   │───▶│ supabase.auth.signIn │
+└──────────────┘    └─────────────────┘    └──────────────────────┘
+                                                      │
+                                                      ▼
+┌──────────────┐    ┌─────────────────┐    ┌──────────────────────┐
+│  router.tsx  │◀───│ SupabaseAuth    │◀───│ onAuthStateChange    │
+│ (protected)  │    │ Provider        │    │ listener             │
+└──────────────┘    └─────────────────┘    └──────────────────────┘
+                           │
+                           ▼
+                    ┌─────────────────┐
+                    │ fetchUserRoles  │
+                    │ (RLS-protected) │
+                    └─────────────────┘
+```
+
+### Wired Components
+
+| Component | File | Auth Integration |
+|-----------|------|------------------|
+| App Entry | `src/App.tsx` | Fake-backend REMOVED |
+| Providers | `AppProvidersWrapper.tsx` | Uses `SupabaseAuthProvider` |
+| Sign In | `useSignIn.ts` | Uses `supabase.auth.signInWithPassword` |
+| Router | `router.tsx` | Uses `useSupabaseAuth()` for protection |
+| Logout | `ProfileDropdown.tsx` | Uses `signOut()` from context |
+
+### Legacy Auth (REMOVED)
 
 ```
 src/
 ├── context/
-│   └── useAuthContext.tsx    # Darkone cookie-based auth
+│   └── useAuthContext.tsx    # Darkone cookie-based auth (NOT USED)
 └── helpers/
-    └── fake-backend.ts       # Mock API responses
+    └── fake-backend.ts       # Mock API responses (NOT IMPORTED)
 ```
 
-This will be removed in Phase 7B after migration.
+These files will be deleted in Phase 7C.
 
 ## Role-Based Access Control
 
@@ -131,6 +162,6 @@ docs/
 | Phase | Status | Description |
 |-------|--------|-------------|
 | 7A | ✅ Complete | Auth infrastructure scaffolded |
-| 7B | Pending | Wire auth provider, migrate sign-in |
-| 7C | Pending | Remove fake-backend |
+| 7B | ✅ Complete | Wired auth provider, migrated sign-in |
+| 7C | Pending | Delete fake-backend file |
 | 7D | Pending | Create test users, replace placeholders |
