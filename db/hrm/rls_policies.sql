@@ -4,15 +4,15 @@
 -- Purpose: Define granular access control for all HRM tables.
 -- Run Order: 4 (after functions.sql)
 -- Dependencies: enums.sql, schema.sql, functions.sql must be run first
--- Status: PHASE 1 STEP 5A - SELECT policies ACTIVE for all 4 core tables
+-- Status: PHASE 1 STEP 5B - WRITE policies ACTIVE for org_units, positions
 -- =============================================================================
 
 -- =============================================================================
--- STEP 5A ACTIVATION STATUS:
+-- STEP 5B ACTIVATION STATUS:
 -- ✅ user_roles: RLS ENABLED, SELECT policies ACTIVE
 -- ✅ hrm_employees: RLS ENABLED, SELECT policies ACTIVE
--- ✅ hrm_organization_units: RLS ENABLED, SELECT policies ACTIVE
--- ✅ hrm_positions: RLS ENABLED, SELECT policies ACTIVE
+-- ✅ hrm_organization_units: RLS ENABLED, SELECT + INSERT/UPDATE/DELETE ACTIVE
+-- ✅ hrm_positions: RLS ENABLED, SELECT + INSERT/UPDATE/DELETE ACTIVE
 -- =============================================================================
 
 -- =============================================================================
@@ -59,14 +59,14 @@ CREATE POLICY "user_roles_select_own"
     USING (user_id = auth.uid());
 
 -- -----------------------------------------------------------------------------
--- INSERT Policies for user_roles (DEFERRED - Step 5B+)
+-- INSERT Policies for user_roles (DEFERRED - Step 5C+)
 -- -----------------------------------------------------------------------------
 
 -- Policy: user_roles_insert_admin
 -- Description: Only admins can assign roles
 -- Role: admin
 -- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "user_roles_insert_admin"
 --     ON public.user_roles
 --     FOR INSERT
@@ -74,14 +74,14 @@ CREATE POLICY "user_roles_select_own"
 --     WITH CHECK (public.user_is_admin(auth.uid()));
 
 -- -----------------------------------------------------------------------------
--- UPDATE Policies for user_roles (DEFERRED - Step 5B+)
+-- UPDATE Policies for user_roles (DEFERRED - Step 5C+)
 -- -----------------------------------------------------------------------------
 
 -- Policy: user_roles_update_admin
 -- Description: Only admins can modify role assignments
 -- Role: admin
 -- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "user_roles_update_admin"
 --     ON public.user_roles
 --     FOR UPDATE
@@ -90,14 +90,14 @@ CREATE POLICY "user_roles_select_own"
 --     WITH CHECK (public.user_is_admin(auth.uid()));
 
 -- -----------------------------------------------------------------------------
--- DELETE Policies for user_roles (DEFERRED - Step 5B+)
+-- DELETE Policies for user_roles (DEFERRED - Step 5C+)
 -- -----------------------------------------------------------------------------
 
 -- Policy: user_roles_delete_admin
 -- Description: Only admins can remove role assignments
 -- Role: admin
 -- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "user_roles_delete_admin"
 --     ON public.user_roles
 --     FOR DELETE
@@ -111,7 +111,7 @@ CREATE POLICY "user_roles_select_own"
 -- Description: Stores organizational hierarchy (departments, divisions).
 -- Sensitivity: MEDIUM - Organizational structure is restricted.
 -- Security Model: Admin/HR full access, managers/employees no access.
--- Status: RLS ENABLED, SELECT policies ACTIVE (Step 5A)
+-- Status: RLS ENABLED, SELECT + INSERT/UPDATE/DELETE policies ACTIVE (Step 5B)
 -- =============================================================================
 
 -- STEP 5A: ENABLE RLS
@@ -160,73 +160,135 @@ CREATE POLICY "org_units_select_employee"
     USING (FALSE);
 
 -- -----------------------------------------------------------------------------
--- INSERT Policies for hrm_organization_units (DEFERRED - Step 5B+)
+-- INSERT Policies for hrm_organization_units (ACTIVE - Step 5B)
 -- -----------------------------------------------------------------------------
 
--- Policy: hrm_organization_units_insert_admin
--- Description: Only admins can create organization units
+-- Policy: org_units_insert_admin
+-- Description: Admins can create organization units
 -- Role: admin
--- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_organization_units_insert_admin"
---     ON public.hrm_organization_units
---     FOR INSERT
---     TO authenticated
---     WITH CHECK (public.user_is_admin(auth.uid()));
+CREATE POLICY "org_units_insert_admin"
+    ON public.hrm_organization_units
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (public.user_is_admin(auth.uid()));
 
--- Policy: hrm_organization_units_insert_hr_manager
+-- Policy: org_units_insert_hr
 -- Description: HR managers can create organization units
 -- Role: hr_manager
--- Rule: user_is_hr_manager(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_organization_units_insert_hr_manager"
---     ON public.hrm_organization_units
---     FOR INSERT
---     TO authenticated
---     WITH CHECK (public.user_is_hr_manager(auth.uid()));
+CREATE POLICY "org_units_insert_hr"
+    ON public.hrm_organization_units
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (public.user_is_hr_manager(auth.uid()));
+
+-- Policy: org_units_insert_manager
+-- Description: Managers cannot create organization units
+-- Role: manager
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_insert_manager"
+    ON public.hrm_organization_units
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (FALSE);
+
+-- Policy: org_units_insert_employee
+-- Description: Employees cannot create organization units
+-- Role: employee
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_insert_employee"
+    ON public.hrm_organization_units
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (FALSE);
 
 -- -----------------------------------------------------------------------------
--- UPDATE Policies for hrm_organization_units (DEFERRED - Step 5B+)
+-- UPDATE Policies for hrm_organization_units (ACTIVE - Step 5B)
 -- -----------------------------------------------------------------------------
 
--- Policy: hrm_organization_units_update_admin
--- Description: Only admins can modify organization units
+-- Policy: org_units_update_admin
+-- Description: Admins can modify organization units
 -- Role: admin
--- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_organization_units_update_admin"
---     ON public.hrm_organization_units
---     FOR UPDATE
---     TO authenticated
---     USING (public.user_is_admin(auth.uid()))
---     WITH CHECK (public.user_is_admin(auth.uid()));
+CREATE POLICY "org_units_update_admin"
+    ON public.hrm_organization_units
+    FOR UPDATE
+    TO authenticated
+    USING (public.user_is_admin(auth.uid()))
+    WITH CHECK (public.user_is_admin(auth.uid()));
 
--- Policy: hrm_organization_units_update_hr_manager
+-- Policy: org_units_update_hr
 -- Description: HR managers can modify organization units
 -- Role: hr_manager
--- Rule: user_is_hr_manager(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_organization_units_update_hr_manager"
---     ON public.hrm_organization_units
---     FOR UPDATE
---     TO authenticated
---     USING (public.user_is_hr_manager(auth.uid()))
---     WITH CHECK (public.user_is_hr_manager(auth.uid()));
+CREATE POLICY "org_units_update_hr"
+    ON public.hrm_organization_units
+    FOR UPDATE
+    TO authenticated
+    USING (public.user_is_hr_manager(auth.uid()))
+    WITH CHECK (public.user_is_hr_manager(auth.uid()));
+
+-- Policy: org_units_update_manager
+-- Description: Managers cannot modify organization units
+-- Role: manager
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_update_manager"
+    ON public.hrm_organization_units
+    FOR UPDATE
+    TO authenticated
+    USING (FALSE)
+    WITH CHECK (FALSE);
+
+-- Policy: org_units_update_employee
+-- Description: Employees cannot modify organization units
+-- Role: employee
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_update_employee"
+    ON public.hrm_organization_units
+    FOR UPDATE
+    TO authenticated
+    USING (FALSE)
+    WITH CHECK (FALSE);
 
 -- -----------------------------------------------------------------------------
--- DELETE Policies for hrm_organization_units (DEFERRED - Step 5B+)
+-- DELETE Policies for hrm_organization_units (ACTIVE - Step 5B)
 -- -----------------------------------------------------------------------------
 
--- Policy: hrm_organization_units_delete_admin
+-- Policy: org_units_delete_admin
 -- Description: Only admins can delete organization units
 -- Role: admin
--- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_organization_units_delete_admin"
---     ON public.hrm_organization_units
---     FOR DELETE
---     TO authenticated
---     USING (public.user_is_admin(auth.uid()));
+CREATE POLICY "org_units_delete_admin"
+    ON public.hrm_organization_units
+    FOR DELETE
+    TO authenticated
+    USING (public.user_is_admin(auth.uid()));
+
+-- Policy: org_units_delete_hr
+-- Description: HR managers cannot delete organization units
+-- Role: hr_manager
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_delete_hr"
+    ON public.hrm_organization_units
+    FOR DELETE
+    TO authenticated
+    USING (FALSE);
+
+-- Policy: org_units_delete_manager
+-- Description: Managers cannot delete organization units
+-- Role: manager
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_delete_manager"
+    ON public.hrm_organization_units
+    FOR DELETE
+    TO authenticated
+    USING (FALSE);
+
+-- Policy: org_units_delete_employee
+-- Description: Employees cannot delete organization units
+-- Role: employee
+-- Rule: FALSE (no access)
+CREATE POLICY "org_units_delete_employee"
+    ON public.hrm_organization_units
+    FOR DELETE
+    TO authenticated
+    USING (FALSE);
 
 
 -- =============================================================================
@@ -235,7 +297,7 @@ CREATE POLICY "org_units_select_employee"
 -- Description: Stores job positions and titles.
 -- Sensitivity: MEDIUM - Position information is restricted.
 -- Security Model: Admin/HR full access, managers/employees no access.
--- Status: RLS ENABLED, SELECT policies ACTIVE (Step 5A)
+-- Status: RLS ENABLED, SELECT + INSERT/UPDATE/DELETE policies ACTIVE (Step 5B)
 -- =============================================================================
 
 -- STEP 5A: ENABLE RLS
@@ -284,73 +346,135 @@ CREATE POLICY "positions_select_employee"
     USING (FALSE);
 
 -- -----------------------------------------------------------------------------
--- INSERT Policies for hrm_positions (DEFERRED - Step 5B+)
+-- INSERT Policies for hrm_positions (ACTIVE - Step 5B)
 -- -----------------------------------------------------------------------------
 
--- Policy: hrm_positions_insert_admin
--- Description: Only admins can create positions
+-- Policy: positions_insert_admin
+-- Description: Admins can create positions
 -- Role: admin
--- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_positions_insert_admin"
---     ON public.hrm_positions
---     FOR INSERT
---     TO authenticated
---     WITH CHECK (public.user_is_admin(auth.uid()));
+CREATE POLICY "positions_insert_admin"
+    ON public.hrm_positions
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (public.user_is_admin(auth.uid()));
 
--- Policy: hrm_positions_insert_hr_manager
+-- Policy: positions_insert_hr
 -- Description: HR managers can create positions
 -- Role: hr_manager
--- Rule: user_is_hr_manager(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_positions_insert_hr_manager"
---     ON public.hrm_positions
---     FOR INSERT
---     TO authenticated
---     WITH CHECK (public.user_is_hr_manager(auth.uid()));
+CREATE POLICY "positions_insert_hr"
+    ON public.hrm_positions
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (public.user_is_hr_manager(auth.uid()));
+
+-- Policy: positions_insert_manager
+-- Description: Managers cannot create positions
+-- Role: manager
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_insert_manager"
+    ON public.hrm_positions
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (FALSE);
+
+-- Policy: positions_insert_employee
+-- Description: Employees cannot create positions
+-- Role: employee
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_insert_employee"
+    ON public.hrm_positions
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (FALSE);
 
 -- -----------------------------------------------------------------------------
--- UPDATE Policies for hrm_positions (DEFERRED - Step 5B+)
+-- UPDATE Policies for hrm_positions (ACTIVE - Step 5B)
 -- -----------------------------------------------------------------------------
 
--- Policy: hrm_positions_update_admin
--- Description: Only admins can modify positions
+-- Policy: positions_update_admin
+-- Description: Admins can modify positions
 -- Role: admin
--- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_positions_update_admin"
---     ON public.hrm_positions
---     FOR UPDATE
---     TO authenticated
---     USING (public.user_is_admin(auth.uid()))
---     WITH CHECK (public.user_is_admin(auth.uid()));
+CREATE POLICY "positions_update_admin"
+    ON public.hrm_positions
+    FOR UPDATE
+    TO authenticated
+    USING (public.user_is_admin(auth.uid()))
+    WITH CHECK (public.user_is_admin(auth.uid()));
 
--- Policy: hrm_positions_update_hr_manager
+-- Policy: positions_update_hr
 -- Description: HR managers can modify positions
 -- Role: hr_manager
--- Rule: user_is_hr_manager(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_positions_update_hr_manager"
---     ON public.hrm_positions
---     FOR UPDATE
---     TO authenticated
---     USING (public.user_is_hr_manager(auth.uid()))
---     WITH CHECK (public.user_is_hr_manager(auth.uid()));
+CREATE POLICY "positions_update_hr"
+    ON public.hrm_positions
+    FOR UPDATE
+    TO authenticated
+    USING (public.user_is_hr_manager(auth.uid()))
+    WITH CHECK (public.user_is_hr_manager(auth.uid()));
+
+-- Policy: positions_update_manager
+-- Description: Managers cannot modify positions
+-- Role: manager
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_update_manager"
+    ON public.hrm_positions
+    FOR UPDATE
+    TO authenticated
+    USING (FALSE)
+    WITH CHECK (FALSE);
+
+-- Policy: positions_update_employee
+-- Description: Employees cannot modify positions
+-- Role: employee
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_update_employee"
+    ON public.hrm_positions
+    FOR UPDATE
+    TO authenticated
+    USING (FALSE)
+    WITH CHECK (FALSE);
 
 -- -----------------------------------------------------------------------------
--- DELETE Policies for hrm_positions (DEFERRED - Step 5B+)
+-- DELETE Policies for hrm_positions (ACTIVE - Step 5B)
 -- -----------------------------------------------------------------------------
 
--- Policy: hrm_positions_delete_admin
+-- Policy: positions_delete_admin
 -- Description: Only admins can delete positions
 -- Role: admin
--- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
--- CREATE POLICY "hrm_positions_delete_admin"
---     ON public.hrm_positions
---     FOR DELETE
---     TO authenticated
---     USING (public.user_is_admin(auth.uid()));
+CREATE POLICY "positions_delete_admin"
+    ON public.hrm_positions
+    FOR DELETE
+    TO authenticated
+    USING (public.user_is_admin(auth.uid()));
+
+-- Policy: positions_delete_hr
+-- Description: HR managers cannot delete positions
+-- Role: hr_manager
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_delete_hr"
+    ON public.hrm_positions
+    FOR DELETE
+    TO authenticated
+    USING (FALSE);
+
+-- Policy: positions_delete_manager
+-- Description: Managers cannot delete positions
+-- Role: manager
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_delete_manager"
+    ON public.hrm_positions
+    FOR DELETE
+    TO authenticated
+    USING (FALSE);
+
+-- Policy: positions_delete_employee
+-- Description: Employees cannot delete positions
+-- Role: employee
+-- Rule: FALSE (no access)
+CREATE POLICY "positions_delete_employee"
+    ON public.hrm_positions
+    FOR DELETE
+    TO authenticated
+    USING (FALSE);
 
 
 -- =============================================================================
@@ -408,18 +532,18 @@ CREATE POLICY "hrm_employees_select_own"
 -- -----------------------------------------------------------------------------
 -- NOTE: hrm_employees_select_same_org_unit policy DEFERRED
 -- This policy allows employees to see colleagues in same org unit.
--- Requires careful consideration of PII exposure - moved to Step 5B+
+-- Requires careful consideration of PII exposure - moved to Step 5C+
 -- -----------------------------------------------------------------------------
 
 -- -----------------------------------------------------------------------------
--- INSERT Policies for hrm_employees (DEFERRED - Step 5B+)
+-- INSERT Policies for hrm_employees (DEFERRED - Step 5C+)
 -- -----------------------------------------------------------------------------
 
 -- Policy: hrm_employees_insert_admin
 -- Description: Only admins can create employee records
 -- Role: admin
 -- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "hrm_employees_insert_admin"
 --     ON public.hrm_employees
 --     FOR INSERT
@@ -430,7 +554,7 @@ CREATE POLICY "hrm_employees_select_own"
 -- Description: HR managers can create employee records
 -- Role: hr_manager
 -- Rule: user_is_hr_manager(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "hrm_employees_insert_hr_manager"
 --     ON public.hrm_employees
 --     FOR INSERT
@@ -438,14 +562,14 @@ CREATE POLICY "hrm_employees_select_own"
 --     WITH CHECK (public.user_is_hr_manager(auth.uid()));
 
 -- -----------------------------------------------------------------------------
--- UPDATE Policies for hrm_employees (DEFERRED - Step 5B+)
+-- UPDATE Policies for hrm_employees (DEFERRED - Step 5C+)
 -- -----------------------------------------------------------------------------
 
 -- Policy: hrm_employees_update_admin
 -- Description: Admins can update all employee records
 -- Role: admin
 -- Rule: user_is_admin(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "hrm_employees_update_admin"
 --     ON public.hrm_employees
 --     FOR UPDATE
@@ -457,7 +581,7 @@ CREATE POLICY "hrm_employees_select_own"
 -- Description: HR managers can update all employee records
 -- Role: hr_manager
 -- Rule: user_is_hr_manager(auth.uid()) = TRUE
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "hrm_employees_update_hr_manager"
 --     ON public.hrm_employees
 --     FOR UPDATE
@@ -470,7 +594,7 @@ CREATE POLICY "hrm_employees_select_own"
 -- Role: employee (own record)
 -- Rule: user_id = auth.uid()
 -- Note: Column restrictions enforced in application layer (phone, email, etc.)
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "hrm_employees_update_own"
 --     ON public.hrm_employees
 --     FOR UPDATE
@@ -479,7 +603,7 @@ CREATE POLICY "hrm_employees_select_own"
 --     WITH CHECK (user_id = auth.uid());
 
 -- -----------------------------------------------------------------------------
--- DELETE Policies for hrm_employees (DEFERRED - Step 5B+)
+-- DELETE Policies for hrm_employees (DEFERRED - Step 5C+)
 -- -----------------------------------------------------------------------------
 
 -- Policy: hrm_employees_delete_admin
@@ -487,7 +611,7 @@ CREATE POLICY "hrm_employees_select_own"
 -- Role: admin
 -- Rule: user_is_admin(auth.uid()) = TRUE
 -- Note: Soft delete preferred in practice (set employment_status to 'terminated')
--- SQL (Step 5B):
+-- SQL (Step 5C):
 -- CREATE POLICY "hrm_employees_delete_admin"
 --     ON public.hrm_employees
 --     FOR DELETE
