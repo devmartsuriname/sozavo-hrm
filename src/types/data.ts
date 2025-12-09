@@ -100,6 +100,8 @@ export type PropertyType = {
 export type CustomerType = {
   id: IdType
   propertyType: string
+  // userId: UserType['id']
+  // user?: UserType
   interestedProperties: string
   customerStatus: 'Interested' | 'Under Review' | 'Follow-up'
   date: Date
@@ -112,6 +114,8 @@ export type CustomerType = {
 export type CustomerReviewsType = {
   id: IdType
   rating: number
+  // userId: UserType['id']
+  // user?: UserType
   propertyId: PropertyType['id']
   property?: PropertyType
   review: {
@@ -121,6 +125,22 @@ export type CustomerReviewsType = {
   reviewStatus: 'Published' | 'Pending'
   date: Date
 }
+
+// export type SocialUserType = {
+//   id: IdType
+//   avatar: StaticImageData
+//   name: string
+//   activityStatus: 'typing' | 'online' | 'offline'
+//   email: string
+//   phone: string
+//   languages: string[]
+//   location: string
+//   mutualCount: number
+//   hasRequested?: boolean
+//   message?: string
+//   time: Date
+//   status?: string
+// }
 
 export type FileType = Partial<File> & {
   preview?: string
