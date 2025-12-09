@@ -19,9 +19,9 @@ See `/db/hrm/` for version-controlled SQL files:
 
 ## Authentication Architecture
 
-### Current State (Phase 7B - Integrated)
+### Current State (Phase 7C - Cleanup Complete)
 
-The Supabase auth infrastructure is now **fully wired into the runtime**:
+The Supabase auth infrastructure is now **fully wired into the runtime** and legacy code has been removed:
 
 #### 1. Type Definitions (`src/types/supabase-auth.ts`)
 - `AppRole` - Mirrors `public.app_role` enum ('admin' | 'hr_manager' | 'manager' | 'employee')
@@ -46,12 +46,18 @@ The Supabase auth infrastructure is now **fully wired into the runtime**:
 4. **Logout**: `signOut()` method clears session and resets state
 5. **Role Loading**: Roles fetched from `public.user_roles` after authentication
 
-### Legacy Auth (REMOVED in Phase 7B)
+### Legacy Auth (REMOVED in Phase 7C)
 
-The Darkone fake-backend has been fully removed:
-- ~~`src/helpers/fake-backend.ts`~~ - No longer imported or used
+The Darkone fake-backend has been **completely deleted** from the codebase:
+- ~~`src/helpers/fake-backend.ts`~~ - **Deleted** (file no longer exists)
 - ~~Cookie-based session management~~ - Replaced by Supabase sessions
 - ~~Hardcoded demo users~~ - Only real Supabase users work
+- `src/types/auth.ts` - Marked as LEGACY (kept for reference only)
+
+Authentication is now handled **exclusively** via:
+- Supabase Auth (`supabase.auth.signInWithPassword()`, `supabase.auth.signOut()`)
+- SupabaseAuthContext for React state management
+- RLS policies using `auth.uid()` for database access control
 
 ## Role-Based Access Control
 
@@ -66,7 +72,6 @@ The Darkone fake-backend has been fully removed:
 - Security definer functions prevent privilege escalation
 - See `/db/hrm/rls_policies.sql` for complete policy definitions
 
-## Next Steps (Phase 7C+)
+## Next Steps (Phase 7D)
 
-- Phase 7C: Delete `fake-backend.ts` file and unused legacy auth code
-- Phase 7D: Create test users in Supabase, replace placeholder UUIDs
+- Phase 7D: Create test users in Supabase, replace placeholder UUIDs in seed files

@@ -90,17 +90,19 @@ User Login Flow:
 | Router | `router.tsx` | Uses `useSupabaseAuth()` for protection |
 | Logout | `ProfileDropdown.tsx` | Uses `signOut()` from context |
 
-### Legacy Auth (REMOVED)
+### Legacy Auth (DELETED in Phase 7C)
 
 ```
 src/
 ├── context/
 │   └── useAuthContext.tsx    # Darkone cookie-based auth (NOT USED)
+├── types/
+│   └── auth.ts               # Legacy types (marked LEGACY, kept for reference)
 └── helpers/
-    └── fake-backend.ts       # Mock API responses (NOT IMPORTED)
+    └── fake-backend.ts       # DELETED in Phase 7C
 ```
 
-These files will be deleted in Phase 7C.
+The fake-backend file has been completely removed. Only Supabase Auth is operational.
 
 ## Role-Based Access Control
 
@@ -163,5 +165,5 @@ docs/
 |-------|--------|-------------|
 | 7A | ✅ Complete | Auth infrastructure scaffolded |
 | 7B | ✅ Complete | Wired auth provider, migrated sign-in |
-| 7C | Pending | Delete fake-backend file |
+| 7C | ✅ Complete | Deleted fake-backend file, marked legacy types |
 | 7D | Pending | Create test users, replace placeholders |
