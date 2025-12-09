@@ -1,0 +1,62 @@
+//
+// HRM Override Layer
+// ===================
+// This file contains minimal style overrides for HRM-specific adjustments.
+// It is imported AFTER the Darkone style.scss to ensure overrides take effect.
+//
+// RULES:
+// 1. Only add overrides when absolutely necessary
+// 2. Document every override with a comment explaining WHY
+// 3. Use specific selectors to avoid affecting unrelated components
+// 4. Prefer minimal changes over broad overrides
+//
+
+// =============================================================================
+// FIX: Page Content Bottom Spacing
+// =============================================================================
+// ISSUE: The .page-content has min-height: calc(100vh - $topbar-height) and
+//        padding-bottom: $footer-height which creates excessive empty space
+//        at the bottom of pages when content is shorter than viewport.
+//
+// SOLUTION: Override min-height to use auto for content-based height,
+//           and reduce bottom padding while keeping footer visible.
+//
+// AFFECTED: All admin pages (dashboards, base-ui, forms, tables, etc.)
+// TESTED: Verified on /dashboards, /base-ui/buttons, /forms/basic, /tables/basic
+// =============================================================================
+
+.page-content {
+  // Remove fixed min-height that forces full viewport height
+  // This allows the page to size based on actual content
+  min-height: auto !important;
+  
+  // Reduce excessive bottom padding while maintaining footer space
+  // Original: $footer-height (usually 60-80px)
+  // Override: 1.5rem (24px) - enough for visual breathing room
+  padding-bottom: 1.5rem !important;
+}
+
+// =============================================================================
+// Ensure footer stays at the bottom visually
+// The footer is already positioned at the bottom of .page-content
+// This ensures proper spacing above footer content
+// =============================================================================
+
+.footer {
+  // Ensure footer has proper top margin for separation from content
+  margin-top: 1rem;
+}
+
+// =============================================================================
+// HRM Module Namespace
+// =============================================================================
+// All HRM-specific styles should be scoped under .hrm-* classes
+// to prevent conflicts with Darkone template styles.
+//
+// Example:
+// .hrm-employee-card { ... }
+// .hrm-attendance-grid { ... }
+// =============================================================================
+
+// Placeholder for future HRM component styles
+// Add HRM-specific overrides below this line as needed
