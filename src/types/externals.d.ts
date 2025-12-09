@@ -147,9 +147,13 @@ declare module 'react-bootstrap' {
   export const Breadcrumb: ComponentType<any> & { Item: ComponentType<any> }
   export const Collapse: ComponentType<any>
   export const Accordion: ComponentType<any> & { Item: ComponentType<any>; Header: ComponentType<any>; Body: ComponentType<any> }
+  export const AccordionItem: ComponentType<any>
+  export const AccordionHeader: ComponentType<any>
+  export const AccordionBody: ComponentType<any>
   export const Tab: ComponentType<any> & { Container: ComponentType<any>; Content: ComponentType<any>; Pane: ComponentType<any> }
   export const Tabs: ComponentType<any>
   export const ListGroup: ComponentType<any> & { Item: ComponentType<any> }
+  export const ListGroupItem: ComponentType<any>
   export const Table: ComponentType<any>
   export const Spinner: ComponentType<any>
   export const ProgressBar: ComponentType<any>
@@ -157,12 +161,20 @@ declare module 'react-bootstrap' {
   export const Tooltip: ComponentType<any>
   export const OverlayTrigger: ComponentType<any>
   export const Popover: ComponentType<any> & { Header: ComponentType<any>; Body: ComponentType<any> }
+  export const PopoverHeader: ComponentType<any>
+  export const PopoverBody: ComponentType<any>
   export const Carousel: ComponentType<any> & { Item: ComponentType<any>; Caption: ComponentType<any> }
+  export const CarouselItem: ComponentType<any>
   export const InputGroup: ComponentType<any> & { Text: ComponentType<any> }
   export const Image: ComponentType<any>
   export const Figure: ComponentType<any>
   export const Navbar: ComponentType<any> & { Brand: ComponentType<any>; Toggle: ComponentType<any>; Collapse: ComponentType<any> }
   export const CloseButton: ComponentType<any>
+  export const ButtonGroup: ComponentType<any>
+  export const ModalHeader: ComponentType<any>
+  export const ModalBody: ComponentType<any>
+  export const ModalFooter: ComponentType<any>
+  export const ModalTitle: ComponentType<any>
   export const Stack: ComponentType<any>
   export const Placeholder: ComponentType<any>
   export const Ratio: ComponentType<any>
@@ -574,4 +586,58 @@ declare module 'preline/preline' {
     autoInit(): void
     [key: string]: any
   }
+}
+
+// ApexCharts
+declare module 'apexcharts' {
+  export interface ApexOptions {
+    chart?: any
+    series?: any[]
+    xaxis?: any
+    yaxis?: any
+    colors?: string[]
+    stroke?: any
+    fill?: any
+    legend?: any
+    dataLabels?: any
+    tooltip?: any
+    grid?: any
+    plotOptions?: any
+    labels?: string[]
+    responsive?: any[]
+    theme?: any
+    title?: any
+    subtitle?: any
+    annotations?: any
+    markers?: any
+    noData?: any
+    states?: any
+    [key: string]: any
+  }
+  class ApexCharts {
+    constructor(el: HTMLElement, options: ApexOptions)
+    render(): Promise<void>
+    updateSeries(series: any[], animate?: boolean): void
+    updateOptions(options: ApexOptions, redrawPaths?: boolean, animate?: boolean): void
+    destroy(): void
+    [key: string]: any
+  }
+  export default ApexCharts
+}
+
+declare module 'react-apexcharts' {
+  import { ComponentType } from 'react'
+  import { ApexOptions } from 'apexcharts'
+  
+  export interface ApexChartProps {
+    type?: 'line' | 'area' | 'bar' | 'pie' | 'donut' | 'radialBar' | 'scatter' | 'bubble' | 'heatmap' | 'candlestick' | 'boxPlot' | 'radar' | 'polarArea' | 'rangeBar' | 'rangeArea' | 'treemap'
+    series?: any[]
+    width?: string | number
+    height?: string | number
+    options?: ApexOptions
+    [key: string]: any
+  }
+  
+  const ReactApexChart: ComponentType<ApexChartProps>
+  export default ReactApexChart
 }
