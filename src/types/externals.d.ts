@@ -10,6 +10,7 @@ declare module '@iconify/react' {
     className?: string
     style?: React.CSSProperties
     onClick?: () => void
+    [key: string]: any
   }
   export const Icon: React.FC<IconProps>
 }
@@ -53,9 +54,22 @@ declare module '@fullcalendar/interaction/index.js' {
   }
 }
 
-// React Bootstrap
+// React Bootstrap - with FormControlProps export
 declare module 'react-bootstrap' {
-  import { ComponentType, ReactNode, HTMLAttributes, FormHTMLAttributes, ButtonHTMLAttributes } from 'react'
+  import * as React from 'react'
+  import { ComponentType, ReactNode, HTMLAttributes, FormHTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes } from 'react'
+  
+  // FormControlProps - required by Darkone form components
+  export interface FormControlProps extends InputHTMLAttributes<HTMLInputElement> {
+    as?: React.ElementType
+    htmlSize?: number
+    size?: 'sm' | 'lg'
+    plaintext?: boolean
+    readOnly?: boolean
+    isValid?: boolean
+    isInvalid?: boolean
+    [key: string]: any
+  }
   
   export interface CardProps extends HTMLAttributes<HTMLDivElement> {
     children?: ReactNode
@@ -103,7 +117,7 @@ declare module 'react-bootstrap' {
     Range: ComponentType<any>
     Floating: ComponentType<any>
   }
-  export const FormControl: ComponentType<any>
+  export const FormControl: ComponentType<FormControlProps>
   export const FormGroup: ComponentType<any>
   export const FormLabel: ComponentType<any>
   export const FormCheck: ComponentType<any>
@@ -206,6 +220,7 @@ declare module 'react-flatpickr' {
     disabled?: boolean
     name?: string
     id?: string
+    [key: string]: any
   }
   const Flatpickr: ComponentType<FlatpickrProps>
   export default Flatpickr
@@ -221,17 +236,13 @@ declare module 'react-helmet-async' {
   export const HelmetProvider: ComponentType<{ children?: ReactNode }>
 }
 
-// Choices.js
+// Choices.js - with Options export and passedElement property
 declare module 'choices.js' {
-  export interface ChoicesOptions {
-    removeItemButton?: boolean
-    searchEnabled?: boolean
-    placeholder?: boolean
-    placeholderValue?: string
-    [key: string]: any
-  }
-  class Choices {
-    constructor(element: HTMLElement | string, options?: ChoicesOptions)
+  export type Options = any
+
+  export default class Choices {
+    constructor(element: HTMLElement | string, options?: Options)
+    passedElement: any
     destroy(): void
     disable(): void
     enable(): void
@@ -242,8 +253,8 @@ declare module 'choices.js' {
     clearInput(): void
     removeActiveItems(excludedId?: number): void
     removeHighlightedItems(runEvent?: boolean): void
+    [key: string]: any
   }
-  export default Choices
 }
 
 // React Dropzone
@@ -318,7 +329,7 @@ declare module 'react-toastify' {
   }
 }
 
-// Simplebar
+// Simplebar - with Props export
 declare module 'simplebar-core' {
   export interface SimpleBarOptions {
     autoHide?: boolean
@@ -340,13 +351,15 @@ declare module 'simplebar-core' {
 }
 
 declare module 'simplebar-react' {
-  import { ComponentType, HTMLAttributes, RefObject } from 'react'
-  import { SimpleBarOptions } from 'simplebar-core'
-  export interface SimpleBarReactProps extends HTMLAttributes<HTMLDivElement>, SimpleBarOptions {
-    scrollableNodeProps?: any
+  import * as React from 'react'
+
+  export interface Props {
     children?: React.ReactNode
+    scrollableNodeProps?: any
+    [key: string]: any
   }
-  const SimpleBar: ComponentType<SimpleBarReactProps>
+
+  const SimpleBar: React.FC<Props>
   export default SimpleBar
 }
 
@@ -368,64 +381,32 @@ declare module 'cookies-next' {
   export function getCookies(options?: any): Record<string, string>
 }
 
-// Yup
+// Yup - with validate method and permissive schemas
 declare module 'yup' {
-  export interface StringSchema {
-    required(message?: string): StringSchema
-    email(message?: string): StringSchema
-    min(limit: number, message?: string): StringSchema
-    max(limit: number, message?: string): StringSchema
-    matches(regex: RegExp, message?: string): StringSchema
-    oneOf(values: any[], message?: string): StringSchema
-    nullable(): StringSchema
-    optional(): StringSchema
-    label(label: string): StringSchema
+  export type AnySchema = any
+  
+  export type ObjectSchema<T extends object = any> = {
+    validate: (value: any, options?: any) => Promise<any>
+    validateSync: (value: any, options?: any) => any
+    shape: (fields: any) => ObjectSchema<T>
+    required: (message?: string) => ObjectSchema<T>
+    nullable: () => ObjectSchema<T>
+    optional: () => ObjectSchema<T>
+    [key: string]: any
   }
-  export interface NumberSchema {
-    required(message?: string): NumberSchema
-    min(limit: number, message?: string): NumberSchema
-    max(limit: number, message?: string): NumberSchema
-    positive(message?: string): NumberSchema
-    negative(message?: string): NumberSchema
-    integer(message?: string): NumberSchema
-    nullable(): NumberSchema
-    optional(): NumberSchema
-  }
-  export interface BooleanSchema {
-    required(message?: string): BooleanSchema
-    nullable(): BooleanSchema
-    optional(): BooleanSchema
-  }
-  export interface DateSchema {
-    required(message?: string): DateSchema
-    min(limit: Date | string, message?: string): DateSchema
-    max(limit: Date | string, message?: string): DateSchema
-    nullable(): DateSchema
-    optional(): DateSchema
-  }
-  export interface ArraySchema<T = any> {
-    required(message?: string): ArraySchema<T>
-    min(limit: number, message?: string): ArraySchema<T>
-    max(limit: number, message?: string): ArraySchema<T>
-    of(schema: any): ArraySchema<T>
-    nullable(): ArraySchema<T>
-    optional(): ArraySchema<T>
-  }
-  export interface ObjectSchema<T = any> {
-    shape(fields: Record<string, any>): ObjectSchema<T>
-    required(message?: string): ObjectSchema<T>
-    nullable(): ObjectSchema<T>
-    optional(): ObjectSchema<T>
-  }
-  export function string(): StringSchema
-  export function number(): NumberSchema
-  export function boolean(): BooleanSchema
-  export function date(): DateSchema
-  export function array<T = any>(): ArraySchema<T>
-  export function object<T = any>(): ObjectSchema<T>
-  export function ref(path: string): any
-  export function lazy(fn: (value: any) => any): any
-  export const mixed: () => any
+
+  export function object<T extends object = any>(shape?: any): ObjectSchema<T>
+  export function string(): AnySchema
+  export function number(): AnySchema
+  export function boolean(): AnySchema
+  export function bool(): AnySchema
+  export function date(): AnySchema
+  export function array<T = any>(): AnySchema
+  export function mixed<T = any>(): AnySchema
+
+  export const ref: (...args: any[]) => any
+  export const setLocale: (...args: any[]) => void
+  export const lazy: (fn: (value: any) => any) => any
 }
 
 // Axios
@@ -480,11 +461,19 @@ declare module 'axios' {
   export default axios
 }
 
-// Axios Mock Adapter
+// Axios Mock Adapter - with permissive constructor and reply method
 declare module 'axios-mock-adapter' {
   import { AxiosInstance, AxiosRequestConfig } from 'axios'
-  class MockAdapter {
-    constructor(axios: AxiosInstance, options?: { delayResponse?: number; onNoMatch?: string })
+
+  export interface AxiosMockAdapterOptions {
+    delayResponse?: number
+    onNoMatch?: 'passthrough' | 'throwException' | null
+    [key: string]: any
+  }
+
+  export default class MockAdapter {
+    constructor(axiosInstance: AxiosInstance, options?: AxiosMockAdapterOptions)
+
     onGet(url?: string | RegExp, body?: any): MockAdapter
     onPost(url?: string | RegExp, body?: any): MockAdapter
     onPut(url?: string | RegExp, body?: any): MockAdapter
@@ -493,8 +482,12 @@ declare module 'axios-mock-adapter' {
     onHead(url?: string | RegExp, body?: any): MockAdapter
     onOptions(url?: string | RegExp, body?: any): MockAdapter
     onAny(url?: string | RegExp, body?: any): MockAdapter
+    
+    reply(callback: (config: any) => any): MockAdapter
     reply(status: number, data?: any, headers?: Record<string, string>): MockAdapter
+    replyOnce(callback: (config: any) => any): MockAdapter
     replyOnce(status: number, data?: any, headers?: Record<string, string>): MockAdapter
+    
     passThrough(): MockAdapter
     networkError(): MockAdapter
     networkErrorOnce(): MockAdapter
@@ -504,8 +497,9 @@ declare module 'axios-mock-adapter' {
     restore(): void
     resetHistory(): void
     history: Record<string, AxiosRequestConfig[]>
+
+    [key: string]: any
   }
-  export default MockAdapter
 }
 
 // JVectorMap
@@ -548,6 +542,7 @@ declare module 'jsvectormap' {
     onMarkerSelected?: (markerIndex: number, isSelected: boolean, selectedMarkers: number[]) => void
     onRegionTooltipShow?: (event: any, tooltip: any, code: string) => void
     onMarkerTooltipShow?: (event: any, tooltip: any, markerIndex: number) => void
+    [key: string]: any
   }
   class Jsvectormap {
     constructor(options: JsvectormapOptions)
@@ -562,6 +557,7 @@ declare module 'jsvectormap' {
     destroy(): void
     extend(name: string, value: any): void
     getMap(name: string): any
+    [key: string]: any
   }
   export default Jsvectormap
 }
@@ -571,3 +567,11 @@ declare module 'jsvectormap/dist/maps/canada' {}
 declare module 'jsvectormap/dist/maps/spain' {}
 declare module 'jsvectormap/dist/maps/iraq' {}
 declare module 'jsvectormap/dist/maps/russia' {}
+
+// Preline
+declare module 'preline/preline' {
+  export interface IStaticMethods {
+    autoInit(): void
+    [key: string]: any
+  }
+}
