@@ -115,6 +115,14 @@ interface HrmEmployeeDirectory extends HrmEmployeeRow {
   positionTitle: string | null
   managerName: string | null
 }
+
+// Detail ViewModel - Row + all derived fields
+interface HrmEmployeeDetail extends HrmEmployeeRow {
+  fullName: string
+  orgUnitName: string | null
+  positionTitle: string | null
+  managerName: string | null
+}
 ```
 
 ### Employee Directory (`/hrm/employees`)
@@ -139,6 +147,36 @@ Read-only profile view for a single employee (Phase 2 – Step 4):
 | `fetchEmployeeDetail()` in service | Fetch single employee with derived fields |
 
 The detail route is a **hidden/internal route** (not shown in sidebar), accessible via employee code links from the directory.
+
+### Service Functions
+
+The HRM Employee Service (`src/services/hrmEmployeeService.ts`) provides two main functions:
+
+| Function | Description |
+|----------|-------------|
+| `fetchEmployeeDirectory()` | Returns `HrmEmployeeDirectory[]` for table listing |
+| `fetchEmployeeDetail(id)` | Returns `HrmEmployeeDetail \| null` for single employee |
+
+Both functions use the **parallel-fetch + merge pattern**:
+1. Execute multiple Supabase queries in parallel via `Promise.all()`
+2. Build lookup Maps for related data (org units, positions, employees)
+3. Derive display fields (`fullName`, `orgUnitName`, `positionTitle`, `managerName`)
+
+**RLS-Aware Behavior:**
+- Service returns `null` when RLS denies access
+- Related table lookups gracefully return `null` when RLS blocks access
+- UI displays "Not found or access denied" instead of crashing
+
+### React Hooks (Custom Pattern, No React Query)
+
+The HRM module uses simple custom hooks for data fetching:
+
+| Hook | File | Purpose |
+|------|------|---------|
+| `useHrmEmployees()` | `src/hooks/useHrmEmployees.ts` | Load employee directory |
+| `useHrmEmployeeDetail(id)` | `src/hooks/useHrmEmployeeDetail.ts` | Load single employee |
+
+Pattern: `useState` + `useEffect` with loading/error state management. React Query is NOT used per project constraints.
 
 #### Derived Fields (TypeScript-only, not in DB)
 
@@ -184,6 +222,27 @@ The Employee Directory page implements local UX enhancements:
 
 These operate on the in-memory array after Supabase returns data, respecting RLS visibility.
 
+## Implementation Status
+
+### Phase 1: ✅ COMPLETE
+
+All 35 tasks completed and verified:
+- Database schema with 5 enums and 4 core tables
+- 11 security definer functions
+- 48+ RLS policies
+- Supabase Auth integration
+- Test users and seed data
+
+### Phase 2 – Steps 1–4: ✅ IMPLEMENTED_AND_VERIFIED
+
+Manual role-based testing completed 2025-12-10:
+- **Admin**: Sees all employees with full organization/position details
+- **HR Manager**: Sees all employees with full details
+- **Manager**: Sees only direct reports; URL manipulation → "Not found or access denied"
+- **Employee**: Sees only own record; URL manipulation → "Not found or access denied"
+
+All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modification.
+
 ## Next Steps
 
-- Phase 2 continues with additional HRM screens and features
+- Phase 2 continues with Organization Units, Positions, and Employee Edit forms

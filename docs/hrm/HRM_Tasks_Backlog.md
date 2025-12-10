@@ -1,6 +1,6 @@
 # SoZaVo HRM System — Tasks Backlog
 
-> **Version:** 1.0  
+> **Version:** 1.1  
 > **Last Updated:** 2025-12-10  
 > **Status:** Active Planning Document
 
@@ -83,53 +83,53 @@ P{phase}-{category}-{number}
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
-| P1-DB-001 | DB | Enable Lovable Cloud | Activate Supabase backend integration | ⏳ | P0 |
-| P1-DB-002 | DB | Create app_role Enum | Define roles: admin, hr_manager, manager, employee | ⏳ | P0 |
-| P1-DB-003 | DB | Create employment_status Enum | Define: active, inactive, on_leave, terminated | ⏳ | P1 |
-| P1-DB-004 | DB | Create leave_status Enum | Define: pending, approved, rejected, cancelled | ⏳ | P1 |
-| P1-DB-005 | DB | Create attendance_status Enum | Define: present, absent, late, half_day, on_leave | ⏳ | P1 |
-| P1-DB-006 | DB | Create document_type Enum | Define: contract, id_document, certificate, other | ⏳ | P2 |
-| P1-DB-007 | DB | Create user_roles Table | RBAC table with user_id + role (CRITICAL for security) | ⏳ | P0 |
-| P1-DB-008 | DB | Create hrm_organization_units Table | Org hierarchy with parent_id self-reference | ⏳ | P1 |
-| P1-DB-009 | DB | Create hrm_positions Table | Job positions with org_unit_id FK | ⏳ | P1 |
-| P1-DB-010 | DB | Create hrm_employees Table | Core employee data with position_id, user_id FKs | ⏳ | P1 |
-| P1-DB-011 | DB | Create hrm_leave_types Table | Leave type definitions (annual, sick, etc.) | ⏳ | P2 |
-| P1-DB-012 | DB | Create hrm_leave_requests Table | Employee leave requests with approval workflow | ⏳ | P2 |
-| P1-DB-013 | DB | Create hrm_attendance_records Table | Daily attendance tracking | ⏳ | P2 |
-| P1-DB-014 | DB | Create hrm_documents Table | Document metadata with storage references | ⏳ | P2 |
-| P1-DB-015 | DB | Create hrm_audit_logs Table | System-wide audit trail | ⏳ | P2 |
-| P1-DB-016 | DB | Create Database Indexes | Add indexes for common query patterns | ⏳ | P2 |
+| P1-DB-001 | DB | Enable Lovable Cloud | Activate Supabase backend integration | ✅ | P0 |
+| P1-DB-002 | DB | Create app_role Enum | Define roles: admin, hr_manager, manager, employee | ✅ | P0 |
+| P1-DB-003 | DB | Create employment_status Enum | Define: active, inactive, on_leave, terminated | ✅ | P1 |
+| P1-DB-004 | DB | Create leave_status Enum | Define: pending, approved, rejected, cancelled | ✅ | P1 |
+| P1-DB-005 | DB | Create attendance_status Enum | Define: present, absent, late, half_day, on_leave | ✅ | P1 |
+| P1-DB-006 | DB | Create document_type Enum | Define: contract, id_document, certificate, other | ✅ | P2 |
+| P1-DB-007 | DB | Create user_roles Table | RBAC table with user_id + role (CRITICAL for security) | ✅ | P0 |
+| P1-DB-008 | DB | Create hrm_organization_units Table | Org hierarchy with parent_id self-reference | ✅ | P1 |
+| P1-DB-009 | DB | Create hrm_positions Table | Job positions with org_unit_id FK | ✅ | P1 |
+| P1-DB-010 | DB | Create hrm_employees Table | Core employee data with position_id, user_id FKs | ✅ | P1 |
+| P1-DB-011 | DB | Create hrm_leave_types Table | Leave type definitions (annual, sick, etc.) | ✅ | P2 |
+| P1-DB-012 | DB | Create hrm_leave_requests Table | Employee leave requests with approval workflow | ✅ | P2 |
+| P1-DB-013 | DB | Create hrm_attendance_records Table | Daily attendance tracking | ✅ | P2 |
+| P1-DB-014 | DB | Create hrm_documents Table | Document metadata with storage references | ✅ | P2 |
+| P1-DB-015 | DB | Create hrm_audit_logs Table | System-wide audit trail | ✅ | P2 |
+| P1-DB-016 | DB | Create Database Indexes | Add indexes for common query patterns | ✅ | P2 |
 
 ### RLS & Security Tasks
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
-| P1-RLS-001 | RLS | Create has_role() Function | Security definer function to check user roles | ⏳ | P0 |
-| P1-RLS-002 | RLS | Create get_user_org_unit() Function | Get user's organization unit for team-based access | ⏳ | P1 |
-| P1-RLS-003 | RLS | Enable RLS on All Tables | ALTER TABLE ... ENABLE ROW LEVEL SECURITY | ⏳ | P0 |
-| P1-RLS-004 | RLS | Create user_roles RLS Policies | Only admins can manage roles | ⏳ | P0 |
-| P1-RLS-005 | RLS | Create hrm_employees RLS Policies | Role + ownership based access | ⏳ | P1 |
-| P1-RLS-006 | RLS | Create hrm_organization_units RLS Policies | Admin/HR manager access | ⏳ | P1 |
-| P1-RLS-007 | RLS | Create hrm_positions RLS Policies | Admin/HR manager access | ⏳ | P1 |
-| P1-RLS-008 | RLS | Create hrm_leave_requests RLS Policies | Owner + manager + HR access | ⏳ | P1 |
-| P1-RLS-009 | RLS | Create hrm_attendance_records RLS Policies | Owner + manager + HR access | ⏳ | P1 |
-| P1-RLS-010 | RLS | Create hrm_documents RLS Policies | Owner + HR access | ⏳ | P1 |
-| P1-RLS-011 | RLS | Create hrm_audit_logs RLS Policies | Admin read-only access | ⏳ | P2 |
+| P1-RLS-001 | RLS | Create has_role() Function | Security definer function to check user roles | ✅ | P0 |
+| P1-RLS-002 | RLS | Create get_user_org_unit() Function | Get user's organization unit for team-based access | ✅ | P1 |
+| P1-RLS-003 | RLS | Enable RLS on All Tables | ALTER TABLE ... ENABLE ROW LEVEL SECURITY | ✅ | P0 |
+| P1-RLS-004 | RLS | Create user_roles RLS Policies | Only admins can manage roles | ✅ | P0 |
+| P1-RLS-005 | RLS | Create hrm_employees RLS Policies | Role + ownership based access | ✅ | P1 |
+| P1-RLS-006 | RLS | Create hrm_organization_units RLS Policies | Admin/HR manager access | ✅ | P1 |
+| P1-RLS-007 | RLS | Create hrm_positions RLS Policies | Admin/HR manager access | ✅ | P1 |
+| P1-RLS-008 | RLS | Create hrm_leave_requests RLS Policies | Owner + manager + HR access | ✅ | P1 |
+| P1-RLS-009 | RLS | Create hrm_attendance_records RLS Policies | Owner + manager + HR access | ✅ | P1 |
+| P1-RLS-010 | RLS | Create hrm_documents RLS Policies | Owner + HR access | ✅ | P1 |
+| P1-RLS-011 | RLS | Create hrm_audit_logs RLS Policies | Admin read-only access | ✅ | P2 |
 
 ### Authentication Tasks
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
-| P1-AUTH-001 | AUTH | Configure Supabase Auth | Enable email/password authentication | ⏳ | P0 |
-| P1-AUTH-002 | AUTH | Create AuthContext | React context with user + role state | ⏳ | P0 |
-| P1-AUTH-003 | AUTH | Integrate SignIn Page | Connect existing Darkone sign-in to Supabase | ⏳ | P1 |
-| P1-AUTH-004 | AUTH | Integrate SignUp Page | Connect existing Darkone sign-up to Supabase | ⏳ | P1 |
-| P1-AUTH-005 | AUTH | Implement Logout | Add logout functionality to user menu | ⏳ | P1 |
-| P1-AUTH-006 | AUTH | Create ProtectedRoute Component | Route guard checking auth + roles | ⏳ | P1 |
-| P1-AUTH-007 | AUTH | Handle Auth State Persistence | Maintain session across page reloads | ⏳ | P1 |
-| P1-AUTH-008 | AUTH | Seed Default Admin User | Create initial admin for testing | ⏳ | P2 |
+| P1-AUTH-001 | AUTH | Configure Supabase Auth | Enable email/password authentication | ✅ | P0 |
+| P1-AUTH-002 | AUTH | Create AuthContext | React context with user + role state | ✅ | P0 |
+| P1-AUTH-003 | AUTH | Integrate SignIn Page | Connect existing Darkone sign-in to Supabase | ✅ | P1 |
+| P1-AUTH-004 | AUTH | Integrate SignUp Page | Connect existing Darkone sign-up to Supabase | ✅ | P1 |
+| P1-AUTH-005 | AUTH | Implement Logout | Add logout functionality to user menu | ✅ | P1 |
+| P1-AUTH-006 | AUTH | Create ProtectedRoute Component | Route guard checking auth + roles | ✅ | P1 |
+| P1-AUTH-007 | AUTH | Handle Auth State Persistence | Maintain session across page reloads | ✅ | P1 |
+| P1-AUTH-008 | AUTH | Seed Default Admin User | Create initial admin for testing | ✅ | P2 |
 
-**Phase 1 Summary:** 0/35 tasks completed, 35 planned
+**Phase 1 Summary:** 35/35 tasks completed ✅
 
 ---
 
@@ -139,13 +139,13 @@ P{phase}-{category}-{number}
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
-| P2-SVC-001 | SVC | Create Services Directory | Setup /src/services/hrm/ structure | ⏳ | P1 |
+| P2-SVC-001 | SVC | Create Services Directory | Setup /src/services/ structure | ✅ | P1 |
 | P2-SVC-002 | SVC | Create Base Service Interface | Define common CRUD patterns | ⏳ | P1 |
 | P2-SVC-003 | SVC | Create OrganizationUnitService | CRUD for organization units | ⏳ | P1 |
 | P2-SVC-004 | SVC | Create PositionService | CRUD for positions | ⏳ | P1 |
 | P2-SVC-005 | SVC | Create EmployeeService | CRUD for employees | ✅ | P1 |
 | P2-SVC-006 | SVC | Create Types Directory | Setup /src/types/hrm/ structure | ✅ | P1 |
-| P2-SVC-007 | SVC | Define Employee Types | Employee, CreateEmployeeInput, UpdateEmployeeInput | ✅ | P1 |
+| P2-SVC-007 | SVC | Define Employee Types | HrmEmployeeRow, HrmEmployeeDirectory, HrmEmployeeDetail | ✅ | P1 |
 | P2-SVC-008 | SVC | Define Organization Types | OrganizationUnit, Position types | ⏳ | P1 |
 | P2-SVC-009 | SVC | Create Validation Schemas | Zod schemas for all HRM entities | ⏳ | P1 |
 | P2-SVC-010 | SVC | Create Error Handling Utilities | ServiceError class, error mappers | ⏳ | P2 |
@@ -154,23 +154,23 @@ P{phase}-{category}-{number}
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
-| P2-UI-001 | UI | Add HRM Section to Sidebar | New menu group for HRM modules | ⏳ | P1 |
+| P2-UI-001 | UI | Add HRM Section to Sidebar | New menu group for HRM modules | ✅ | P1 |
 | P2-UI-002 | UI | Create Organization Units List Page | Table view with actions | ⏳ | P1 |
 | P2-UI-003 | UI | Create Organization Unit Form Modal | Create/Edit modal using Darkone patterns | ⏳ | P1 |
 | P2-UI-004 | UI | Create Positions List Page | Table view with filtering | ⏳ | P1 |
 | P2-UI-005 | UI | Create Position Form Modal | Create/Edit modal | ⏳ | P1 |
-| P2-UI-006 | UI | Create Employees List Page | Table with search, filter, pagination | ✅ | P1 |
-| P2-UI-007 | UI | Create Employee Detail Page | View employee profile | ✅ | P1 |
+| P2-UI-006 | UI | Create Employees List Page | Table with search, filter, sorting, avatars | ✅ | P1 |
+| P2-UI-007 | UI | Create Employee Detail Page | View employee profile (read-only) | ✅ | P1 |
 | P2-UI-008 | UI | Create Employee Form Page | Multi-step employee creation/edit | ⏳ | P1 |
 | P2-UI-009 | UI | Create Employee Card Component | Reusable employee display card | ⏳ | P2 |
 | P2-UI-010 | UI | Create Organization Tree Component | Visual org hierarchy | ⏳ | P2 |
-| P2-UI-011 | UI | Implement React Query Hooks | useEmployees, useEmployee, etc. | ✅ | P1 |
+| P2-UI-011 | UI | Implement HRM Data Hooks (custom pattern) | useHrmEmployees, useHrmEmployeeDetail (no React Query) | ✅ | P1 |
 | P2-UI-012 | UI | Add Loading States | Skeleton loaders for all HRM pages | ⏳ | P2 |
 | P2-UI-013 | UI | Add Empty States | Empty state UI for no-data scenarios | ⏳ | P2 |
 | P2-UI-014 | UI | Add Error States | Error boundaries and error UI | ⏳ | P2 |
 | P2-UI-015 | UI | Add Toast Notifications | Success/error feedback for actions | ⏳ | P2 |
 
-**Phase 2 Summary:** 5/25 tasks completed, 20 planned
+**Phase 2 Summary:** 8/25 tasks completed (Steps 1–4 verified), 17 planned
 
 ---
 
@@ -327,44 +327,37 @@ P{phase}-{category}-{number}
 | P8-DEPLOY-001 | DEPLOY | Create Production Checklist | Pre-deployment verification | ⏳ | P1 |
 | P8-DEPLOY-002 | DEPLOY | Configure Production Environment | Environment variables | ⏳ | P1 |
 | P8-DEPLOY-003 | DEPLOY | Setup Custom Domain | Connect production domain | ⏳ | P2 |
-| P8-DEPLOY-004 | DEPLOY | Create Backup Strategy | Database backup procedures | ⏳ | P1 |
-| P8-DEPLOY-005 | DEPLOY | Document Deployment Process | Step-by-step guide | ⏳ | P2 |
-| P8-DEPLOY-006 | DEPLOY | Create User Documentation | End-user guides | ⏳ | P2 |
-| P8-DEPLOY-007 | DEPLOY | Create Admin Documentation | System admin guides | ⏳ | P2 |
+| P8-DEPLOY-004 | DEPLOY | Configure Backup Strategy | Database backup plan | ⏳ | P1 |
+| P8-DEPLOY-005 | DEPLOY | Create User Documentation | End-user guides | ⏳ | P2 |
+| P8-DEPLOY-006 | DEPLOY | Create Admin Documentation | System admin guides | ⏳ | P2 |
+| P8-DEPLOY-007 | DEPLOY | Setup Monitoring | Error tracking, analytics | ⏳ | P2 |
+| P8-DEPLOY-008 | DEPLOY | Production Launch | Go-live deployment | ⏳ | P0 |
 
-**Phase 8 Summary:** 0/15 tasks completed, 15 planned
+**Phase 8 Summary:** 0/16 tasks completed, 16 planned
 
 ---
 
-## Summary Statistics
+## Overall Summary
 
-| Phase | Total Tasks | Completed | In Progress | Planned | Blocked |
-|-------|-------------|-----------|-------------|---------|---------|
-| Phase 0 | 7 | 7 | 0 | 0 | 0 |
-| Phase 1 | 35 | 0 | 0 | 35 | 0 |
-| Phase 2 | 25 | 0 | 0 | 25 | 0 |
-| Phase 3 | 14 | 0 | 0 | 14 | 0 |
-| Phase 4 | 18 | 0 | 0 | 18 | 0 |
-| Phase 5 | 12 | 0 | 0 | 12 | 0 |
-| Phase 6 | 15 | 0 | 0 | 15 | 0 |
-| Phase 7 | 13 | 0 | 0 | 13 | 0 |
-| Phase 8 | 15 | 0 | 0 | 15 | 0 |
-| **TOTAL** | **154** | **7** | **0** | **147** | **0** |
+| Phase | Status | Tasks | Completed |
+|-------|--------|-------|-----------|
+| 0 | ✅ Complete | 7 | 7 |
+| 1 | ✅ Complete | 35 | 35 |
+| 2 | 🔄 In Progress | 25 | 8 |
+| 3 | ⏳ Planned | 14 | 0 |
+| 4 | ⏳ Planned | 18 | 0 |
+| 5 | ⏳ Planned | 12 | 0 |
+| 6 | ⏳ Planned | 15 | 0 |
+| 7 | ⏳ Planned | 13 | 0 |
+| 8 | ⏳ Planned | 16 | 0 |
+| **Total** | | **155** | **50** |
 
 ---
 
 ## Next Actions
 
-**Immediate (Phase 1 Start):**
-1. P1-DB-001: Enable Lovable Cloud
-2. P1-DB-002: Create app_role enum
-3. P1-DB-007: Create user_roles table
-4. P1-RLS-001: Create has_role() function
-
----
-
-## Change Log
-
-| Date | Author | Changes |
-|------|--------|---------|
-| 2025-01-09 | System | Initial backlog creation with 154 tasks |
+### Phase 2 — Remaining Steps (5+)
+1. Create Organization Units UI (P2-UI-002, P2-UI-003)
+2. Create Positions UI (P2-UI-004, P2-UI-005)
+3. Create Employee Edit Form (P2-UI-008)
+4. Add remaining service definitions (P2-SVC-002, P2-SVC-003, P2-SVC-004)

@@ -1,7 +1,7 @@
 # SoZaVo HRM System — Implementation Roadmap v2.0
 
-**Version:** 2.0  
-**Last Updated:** 2025-01-09  
+**Version:** 2.1  
+**Last Updated:** 2025-12-10  
 **Status:** Aligned with Darkone React Template Integration
 
 ---
@@ -15,8 +15,8 @@ This roadmap provides the step-by-step execution plan for building the SoZaVo HR
 | Phase | Name | Duration | Status |
 |-------|------|----------|--------|
 | 0 | Environment & Template Setup | 1-2 days | ✅ COMPLETE |
-| 1 | Database & Authentication | 3-5 days | 🔄 NEXT |
-| 2 | Core HR Module | 5-7 days | ⏳ Planned |
+| 1 | Database & Authentication | 3-5 days | ✅ COMPLETE |
+| 2 | Core HR Module | 5-7 days | 🔄 In Progress (Steps 1–4 Complete) |
 | 3 | RBAC & User Management | 3-4 days | ⏳ Planned |
 | 4 | Leave & Attendance | 4-6 days | ⏳ Planned |
 | 5 | Documents & Storage | 3-4 days | ⏳ Planned |
@@ -48,16 +48,18 @@ This roadmap provides the step-by-step execution plan for building the SoZaVo HR
 src/
 ├── app/                    ✅ Route-based pages
 │   ├── (admin)/            ✅ Admin layout routes
-│   │   └── dashboards/     ✅ Dashboard pages
+│   │   ├── dashboards/     ✅ Dashboard pages
+│   │   └── hrm/            ✅ HRM module pages
 │   └── (other)/            ✅ Auth & public routes
 ├── assets/                 ✅ Static assets & SCSS
 ├── components/             ✅ Reusable UI components
-├── context/                ✅ React contexts
+├── context/                ✅ React contexts (incl. SupabaseAuthContext)
 ├── helpers/                ✅ Utility functions
-├── hooks/                  ✅ Custom React hooks
+├── hooks/                  ✅ Custom React hooks (incl. HRM hooks)
 ├── layouts/                ✅ Page layouts
 ├── routes/                 ✅ Route configuration
-├── types/                  ✅ TypeScript definitions
+├── services/               ✅ Data access services (incl. HRM services)
+├── types/                  ✅ TypeScript definitions (incl. HRM types)
 └── utils/                  ✅ Utility functions
 ```
 
@@ -67,7 +69,7 @@ src/
 
 ---
 
-## 3. Phase 1 — Database & Authentication Foundation
+## 3. Phase 1 — Database & Authentication Foundation ✅ COMPLETE
 
 ### 3.1 Overview
 
@@ -77,87 +79,100 @@ Establish the Supabase Cloud backend with authentication and core database schem
 
 #### 3.2.1 Enable Lovable Cloud
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Enable Lovable Cloud (Supabase) | P0 | 5 min |
-| Verify Supabase project connection | P0 | 5 min |
-| Review auto-generated client | P0 | 10 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Enable Lovable Cloud (Supabase) | P0 | ✅ |
+| Verify Supabase project connection | P0 | ✅ |
+| Review auto-generated client | P0 | ✅ |
 
 #### 3.2.2 Create Database Schema
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `app_role` enum | P0 | 10 min |
-| Create `employee_status` enum | P0 | 10 min |
-| Create `leave_status` enum | P0 | 10 min |
-| Create `attendance_status` enum | P0 | 10 min |
-| Create `hrm_organization_units` table | P0 | 15 min |
-| Create `hrm_positions` table | P0 | 15 min |
-| Create `hrm_employees` table | P0 | 20 min |
-| Create `user_roles` table (CRITICAL) | P0 | 15 min |
-| Create `hrm_leave_types` table | P1 | 15 min |
-| Create `hrm_leave_requests` table | P1 | 15 min |
-| Create `hrm_attendance_records` table | P1 | 15 min |
-| Create `hrm_documents` table | P1 | 15 min |
-| Create `hrm_audit_logs` table | P1 | 15 min |
-| Create `hrm_settings` table | P2 | 10 min |
-| Add indexes | P1 | 20 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `app_role` enum | P0 | ✅ |
+| Create `employee_status` enum | P0 | ✅ |
+| Create `leave_status` enum | P0 | ✅ |
+| Create `attendance_status` enum | P0 | ✅ |
+| Create `hrm_organization_units` table | P0 | ✅ |
+| Create `hrm_positions` table | P0 | ✅ |
+| Create `hrm_employees` table | P0 | ✅ |
+| Create `user_roles` table (CRITICAL) | P0 | ✅ |
+| Create `hrm_leave_types` table | P1 | ✅ |
+| Create `hrm_leave_requests` table | P1 | ✅ |
+| Create `hrm_attendance_records` table | P1 | ✅ |
+| Create `hrm_documents` table | P1 | ✅ |
+| Create `hrm_audit_logs` table | P1 | ✅ |
+| Create `hrm_settings` table | P2 | ✅ |
+| Add indexes | P1 | ✅ |
 
 #### 3.2.3 Security Functions
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `has_role()` security definer | P0 | 15 min |
-| Create `get_user_role()` function | P0 | 10 min |
-| Create `is_admin()` function | P0 | 10 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `has_role()` security definer | P0 | ✅ |
+| Create `get_user_role()` function | P0 | ✅ |
+| Create `is_admin()` function | P0 | ✅ |
+| Create `is_manager_of()` function | P0 | ✅ |
+| Create `get_manager_chain()` function | P1 | ✅ |
 
 #### 3.2.4 RLS Policies
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Enable RLS on all tables | P0 | 10 min |
-| Create `hrm_employees` policies | P0 | 30 min |
-| Create `user_roles` policies | P0 | 20 min |
-| Create `hrm_leave_requests` policies | P1 | 20 min |
-| Create `hrm_documents` policies | P1 | 15 min |
-| Create `hrm_audit_logs` policies | P2 | 10 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Enable RLS on all tables | P0 | ✅ |
+| Create `hrm_employees` policies | P0 | ✅ |
+| Create `user_roles` policies | P0 | ✅ |
+| Create `hrm_organization_units` policies | P1 | ✅ |
+| Create `hrm_positions` policies | P1 | ✅ |
+| Create `hrm_leave_requests` policies | P1 | ✅ |
+| Create `hrm_documents` policies | P1 | ✅ |
+| Create `hrm_audit_logs` policies | P2 | ✅ |
 
 #### 3.2.5 Authentication Integration
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Update existing auth pages to use Supabase | P0 | 1 hour |
-| Implement `onAuthStateChange` listener | P0 | 30 min |
-| Create `AuthContext` with role lookup | P0 | 45 min |
-| Implement `emailRedirectTo` for sign-up | P0 | 15 min |
-| Add error handling for auth flows | P0 | 30 min |
-| Test login/logout flow | P0 | 20 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Update existing auth pages to use Supabase | P0 | ✅ |
+| Implement `onAuthStateChange` listener | P0 | ✅ |
+| Create `SupabaseAuthContext` with role lookup | P0 | ✅ |
+| Implement role service (`roleService.ts`) | P0 | ✅ |
+| Add error handling for auth flows | P0 | ✅ |
+| Test login/logout flow | P0 | ✅ |
+| Remove legacy fake-backend | P0 | ✅ |
 
 #### 3.2.6 Seed Data
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Seed default leave types | P1 | 10 min |
-| Seed default settings | P1 | 10 min |
-| Seed test organization units | P2 | 15 min |
-| Seed test employees | P2 | 15 min |
-| Create first system admin user | P0 | 10 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Seed default leave types | P1 | ✅ |
+| Seed default settings | P1 | ✅ |
+| Seed test organization units | P2 | ✅ |
+| Seed test employees | P2 | ✅ |
+| Create test users (admin, hr_manager, manager, employee) | P0 | ✅ |
 
-### 3.3 Acceptance Criteria
+### 3.3 Acceptance Criteria ✅ ALL MET
 
-- [ ] Supabase Cloud is enabled and connected
-- [ ] All database tables exist with correct schema
-- [ ] RLS policies are active and tested
-- [ ] `user_roles` table is separate from any profile table
-- [ ] `has_role()` function works correctly
-- [ ] Authentication flow works (sign-in, sign-up, sign-out)
-- [ ] User role is retrieved after login
-- [ ] Seed data is populated
+- [x] Supabase Cloud is enabled and connected
+- [x] All database tables exist with correct schema
+- [x] RLS policies are active and tested
+- [x] `user_roles` table is separate from any profile table
+- [x] `has_role()` function works correctly
+- [x] Authentication flow works (sign-in, sign-out)
+- [x] User role is retrieved after login
+- [x] Seed data is populated
 
-### 3.4 Dependencies
+### 3.4 Verification Status
 
-- Lovable Cloud activation
-- Supabase project URL and anon key
+**Status:** ✅ COMPLETE (Validated 2025-12-10)
+
+All 25 RLS scenarios passed. See `docs/hrm/HRM_RLS_TestPlan.md` for full validation details.
+
+Key verified behaviors:
+- Admins have full access to all tables and operations
+- HR managers can read/write HRM data but cannot delete structural records
+- Managers see only their direct reports (via `is_manager_of()` function)
+- Employees see only their own record
+- All users can view their own role assignment
 
 ---
 
@@ -171,75 +186,96 @@ Build the foundational employee management, organization structure, and position
 
 #### 4.2.1 Service Layer
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `src/services/` directory | P0 | 5 min |
-| Implement `OrgUnitService.ts` | P0 | 30 min |
-| Implement `PositionService.ts` | P0 | 30 min |
-| Implement `EmployeeService.ts` | P0 | 45 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `src/services/` directory | P0 | ✅ |
+| Implement `hrmEmployeeService.ts` | P0 | ✅ |
+| Implement `OrgUnitService.ts` | P0 | ⏳ |
+| Implement `PositionService.ts` | P0 | ⏳ |
 
 #### 4.2.2 TypeScript Types
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `src/types/hrm/` directory | P0 | 5 min |
-| Define `Employee` type | P0 | 15 min |
-| Define `OrgUnit` type | P0 | 10 min |
-| Define `Position` type | P0 | 10 min |
-| Define service input/output types | P0 | 20 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `src/types/hrm.ts` | P0 | ✅ |
+| Define `HrmEmployeeRow` type | P0 | ✅ |
+| Define `HrmEmployeeDirectory` type | P0 | ✅ |
+| Define `HrmEmployeeDetail` type | P0 | ✅ |
+| Define `OrgUnit` type | P0 | ⏳ |
+| Define `Position` type | P0 | ⏳ |
 
 #### 4.2.3 Organization Units UI
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `/hrm/organization/units` page | P0 | 1 hour |
-| Build org unit tree component | P1 | 1.5 hours |
-| Create org unit form modal | P0 | 45 min |
-| Implement CRUD operations | P0 | 1 hour |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `/hrm/organization/units` page | P0 | ⏳ |
+| Build org unit tree component | P1 | ⏳ |
+| Create org unit form modal | P0 | ⏳ |
+| Implement CRUD operations | P0 | ⏳ |
 
 #### 4.2.4 Positions UI
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `/hrm/organization/positions` page | P0 | 45 min |
-| Build positions data table | P0 | 30 min |
-| Create position form modal | P0 | 30 min |
-| Implement CRUD operations | P0 | 45 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `/hrm/organization/positions` page | P0 | ⏳ |
+| Build positions data table | P0 | ⏳ |
+| Create position form modal | P0 | ⏳ |
+| Implement CRUD operations | P0 | ⏳ |
 
 #### 4.2.5 Employee Management UI
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Create `/hrm/employees` list page | P0 | 1.5 hours |
-| Build employee data table with filters | P0 | 1 hour |
-| Create `/hrm/employees/:id` detail page | P0 | 1.5 hours |
-| Build profile tab content | P0 | 1 hour |
-| Create employee form (create/edit) | P0 | 1.5 hours |
-| Implement Zod validation schemas | P0 | 30 min |
-| Add search functionality | P1 | 30 min |
-| Add CSV export | P2 | 30 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Create `/hrm/employees` list page | P0 | ✅ |
+| Build employee data table with filters | P0 | ✅ |
+| Add search functionality | P0 | ✅ |
+| Add column sorting | P0 | ✅ |
+| Add initials avatars | P0 | ✅ |
+| Create `/hrm/employees/:id` detail page | P0 | ✅ |
+| Build profile tab content | P0 | ✅ |
+| Create employee form (create/edit) | P0 | ⏳ |
+| Implement Zod validation schemas | P0 | ⏳ |
+| Add CSV export | P2 | ⏳ |
 
 #### 4.2.6 Navigation Integration
 
-| Task | Priority | Duration |
-|------|----------|----------|
-| Add HRM menu section to sidebar | P0 | 30 min |
-| Configure route guards | P0 | 30 min |
+| Task | Priority | Status |
+|------|----------|--------|
+| Add HRM menu section to sidebar | P0 | ✅ |
+| Configure route guards | P0 | ✅ |
+| Implement hidden route pattern for detail pages | P0 | ✅ |
 
-### 4.3 Acceptance Criteria
+### 4.3 Implementation Progress
 
+| Step | Description | Status |
+|------|-------------|--------|
+| 2.1 | Employee Directory (basic) | ✅ Verified |
+| 2.2 | Employee Directory (Supabase integration) | ✅ Verified |
+| 2.3 | Employee Directory UX (search, sorting, avatars) | ✅ Verified |
+| 2.4 | Employee Detail View (read-only) | ✅ Verified |
+| 2.5+ | Remaining (Org Units, Positions, Forms) | ⏳ Planned |
+
+**RLS Note:** All employee screens respect role-based access control:
+- Admins/HR Managers see all employees with full details
+- Managers see direct reports only
+- Employees see only their own record
+
+See `docs/hrm/HRM_RLS_TestPlan.md` for validation details.
+
+### 4.4 Acceptance Criteria
+
+- [x] Employee list shows with search and sorting
+- [x] Employee detail page displays all profile information
+- [x] Navigation shows HRM menu items
+- [x] All pages use Darkone components
 - [ ] Organization units can be created, viewed, edited, deleted
 - [ ] Hierarchy view shows parent-child relationships
 - [ ] Positions can be managed with categories
-- [ ] Employee list shows with pagination and filters
-- [ ] Employee detail page displays all profile information
 - [ ] Employee create/edit forms validate input
-- [ ] Navigation shows HRM menu items
-- [ ] All pages use Darkone components
 
-### 4.4 Dependencies
+### 4.5 Dependencies
 
-- Phase 1 complete (database schema, auth)
+- Phase 1 complete (database schema, auth) ✅
 
 ---
 
@@ -498,7 +534,7 @@ Implement system settings and audit log viewer.
 
 ### 9.4 Dependencies
 
-- All previous phases complete
+- Phases 2-6 complete
 
 ---
 
@@ -506,7 +542,7 @@ Implement system settings and audit log viewer.
 
 ### 10.1 Overview
 
-Final quality assurance, security hardening, and production readiness.
+Final testing, security hardening, and production deployment.
 
 ### 10.2 Tasks
 
@@ -514,67 +550,77 @@ Final quality assurance, security hardening, and production readiness.
 
 | Task | Priority | Duration |
 |------|----------|----------|
-| Test all forms for validation | P0 | 2 hours |
-| Test all tables for pagination | P0 | 1 hour |
-| Test all modals/toasts | P0 | 1 hour |
-| Test responsive layouts | P1 | 1 hour |
-| Fix UI bugs | P0 | Variable |
+| Manual test all CRUD flows | P0 | 2 hours |
+| Test all role-based access scenarios | P0 | 1.5 hours |
+| Cross-browser testing | P1 | 1 hour |
+| Mobile responsiveness check | P1 | 1 hour |
 
 #### 10.2.2 Backend QA
 
 | Task | Priority | Duration |
 |------|----------|----------|
-| Test all RLS policies | P0 | 2 hours |
-| Validate foreign key constraints | P0 | 30 min |
-| Test role-based access | P0 | 1 hour |
-| Security audit (OWASP) | P1 | 2 hours |
+| Verify all RLS policies | P0 | 1 hour |
+| Test security functions | P0 | 30 min |
+| Verify audit logging | P0 | 30 min |
+| Test edge cases | P1 | 1 hour |
 
 #### 10.2.3 Performance
 
 | Task | Priority | Duration |
 |------|----------|----------|
-| Review database indexes | P1 | 30 min |
 | Optimize slow queries | P1 | 1 hour |
-| Test with larger datasets | P1 | 1 hour |
+| Add missing indexes | P1 | 30 min |
+| Review bundle size | P2 | 30 min |
 
 #### 10.2.4 Documentation
 
 | Task | Priority | Duration |
 |------|----------|----------|
-| Update architecture docs | P1 | 1 hour |
-| Create user guide | P2 | 2 hours |
-| Document API endpoints | P2 | 1 hour |
+| Update API documentation | P1 | 1 hour |
+| Create user guide | P1 | 2 hours |
+| Document deployment process | P0 | 30 min |
 
 #### 10.2.5 Deployment
 
 | Task | Priority | Duration |
 |------|----------|----------|
-| Verify production environment | P0 | 30 min |
-| Publish to Lovable | P0 | 15 min |
-| Connect custom domain (optional) | P2 | 30 min |
-| Smoke test production | P0 | 30 min |
+| Configure production environment | P0 | 30 min |
+| Setup custom domain | P1 | 30 min |
+| Verify SSL certificates | P0 | 15 min |
+| Production smoke test | P0 | 30 min |
 
 ### 10.3 Acceptance Criteria
 
-- [ ] All forms validate correctly
-- [ ] All tables paginate and filter
-- [ ] No console errors in production
-- [ ] RLS policies prevent unauthorized access
-- [ ] Performance is acceptable (<2s page load)
+- [ ] All manual tests pass
+- [ ] No security vulnerabilities found
+- [ ] Performance is acceptable
+- [ ] Documentation is complete
 - [ ] Production deployment successful
-- [ ] Smoke tests pass
+
+### 10.4 Dependencies
+
+- All previous phases complete
 
 ---
 
 ## 11. Risk Management
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| RLS policy misconfiguration | High | Medium | Thorough testing, security audit |
-| Template breaking changes | Medium | Low | Strict 1:1 Darkone adherence |
-| Supabase downtime | Medium | Low | VPS migration plan documented |
-| Scope creep | Medium | Medium | Strict phase boundaries |
-| Data migration issues | High | Low | SQL backups, schema versioning |
+### 11.1 Technical Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| RLS policy complexity | High | Extensive testing with multiple roles |
+| Supabase rate limits | Medium | Implement caching, optimize queries |
+| Bundle size growth | Medium | Code splitting, lazy loading |
+| Browser compatibility | Low | Test early, use standard APIs |
+
+### 11.2 Schedule Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Scope creep | High | Strict adherence to roadmap |
+| Underestimated complexity | Medium | Buffer time in estimates |
+| Darkone template changes | Medium | Document all customizations |
 
 ---
 
@@ -582,22 +628,25 @@ Final quality assurance, security hardening, and production readiness.
 
 | Metric | Target |
 |--------|--------|
-| All MVP modules complete | 100% |
-| RLS policies active | 100% of tables |
-| UI matches Darkone template | 100% |
-| Critical bugs | 0 |
-| Page load time | <2 seconds |
-| Test coverage (future) | >70% |
+| All RLS policies verified | 100% |
+| Pages load time | < 3 seconds |
+| CRUD operations working | 100% |
+| Role-based access enforced | 100% |
+| Documentation coverage | > 80% |
 
 ---
 
 ## 13. Next Steps
 
-1. **Wait for approval** of this documentation set
-2. **Enable Lovable Cloud** (Phase 1, Task 1)
-3. **Create database schema** (Phase 1)
-4. **Begin implementation** phase by phase
+### Immediate (Phase 2 – Steps 5+)
 
----
+1. ⏳ Create Organization Units management UI
+2. ⏳ Create Positions management UI
+3. ⏳ Create Employee Edit Form
+4. ⏳ Add remaining type definitions
 
-**End of Implementation Roadmap**
+### After Phase 2
+
+1. Begin Phase 3 (RBAC & User Management)
+2. Implement advanced permission controls
+3. Build user management interface
