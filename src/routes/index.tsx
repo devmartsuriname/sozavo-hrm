@@ -3,6 +3,9 @@ import { Navigate, type RouteProps } from 'react-router-dom'
 
 const Dashboards = lazy(() => import('@/app/(admin)/dashboards/page'))
 
+// HRM Routes
+const HrmEmployees = lazy(() => import('@/app/(admin)/hrm/employees/page'))
+
 // Base UI Routes
 const Accordions = lazy(() => import('@/app/(admin)/base-ui/accordion/page'))
 const Alerts = lazy(() => import('@/app/(admin)/base-ui/alerts/page'))
@@ -300,6 +303,15 @@ const iconRoutes: RoutesProps[] = [
   },
 ]
 
+// HRM Routes
+const hrmRoutes: RoutesProps[] = [
+  {
+    name: 'Employee Directory',
+    path: '/hrm/employees',
+    element: <HrmEmployees />,
+  },
+]
+
 const layoutsRoutes: RoutesProps[] = [
   {
     name: 'dark sidenav',
@@ -331,6 +343,7 @@ const layoutsRoutes: RoutesProps[] = [
 export const appRoutes = [
   ...initialRoutes,
   // ...authRoutes,
+  ...hrmRoutes,
   ...baseUIRoutes,
   ...formsRoutes,
   ...generalRoutes,

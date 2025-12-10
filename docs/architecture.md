@@ -159,6 +159,32 @@ docs/
 3. **No Client-Side Role Storage**: Roles fetched fresh, not cached in localStorage
 4. **Admin-Only Deletion**: Structural changes require admin role
 
+## HRM UI Implementation
+
+### Phase 2 – Employee Directory
+
+The first HRM UI screen, implemented at `/hrm/employees`:
+
+```
+src/
+├── app/(admin)/hrm/
+│   └── employees/
+│       └── page.tsx            # Employee Directory page
+├── hooks/
+│   └── useHrmEmployees.ts      # Data loading hook
+├── services/
+│   └── hrmEmployeeService.ts   # Supabase query service
+└── types/
+    └── hrm.ts                  # HRM TypeScript types
+```
+
+#### Design Decisions
+
+1. **fullName Derived**: Concatenated in TypeScript (`first_name + ' ' + last_name`), not stored in DB
+2. **RLS-Aware Queries**: Uses authenticated Supabase client, respects row-level security
+3. **Darkone Patterns**: Reuses Card, Table, Spinner, Alert components exactly as template defines
+4. **No TanStack Query**: Simple useState/useEffect pattern (consistent with existing codebase)
+
 ## Migration Path
 
 | Phase | Status | Description |
@@ -166,4 +192,5 @@ docs/
 | 7A | ✅ Complete | Auth infrastructure scaffolded |
 | 7B | ✅ Complete | Wired auth provider, migrated sign-in |
 | 7C | ✅ Complete | Deleted fake-backend file, marked legacy types |
-| 7D | Pending | Create test users, replace placeholders |
+| 7D | ✅ Complete | Created test users, seeded data |
+| **2.1** | ✅ Complete | **Employee Directory UI (read-only)** |

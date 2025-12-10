@@ -16,6 +16,18 @@ export const MENU_ITEMS: MenuItemType[] = [
       variant: 'primary',
     },
   },
+  // ====================HRM===============
+  {
+    key: 'hrm',
+    label: 'HRM',
+    isTitle: true,
+  },
+  {
+    key: 'hrm-employees',
+    label: 'Employees',
+    icon: 'mingcute:group-line',
+    url: '/hrm/employees',
+  },
   // ====================Authentication===============
 
   {
