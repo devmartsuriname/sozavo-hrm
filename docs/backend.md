@@ -72,6 +72,24 @@ Authentication is now handled **exclusively** via:
 - Security definer functions prevent privilege escalation
 - See `/db/hrm/rls_policies.sql` for complete policy definitions
 
+### RLS Validation Status
+
+**Validated:** 2025-12-10  
+**Status:** ✅ All 25 scenarios passed
+
+The RLS Test Plan (`docs/hrm/HRM_RLS_TestPlan.md`) has been formally executed, validating:
+- All 4 core tables: `user_roles`, `hrm_employees`, `hrm_organization_units`, `hrm_positions`
+- All 4 roles: admin, hr_manager, manager, employee
+- All operations: SELECT, INSERT, UPDATE, DELETE
+- Negative security tests: anonymous access denial, privilege escalation prevention
+
+Key verified behaviors:
+- Admins have full access to all tables and operations
+- HR managers can read/write HRM data but cannot delete structural records or manage roles
+- Managers see only their direct reports (via `is_manager_of()` function)
+- Employees see only their own record
+- All users can view their own role assignment
+
 ## HRM UI Screens
 
 ### Employee Directory (`/hrm/employees`)
