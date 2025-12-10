@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import { Icon } from '@iconify/react'
 import PageTitle from '@/components/PageTitle'
@@ -170,7 +171,14 @@ const EmployeeDirectory = () => {
                               {getInitials(emp.fullName)}
                             </div>
                           </td>
-                          <td>{emp.employee_code}</td>
+                          <td>
+                            <Link 
+                              to={`/hrm/employees/${emp.id}`}
+                              className="text-primary text-decoration-none fw-medium"
+                            >
+                              {emp.employee_code}
+                            </Link>
+                          </td>
                           <td>{emp.fullName}</td>
                           <td>{emp.email}</td>
                           <td>{emp.phone || '—'}</td>
