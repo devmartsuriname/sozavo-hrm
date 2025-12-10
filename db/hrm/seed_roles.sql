@@ -8,20 +8,19 @@
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- PLACEHOLDER USER IDs
+-- REAL SUPABASE USER IDs
 -- -----------------------------------------------------------------------------
--- These UUIDs are placeholders that MUST be replaced with real auth.users IDs
--- after creating actual test users in Supabase Authentication.
+-- These UUIDs are linked to actual auth.users created in Supabase Authentication.
 --
--- ADMIN_USER_ID:        00000000-0000-0000-0000-000000000001
--- HR_MANAGER_USER_ID:   00000000-0000-0000-0000-000000000002
--- MANAGER_USER_ID:      00000000-0000-0000-0000-000000000003
--- EMPLOYEE_USER_ID:     00000000-0000-0000-0000-000000000004
+-- ADMIN_USER_ID:        185e5b0b-2d3c-4245-a0e3-8c07623c8ad4  (admin@sozavo.sr)
+-- HR_MANAGER_USER_ID:   4231ee5a-2bc8-47b0-93a0-c9fd172c24e3  (hr.manager@sozavo.sr)
+-- MANAGER_USER_ID:      a6bffd30-455c-491e-87cf-7a41d5f4fffe  (manager@sozavo.sr)
+-- EMPLOYEE_USER_ID:     8628fd46-b774-4b5f-91fc-3a8e1ba56d9a  (employee@sozavo.sr)
 --
--- To find real user IDs after signup:
---   SELECT id, email FROM auth.users WHERE email = 'your-email@example.com';
---
--- Then update the placeholder UUIDs in this file with the real IDs.
+-- To verify these IDs:
+--   SELECT id, email FROM auth.users WHERE email IN (
+--     'admin@sozavo.sr', 'hr.manager@sozavo.sr', 'manager@sozavo.sr', 'employee@sozavo.sr'
+--   );
 -- -----------------------------------------------------------------------------
 
 -- -----------------------------------------------------------------------------
@@ -30,11 +29,11 @@
 -- The admin user has full system access across all HRM modules.
 -- -----------------------------------------------------------------------------
 INSERT INTO public.user_roles (user_id, role)
-SELECT '00000000-0000-0000-0000-000000000001'::UUID, 'admin'::public.app_role
+SELECT '185e5b0b-2d3c-4245-a0e3-8c07623c8ad4'::UUID, 'admin'::public.app_role
 WHERE NOT EXISTS (
     SELECT 1 
     FROM public.user_roles 
-    WHERE user_id = '00000000-0000-0000-0000-000000000001'::UUID 
+    WHERE user_id = '185e5b0b-2d3c-4245-a0e3-8c07623c8ad4'::UUID 
       AND role = 'admin'::public.app_role
 );
 
@@ -45,11 +44,11 @@ WHERE NOT EXISTS (
 -- structural data or manage role assignments.
 -- -----------------------------------------------------------------------------
 INSERT INTO public.user_roles (user_id, role)
-SELECT '00000000-0000-0000-0000-000000000002'::UUID, 'hr_manager'::public.app_role
+SELECT '4231ee5a-2bc8-47b0-93a0-c9fd172c24e3'::UUID, 'hr_manager'::public.app_role
 WHERE NOT EXISTS (
     SELECT 1 
     FROM public.user_roles 
-    WHERE user_id = '00000000-0000-0000-0000-000000000002'::UUID 
+    WHERE user_id = '4231ee5a-2bc8-47b0-93a0-c9fd172c24e3'::UUID 
       AND role = 'hr_manager'::public.app_role
 );
 
@@ -60,11 +59,11 @@ WHERE NOT EXISTS (
 -- Manager visibility is enforced via is_manager_of() function in RLS.
 -- -----------------------------------------------------------------------------
 INSERT INTO public.user_roles (user_id, role)
-SELECT '00000000-0000-0000-0000-000000000003'::UUID, 'manager'::public.app_role
+SELECT 'a6bffd30-455c-491e-87cf-7a41d5f4fffe'::UUID, 'manager'::public.app_role
 WHERE NOT EXISTS (
     SELECT 1 
     FROM public.user_roles 
-    WHERE user_id = '00000000-0000-0000-0000-000000000003'::UUID 
+    WHERE user_id = 'a6bffd30-455c-491e-87cf-7a41d5f4fffe'::UUID 
       AND role = 'manager'::public.app_role
 );
 
@@ -75,33 +74,23 @@ WHERE NOT EXISTS (
 -- No write access to HRM structural tables.
 -- -----------------------------------------------------------------------------
 INSERT INTO public.user_roles (user_id, role)
-SELECT '00000000-0000-0000-0000-000000000004'::UUID, 'employee'::public.app_role
+SELECT '8628fd46-b774-4b5f-91fc-3a8e1ba56d9a'::UUID, 'employee'::public.app_role
 WHERE NOT EXISTS (
     SELECT 1 
     FROM public.user_roles 
-    WHERE user_id = '00000000-0000-0000-0000-000000000004'::UUID 
+    WHERE user_id = '8628fd46-b774-4b5f-91fc-3a8e1ba56d9a'::UUID 
       AND role = 'employee'::public.app_role
 );
 
 -- =============================================================================
--- ONBOARDING INSTRUCTIONS
+-- VERIFICATION QUERY
 -- =============================================================================
--- After creating real test users in Supabase Authentication:
+-- After running this seed, verify role assignments:
 --
--- 1. Create 4 test users in Supabase Dashboard → Authentication → Users
---    - admin@sozavo.sr
---    - hr.manager@sozavo.sr
---    - manager@sozavo.sr
---    - employee@sozavo.sr
---
--- 2. Find their user IDs:
---    SELECT id, email, created_at FROM auth.users ORDER BY created_at DESC;
---
--- 3. Replace the placeholder UUIDs in this file with the real IDs.
---
--- 4. Re-run this seed file to update role assignments.
---
--- 5. Also update /db/hrm/seed_hrm_test_data.sql with the same real IDs.
+-- SELECT ur.user_id, au.email, ur.role 
+-- FROM public.user_roles ur
+-- JOIN auth.users au ON au.id = ur.user_id
+-- ORDER BY ur.role;
 --
 -- =============================================================================
 -- END OF SEED DATA

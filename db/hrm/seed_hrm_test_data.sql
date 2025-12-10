@@ -8,14 +8,12 @@
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- PLACEHOLDER USER IDs (must match seed_roles.sql)
+-- REAL SUPABASE USER IDs (must match seed_roles.sql)
 -- -----------------------------------------------------------------------------
--- ADMIN_USER_ID:        00000000-0000-0000-0000-000000000001
--- HR_MANAGER_USER_ID:   00000000-0000-0000-0000-000000000002
--- MANAGER_USER_ID:      00000000-0000-0000-0000-000000000003
--- EMPLOYEE_USER_ID:     00000000-0000-0000-0000-000000000004
---
--- Replace these with real auth.users IDs after creating test users.
+-- ADMIN_USER_ID:        185e5b0b-2d3c-4245-a0e3-8c07623c8ad4  (admin@sozavo.sr)
+-- HR_MANAGER_USER_ID:   4231ee5a-2bc8-47b0-93a0-c9fd172c24e3  (hr.manager@sozavo.sr)
+-- MANAGER_USER_ID:      a6bffd30-455c-491e-87cf-7a41d5f4fffe  (manager@sozavo.sr)
+-- EMPLOYEE_USER_ID:     8628fd46-b774-4b5f-91fc-3a8e1ba56d9a  (employee@sozavo.sr)
 -- -----------------------------------------------------------------------------
 
 -- =============================================================================
@@ -117,7 +115,7 @@ WHERE NOT EXISTS (
 -- =============================================================================
 -- SECTION 3: EMPLOYEES
 -- =============================================================================
--- Test employees mapped 1:1 with placeholder user IDs:
+-- Test employees mapped 1:1 with real Supabase user IDs:
 --   - EMP-ADMIN-001   → Admin user (HR Director)
 --   - EMP-HR-001      → HR Manager user (HR Officer)
 --   - EMP-MANAGER-001 → Manager user (Dept Manager Volkshuisvesting)
@@ -132,7 +130,7 @@ INSERT INTO public.hrm_employees (
 SELECT 
     gen_random_uuid(),
     'EMP-ADMIN-001',
-    '00000000-0000-0000-0000-000000000001'::UUID,
+    '185e5b0b-2d3c-4245-a0e3-8c07623c8ad4'::UUID,
     'Karel',
     'Adminstra',
     'admin@sozavo.sr',
@@ -154,7 +152,7 @@ INSERT INTO public.hrm_employees (
 SELECT 
     gen_random_uuid(),
     'EMP-HR-001',
-    '00000000-0000-0000-0000-000000000002'::UUID,
+    '4231ee5a-2bc8-47b0-93a0-c9fd172c24e3'::UUID,
     'Sandra',
     'Personeelszaken',
     'hr.manager@sozavo.sr',
@@ -176,7 +174,7 @@ INSERT INTO public.hrm_employees (
 SELECT 
     gen_random_uuid(),
     'EMP-MANAGER-001',
-    '00000000-0000-0000-0000-000000000003'::UUID,
+    'a6bffd30-455c-491e-87cf-7a41d5f4fffe'::UUID,
     'Ricardo',
     'Leidinggevende',
     'manager@sozavo.sr',
@@ -198,7 +196,7 @@ INSERT INTO public.hrm_employees (
 SELECT 
     gen_random_uuid(),
     'EMP-EMP-001',
-    '00000000-0000-0000-0000-000000000004'::UUID,
+    '8628fd46-b774-4b5f-91fc-3a8e1ba56d9a'::UUID,
     'Maria',
     'Werknemer',
     'employee@sozavo.sr',
