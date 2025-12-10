@@ -21,6 +21,9 @@ export interface HrmEmployeeDirectory {
   position_id: string | null
   manager_id: string | null
   employment_status: string
+  // Derived display fields (from JOINed tables)
+  orgUnitName: string | null  // From hrm_organization_units.name
+  positionTitle: string | null // From hrm_positions.title
 }
 
 // Query result type (raw from Supabase, before adding fullName)

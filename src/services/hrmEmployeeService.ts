@@ -8,31 +8,57 @@ import { supabase } from '@/integrations/supabase/client'
 import type { HrmEmployeeDirectory, HrmEmployeeQueryResult } from '@/types/hrm'
 
 /**
- * Fetches employees for the directory listing.
+ * Fetches employees for the directory listing with org unit and position names.
+ * Uses parallel queries + TypeScript merge pattern (no FK constraints in DB).
+ * 
  * RLS policies determine which employees the current user can see:
- * - Admins/HR Managers: all employees
- * - Managers: direct reports only
- * - Employees: self only
+ * - Admins/HR Managers: all employees + can read org units/positions
+ * - Managers: direct reports only, org unit/position names may be null (RLS)
+ * - Employees: self only, org unit/position names may be null (RLS)
  *
- * fullName is derived via TypeScript concatenation (not stored in DB)
+ * Derived fields (not stored in DB):
+ * - fullName: first_name + ' ' + last_name
+ * - orgUnitName: from hrm_organization_units.name
+ * - positionTitle: from hrm_positions.title
  */
 export async function fetchEmployeeDirectory(): Promise<HrmEmployeeDirectory[]> {
-  const { data, error } = await supabase
-    .from('hrm_employees')
-    .select(
-      'id, employee_code, first_name, last_name, email, phone, org_unit_id, position_id, manager_id, employment_status'
-    )
-    .order('employee_code', { ascending: true })
+  // Parallel fetch: employees, org units, positions
+  const [employeesResult, orgUnitsResult, positionsResult] = await Promise.all([
+    supabase
+      .from('hrm_employees')
+      .select('id, employee_code, first_name, last_name, email, phone, org_unit_id, position_id, manager_id, employment_status')
+      .order('employee_code', { ascending: true }),
+    supabase
+      .from('hrm_organization_units')
+      .select('id, name'),
+    supabase
+      .from('hrm_positions')
+      .select('id, title'),
+  ])
 
-  if (error) {
-    throw new Error(`Failed to fetch employees: ${error.message}`)
+  if (employeesResult.error) {
+    throw new Error(`Failed to fetch employees: ${employeesResult.error.message}`)
   }
 
-  // Map results to add derived fullName field
-  const employees: HrmEmployeeDirectory[] = (data as HrmEmployeeQueryResult[]).map(
+  // Note: org units and positions may fail due to RLS for non-admin users
+  // We handle this gracefully by using empty maps
+  const orgUnitMap = new Map<string, string>()
+  if (!orgUnitsResult.error && orgUnitsResult.data) {
+    orgUnitsResult.data.forEach((ou) => orgUnitMap.set(ou.id, ou.name))
+  }
+
+  const positionMap = new Map<string, string>()
+  if (!positionsResult.error && positionsResult.data) {
+    positionsResult.data.forEach((p) => positionMap.set(p.id, p.title))
+  }
+
+  // Map results to add derived fields
+  const employees: HrmEmployeeDirectory[] = (employeesResult.data as HrmEmployeeQueryResult[]).map(
     (emp) => ({
       ...emp,
       fullName: `${emp.first_name} ${emp.last_name}`,
+      orgUnitName: emp.org_unit_id ? orgUnitMap.get(emp.org_unit_id) ?? null : null,
+      positionTitle: emp.position_id ? positionMap.get(emp.position_id) ?? null : null,
     })
   )
 

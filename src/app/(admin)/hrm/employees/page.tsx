@@ -54,8 +54,8 @@ const EmployeeDirectory = () => {
                         <th scope="col">Full Name</th>
                         <th scope="col">Email</th>
                         <th scope="col">Phone</th>
-                        <th scope="col">Org Unit ID</th>
-                        <th scope="col">Position ID</th>
+                        <th scope="col">Org Unit</th>
+                        <th scope="col">Position</th>
                         <th scope="col">Status</th>
                       </tr>
                     </thead>
@@ -66,12 +66,8 @@ const EmployeeDirectory = () => {
                           <td>{emp.fullName}</td>
                           <td>{emp.email}</td>
                           <td>{emp.phone || '—'}</td>
-                          <td>
-                            <code className="small">{emp.org_unit_id || '—'}</code>
-                          </td>
-                          <td>
-                            <code className="small">{emp.position_id || '—'}</code>
-                          </td>
+                          <td>{emp.orgUnitName || '—'}</td>
+                          <td>{emp.positionTitle || '—'}</td>
                           <td>
                             <span
                               className={`badge ${
