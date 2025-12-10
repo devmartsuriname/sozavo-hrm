@@ -52,14 +52,30 @@ export async function fetchEmployeeDirectory(): Promise<HrmEmployeeDirectory[]> 
     positionsResult.data.forEach((p) => positionMap.set(p.id, p.title))
   }
 
+  // Build employee lookup map for manager name resolution
+  const employeeMap = new Map<string, HrmEmployeeQueryResult>()
+  ;(employeesResult.data as HrmEmployeeQueryResult[]).forEach((e) => employeeMap.set(e.id, e))
+
   // Map results to add derived fields
   const employees: HrmEmployeeDirectory[] = (employeesResult.data as HrmEmployeeQueryResult[]).map(
-    (emp) => ({
-      ...emp,
-      fullName: `${emp.first_name} ${emp.last_name}`,
-      orgUnitName: emp.org_unit_id ? orgUnitMap.get(emp.org_unit_id) ?? null : null,
-      positionTitle: emp.position_id ? positionMap.get(emp.position_id) ?? null : null,
-    })
+    (emp) => {
+      // Derive manager name from the same employee dataset
+      let managerName: string | null = null
+      if (emp.manager_id) {
+        const manager = employeeMap.get(emp.manager_id)
+        if (manager) {
+          managerName = `${manager.first_name} ${manager.last_name}`
+        }
+      }
+
+      return {
+        ...emp,
+        fullName: `${emp.first_name} ${emp.last_name}`,
+        orgUnitName: emp.org_unit_id ? orgUnitMap.get(emp.org_unit_id) ?? null : null,
+        positionTitle: emp.position_id ? positionMap.get(emp.position_id) ?? null : null,
+        managerName,
+      }
+    }
   )
 
   return employees
