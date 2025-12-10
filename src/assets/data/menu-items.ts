@@ -28,6 +28,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'mingcute:group-line',
     url: '/hrm/employees',
   },
+  {
+    key: 'hrm-org-units',
+    label: 'Organization Units',
+    icon: 'mingcute:building-3-line',
+    url: '/hrm/org-units',
+  },
   // ====================Authentication===============
 
   {

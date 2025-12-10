@@ -243,6 +243,52 @@ Manual role-based testing completed 2025-12-10:
 
 All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modification.
 
+### Organization Units (`/hrm/org-units`)
+
+Read-only listing page for organization units (Phase 2 – Step 5):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/org-units/OrgUnitsPage.tsx` | Org Units Directory page |
+| `src/services/hrmOrgUnitService.ts` | Supabase data access for hrm_organization_units |
+| `src/hooks/useHrmOrgUnits.ts` | React hook for loading org units |
+
+#### Type Architecture
+
+```typescript
+// Row type - matches DB schema
+interface HrmOrgUnitRow {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  parent_id: string | null
+  is_active: boolean
+  // ... audit columns
+}
+
+// ViewModel - Row + derived fields
+interface HrmOrgUnitDirectory extends HrmOrgUnitRow {
+  parentOrgUnitName: string | null  // Lookup from parent_id
+}
+```
+
+#### Service Function
+
+The `fetchOrgUnits()` function in `hrmOrgUnitService.ts`:
+- Fetches all org units in a single query
+- Builds a self-join Map for parent name resolution
+- Returns empty array when RLS denies access (no crash)
+
+#### React Hook
+
+The `useHrmOrgUnits()` hook follows the same pattern as `useHrmEmployees()`:
+- `useState` + `useEffect` with loading/error state
+- Checks authentication status before fetching
+- Returns `{ orgUnits, isLoading, error, refetch }`
+
+**Note:** Only admins and HR managers can view organization units (RLS policy).
+
 ## Next Steps
 
-- Phase 2 continues with Organization Units, Positions, and Employee Edit forms
+- Phase 2 continues with Positions UI and Employee Edit forms
