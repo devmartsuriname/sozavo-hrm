@@ -245,7 +245,7 @@ src/
 | **2.3** | ✅ Complete | Manager name, avatars, sorting, filtering |
 | **2.4** | ✅ Verified | Employee Detail View (read-only, hidden route) |
 | **2.5** | ✅ Verified | Organization Units UI (read-only listing, RLS tested) |
-| **2.6** | 🔄 In Progress | Positions UI (read-only listing) |
+| **2.6** | ✅ Verified | Positions UI (read-only listing, RLS tested with all roles) |
 
 ## Row/ViewModel Pattern Standard
 

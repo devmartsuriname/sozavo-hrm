@@ -339,6 +339,26 @@ These tests verify the `/hrm/org-units` page respects RLS policies.
 
 ---
 
+## 4.6 Positions UI Tests (Phase 2 – Step 6)
+
+These tests verify the `/hrm/positions` page respects RLS policies.
+
+| Role | Expected Rows | UI State | Verified |
+|------|---------------|----------|----------|
+| Admin | 4 | Table with data | ✅ |
+| HR Manager | 4 | Table with data | ✅ |
+| Manager | 0 | Info alert (empty state) | ✅ |
+| Employee | 0 | Info alert (empty state) | ✅ |
+
+**Test Notes:**
+- Organization Unit column correctly resolves `org_unit_id` → `orgUnitName` via parallel fetch
+- No console errors observed for any role
+- Sidebar entry visible to all roles; data visibility enforced by RLS
+- Empty state displays: "No positions available for your role."
+- Positions table displays Code, Title, Organization Unit, and Active status columns
+
+---
+
 ## 5. Negative Security Tests
 
 ### 5.1 Anonymous Access
