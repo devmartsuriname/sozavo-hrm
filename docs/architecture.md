@@ -180,10 +180,23 @@ src/
 
 #### Design Decisions
 
-1. **fullName Derived**: Concatenated in TypeScript (`first_name + ' ' + last_name`), not stored in DB
+1. **Derived Fields via Parallel-Fetch + Merge**:
+   - `fullName`: Concatenated in TypeScript (`first_name + ' ' + last_name`)
+   - `orgUnitName`: Lookup from `hrm_organization_units.name`
+   - `positionTitle`: Lookup from `hrm_positions.title`
+   - `managerName`: Lookup from same employee dataset by `manager_id`
+
 2. **RLS-Aware Queries**: Uses authenticated Supabase client, respects row-level security
-3. **Darkone Patterns**: Reuses Card, Table, Spinner, Alert components exactly as template defines
-4. **No TanStack Query**: Simple useState/useEffect pattern (consistent with existing codebase)
+   - Non-admin users may see `null` for org unit/position names (RLS blocks related tables)
+   - Manager name resolves only if the manager is visible under current user's RLS scope
+
+3. **Darkone Patterns**: Reuses Card, Table, Spinner, Alert, Form.Control exactly as template defines
+
+4. **Client-Side UX Enhancements** (Phase 2 – Step 3):
+   - **Initials Avatar**: Circular badge derived from fullName (e.g., "KA")
+   - **Search Filter**: Case-insensitive partial match across all text fields
+   - **Column Sorting**: Clickable headers with asc/desc toggle and icon indicators
+   - Operates on in-memory array, no additional DB queries
 
 ## Migration Path
 
@@ -193,4 +206,6 @@ src/
 | 7B | ✅ Complete | Wired auth provider, migrated sign-in |
 | 7C | ✅ Complete | Deleted fake-backend file, marked legacy types |
 | 7D | ✅ Complete | Created test users, seeded data |
-| **2.1** | ✅ Complete | **Employee Directory UI (read-only)** |
+| **2.1** | ✅ Complete | Employee Directory UI (read-only) |
+| **2.2** | ✅ Complete | Org Unit & Position name display |
+| **2.3** | ✅ Complete | Manager name, avatars, sorting, filtering |

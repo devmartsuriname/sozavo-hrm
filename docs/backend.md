@@ -85,23 +85,50 @@ The first HRM UI screen implemented in Phase 2:
 | `src/hooks/useHrmEmployees.ts` | React hook for loading employees |
 | `src/types/hrm.ts` | TypeScript types for HRM module |
 
-#### Full Name Handling
+#### Derived Fields (TypeScript-only, not in DB)
 
-The `fullName` field is **derived in TypeScript**, not stored in the database:
+All display-oriented fields are derived in TypeScript via the parallel-fetch + merge pattern:
+
+| Field | Source | Derivation |
+|-------|--------|------------|
+| `fullName` | `hrm_employees` | `${first_name} ${last_name}` |
+| `orgUnitName` | `hrm_organization_units.name` | Lookup by `org_unit_id` |
+| `positionTitle` | `hrm_positions.title` | Lookup by `position_id` |
+| `managerName` | `hrm_employees` | Lookup by `manager_id` → derive fullName |
 
 ```typescript
-// In hrmEmployeeService.ts
-const employees = data.map((emp) => ({
+// In hrmEmployeeService.ts - parallel fetch + merge pattern
+const [employeesResult, orgUnitsResult, positionsResult] = await Promise.all([
+  supabase.from('hrm_employees').select('...'),
+  supabase.from('hrm_organization_units').select('id, name'),
+  supabase.from('hrm_positions').select('id, title'),
+])
+
+// Build lookup maps
+const orgUnitMap = new Map(orgUnitsResult.data.map(ou => [ou.id, ou.name]))
+const positionMap = new Map(positionsResult.data.map(p => [p.id, p.title]))
+const employeeMap = new Map(employeesResult.data.map(e => [e.id, e]))
+
+// Derive all display fields
+const employees = employeesResult.data.map((emp) => ({
   ...emp,
   fullName: `${emp.first_name} ${emp.last_name}`,
+  orgUnitName: orgUnitMap.get(emp.org_unit_id) ?? null,
+  positionTitle: positionMap.get(emp.position_id) ?? null,
+  managerName: emp.manager_id ? deriveFullName(employeeMap.get(emp.manager_id)) : null,
 }))
 ```
 
-This approach:
-- Keeps the database schema clean (no redundant columns)
-- Allows UI flexibility without schema changes
-- Follows the principle of deriving display values from source data
+#### Client-Side Sorting & Filtering (Phase 2 – Step 3)
 
-## Next Steps (Phase 7D)
+The Employee Directory page implements local UX enhancements:
 
-- Phase 7D: Create test users in Supabase, replace placeholder UUIDs in seed files
+- **Initials Avatar**: Circular badge with first+last initial (e.g., "KA" for Karel Adminstra)
+- **Search Filter**: Case-insensitive partial match on code, name, email, org unit, position, manager
+- **Column Sorting**: Click headers to sort asc/desc on employee_code, fullName, orgUnitName, positionTitle, managerName, status
+
+These operate on the in-memory array after Supabase returns data, respecting RLS visibility.
+
+## Next Steps
+
+- Phase 2 continues with additional HRM screens and features
