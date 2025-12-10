@@ -320,6 +320,25 @@ VALUES ('HACK-001', 'Hacker', 'Attempt', 'hack@evil.com', 'active', CURRENT_DATE
 
 ---
 
+## 4.5 Organization Units UI Tests (Phase 2 – Step 5)
+
+These tests verify the `/hrm/org-units` page respects RLS policies.
+
+| Role | Expected Rows | UI State | Verified |
+|------|---------------|----------|----------|
+| Admin | 3 | Table with data | ✅ |
+| HR Manager | 3 | Table with data | ✅ |
+| Manager | 0 | Info alert (empty state) | ✅ |
+| Employee | 0 | Info alert (empty state) | ✅ |
+
+**Test Notes:**
+- Parent Unit column correctly resolves child → parent name lookups
+- No console errors observed for any role
+- Sidebar entry visible to all roles; data visibility enforced by RLS
+- Empty state displays: "No organization units available for your role."
+
+---
+
 ## 5. Negative Security Tests
 
 ### 5.1 Anonymous Access

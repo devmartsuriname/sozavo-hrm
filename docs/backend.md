@@ -287,7 +287,13 @@ The `useHrmOrgUnits()` hook follows the same pattern as `useHrmEmployees()`:
 - Checks authentication status before fetching
 - Returns `{ orgUnits, isLoading, error, refetch }`
 
-**Note:** Only admins and HR managers can view organization units (RLS policy).
+#### RLS Behavior
+
+**Access Control:**
+- **Admin, HR Manager**: Can see all organization units (3 rows in seed data)
+- **Manager, Employee**: Denied access via FALSE policy; UI shows empty state message
+
+The UI gracefully handles 0 rows by displaying: "No organization units available for your role."
 
 ## Next Steps
 
