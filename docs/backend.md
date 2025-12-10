@@ -295,6 +295,58 @@ The `useHrmOrgUnits()` hook follows the same pattern as `useHrmEmployees()`:
 
 The UI gracefully handles 0 rows by displaying: "No organization units available for your role."
 
+### Positions (`/hrm/positions`)
+
+Read-only listing page for job positions (Phase 2 – Step 6):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/positions/PositionsPage.tsx` | Positions Directory page |
+| `src/services/hrmPositionService.ts` | Supabase data access for hrm_positions |
+| `src/hooks/useHrmPositions.ts` | React hook for loading positions |
+
+#### Type Architecture
+
+```typescript
+// Row type - matches DB schema
+interface HrmPositionRow {
+  id: string
+  code: string
+  title: string
+  description: string | null
+  org_unit_id: string | null
+  is_active: boolean
+  // ... audit columns
+}
+
+// ViewModel - Row + derived fields
+interface HrmPositionDirectory extends HrmPositionRow {
+  orgUnitName: string | null  // Lookup from org_unit_id
+}
+```
+
+#### Service Function
+
+The `fetchPositions()` function in `hrmPositionService.ts`:
+- Parallel fetch: positions + org units for name lookup
+- Builds Map for org unit name resolution
+- Returns empty array when RLS denies access
+
+#### React Hook
+
+The `useHrmPositions()` hook follows the same pattern as `useHrmOrgUnits()`:
+- `useState` + `useEffect` with loading/error state
+- Checks authentication status before fetching
+- Returns `{ positions, isLoading, error, refetch }`
+
+#### RLS Behavior
+
+**Access Control:**
+- **Admin, HR Manager**: Can see all positions
+- **Manager, Employee**: Denied access via FALSE policy; UI shows empty state message
+
+The UI gracefully handles 0 rows by displaying: "No positions available for your role."
+
 ## Next Steps
 
-- Phase 2 continues with Positions UI and Employee Edit forms
+- Phase 2 continues with Employee Edit forms

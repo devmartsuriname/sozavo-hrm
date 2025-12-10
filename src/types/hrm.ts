@@ -107,3 +107,31 @@ export interface HrmOrgUnitRow {
 export interface HrmOrgUnitDirectory extends HrmOrgUnitRow {
   parentOrgUnitName: string | null  // Lookup from parent_id → name
 }
+
+// =============================================================================
+// POSITION TYPES
+// =============================================================================
+
+/**
+ * Position row type - matches hrm_positions table
+ */
+export interface HrmPositionRow {
+  id: string
+  code: string
+  title: string
+  description: string | null
+  org_unit_id: string | null
+  is_active: boolean
+  created_at: string
+  created_by: string | null
+  updated_at: string
+  updated_by: string | null
+}
+
+/**
+ * Position Directory ViewModel - for table listing
+ * Extends row with derived display fields
+ */
+export interface HrmPositionDirectory extends HrmPositionRow {
+  orgUnitName: string | null  // Lookup from org_unit_id → hrm_organization_units.name
+}

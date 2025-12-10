@@ -7,6 +7,7 @@ const Dashboards = lazy(() => import('@/app/(admin)/dashboards/page'))
 const HrmEmployees = lazy(() => import('@/app/(admin)/hrm/employees/page'))
 const HrmEmployeeDetailPage = lazy(() => import('@/app/(admin)/hrm/employees/EmployeeDetailPage'))
 const HrmOrgUnitsPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitsPage'))
+const HrmPositionsPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionsPage'))
 
 // Base UI Routes
 const Accordions = lazy(() => import('@/app/(admin)/base-ui/accordion/page'))
@@ -323,6 +324,11 @@ const hrmRoutes: RoutesProps[] = [
     name: 'Organization Units',
     path: '/hrm/org-units',
     element: <HrmOrgUnitsPage />,
+  },
+  {
+    name: 'Positions',
+    path: '/hrm/positions',
+    element: <HrmPositionsPage />,
   },
 ]
 
