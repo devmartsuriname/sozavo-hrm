@@ -1,9 +1,9 @@
 # HRM RLS Test Plan
 
-**Version:** 1.0  
-**Phase:** 1 – Step 6  
-**Status:** Ready for Testing (pending real user creation)  
-**Last Updated:** 2025-01-XX
+**Version:** 1.1  
+**Phase:** 1 – Step 7D  
+**Status:** Ready for Testing  
+**Last Updated:** 2025-12-09
 
 ---
 
@@ -15,8 +15,8 @@ This document is the **canonical RLS test plan** for validating Row-Level Securi
 
 Before executing these tests:
 
-1. **Create test users** in Supabase Authentication (Dashboard → Authentication → Users)
-2. **Replace placeholder UUIDs** in `/db/hrm/seed_roles.sql` and `/db/hrm/seed_hrm_test_data.sql` with real `auth.users` IDs
+1. **Test users created** in Supabase Authentication ✅
+2. **Real UUIDs configured** in seed files ✅
 3. **Run seed scripts** in order:
    - `seed_roles.sql`
    - `seed_hrm_test_data.sql`
@@ -35,14 +35,16 @@ Before executing these tests:
 
 ## 2. Test Users & Roles
 
-### Placeholder UUIDs
+### Real Supabase User IDs
 
-| Role | Placeholder UUID | Employee Code | Email |
-|------|------------------|---------------|-------|
-| `admin` | `00000000-0000-0000-0000-000000000001` | EMP-ADMIN-001 | admin@sozavo.sr |
-| `hr_manager` | `00000000-0000-0000-0000-000000000002` | EMP-HR-001 | hr.manager@sozavo.sr |
-| `manager` | `00000000-0000-0000-0000-000000000003` | EMP-MANAGER-001 | manager@sozavo.sr |
-| `employee` | `00000000-0000-0000-0000-000000000004` | EMP-EMP-001 | employee@sozavo.sr |
+| Role | UUID | Employee Code | Email |
+|------|------|---------------|-------|
+| `admin` | `185e5b0b-2d3c-4245-a0e3-8c07623c8ad4` | EMP-ADMIN-001 | admin@sozavo.sr |
+| `hr_manager` | `4231ee5a-2bc8-47b0-93a0-c9fd172c24e3` | EMP-HR-001 | hr.manager@sozavo.sr |
+| `manager` | `a6bffd30-455c-491e-87cf-7a41d5f4fffe` | EMP-MANAGER-001 | manager@sozavo.sr |
+| `employee` | `8628fd46-b774-4b5f-91fc-3a8e1ba56d9a` | EMP-EMP-001 | employee@sozavo.sr |
+
+> **Note:** UUIDs are defined in `/db/hrm/seed_roles.sql` and `/db/hrm/seed_hrm_test_data.sql`
 
 ### Role Hierarchy
 
@@ -333,7 +335,7 @@ SELECT * FROM public.hrm_employees;
 ```sql
 -- Run as: employee@sozavo.sr
 INSERT INTO public.user_roles (user_id, role)
-VALUES ('00000000-0000-0000-0000-000000000004', 'admin');
+VALUES ('8628fd46-b774-4b5f-91fc-3a8e1ba56d9a', 'admin');
 -- Expected: Insert DENIED
 ```
 
@@ -341,7 +343,7 @@ VALUES ('00000000-0000-0000-0000-000000000004', 'admin');
 ```sql
 -- Run as: hr.manager@sozavo.sr
 INSERT INTO public.user_roles (user_id, role)
-VALUES ('00000000-0000-0000-0000-000000000002', 'admin');
+VALUES ('4231ee5a-2bc8-47b0-93a0-c9fd172c24e3', 'admin');
 -- Expected: Insert DENIED
 ```
 
@@ -357,53 +359,34 @@ VALUES ('00000000-0000-0000-0000-000000000002', 'admin');
 
 ## 6. Known Limitations
 
-1. **Auth Not Integrated**: The React frontend still uses Darkone's fake-backend. Real RLS testing requires Supabase Auth integration (Phase 1 – Step 7).
-
-2. **Placeholder UUIDs**: All test data uses placeholder UUIDs that must be replaced with real `auth.users` IDs before testing.
-
-3. **Future Modules**: No RLS tests yet for:
+1. **Future Modules**: No RLS tests yet for:
    - Leave management (Phase 4)
    - Attendance tracking (Phase 4)
    - Document storage (Phase 5)
 
-4. **Self-Edit Not Implemented**: Employees cannot currently edit their own limited fields (phone, emergency contact). This may be added in a future phase.
+2. **Self-Edit Not Implemented**: Employees cannot currently edit their own limited fields (phone, emergency contact). This may be added in a future phase.
 
-5. **Manager Hierarchy Depth**: The `is_manager_of()` function only checks direct reports, not the full management chain.
+3. **Manager Hierarchy Depth**: The `is_manager_of()` function only checks direct reports, not the full management chain.
 
 ---
 
 ## 7. Test Execution Procedure
 
-### Step 1: Create Test Users
-
-In Supabase Dashboard → Authentication → Users, create:
-
-| Email | Password | Notes |
-|-------|----------|-------|
-| admin@sozavo.sr | [secure] | Will receive admin role |
-| hr.manager@sozavo.sr | [secure] | Will receive hr_manager role |
-| manager@sozavo.sr | [secure] | Will receive manager role |
-| employee@sozavo.sr | [secure] | Will receive employee role |
-
-### Step 2: Get Real User IDs
+### Step 1: Verify Test Users Exist
 
 ```sql
-SELECT id, email FROM auth.users ORDER BY email;
+SELECT id, email FROM auth.users 
+WHERE email IN ('admin@sozavo.sr', 'hr.manager@sozavo.sr', 'manager@sozavo.sr', 'employee@sozavo.sr')
+ORDER BY email;
 ```
 
-### Step 3: Update Seed Files
-
-Replace placeholder UUIDs in:
-- `/db/hrm/seed_roles.sql`
-- `/db/hrm/seed_hrm_test_data.sql`
-
-### Step 4: Run Seed Scripts
+### Step 2: Run Seed Scripts
 
 Execute in Supabase SQL Editor (in order):
 1. `seed_roles.sql`
 2. `seed_hrm_test_data.sql`
 
-### Step 5: Verify Data
+### Step 3: Verify Data
 
 ```sql
 SELECT ur.user_id, au.email, ur.role 
@@ -412,7 +395,7 @@ JOIN auth.users au ON au.id = ur.user_id
 ORDER BY ur.role;
 ```
 
-### Step 6: Execute Tests
+### Step 4: Execute Tests
 
 Use Supabase SQL Editor with "Run as" user simulation, or use the Supabase JS client with each user's session.
 
@@ -436,10 +419,8 @@ Use Supabase SQL Editor with "Run as" user simulation, or use the Supabase JS cl
 
 After completing RLS testing:
 
-1. **Phase 1 – Step 7**: Integrate Supabase Auth into React frontend
-2. **Phase 1 – Step 8**: Wire up session-aware Supabase queries
-3. **Phase 2**: Begin Core HR Module UI implementation
-4. **Future Phases**: Add RLS for leave, attendance, and document modules
+1. **Phase 2**: Begin Core HR Module UI implementation
+2. **Future Phases**: Add RLS for leave, attendance, and document modules
 
 ---
 
