@@ -14,16 +14,277 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      hrm_employees: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          employee_code: string
+          employment_status: Database["public"]["Enums"]["employment_status"]
+          first_name: string
+          hire_date: string | null
+          id: string
+          is_active: boolean
+          last_name: string
+          manager_id: string | null
+          org_unit_id: string | null
+          phone: string | null
+          position_id: string | null
+          termination_date: string | null
+          updated_at: string
+          updated_by: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          employee_code: string
+          employment_status?: Database["public"]["Enums"]["employment_status"]
+          first_name: string
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean
+          last_name: string
+          manager_id?: string | null
+          org_unit_id?: string | null
+          phone?: string | null
+          position_id?: string | null
+          termination_date?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          employee_code?: string
+          employment_status?: Database["public"]["Enums"]["employment_status"]
+          first_name?: string
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean
+          last_name?: string
+          manager_id?: string | null
+          org_unit_id?: string | null
+          phone?: string | null
+          position_id?: string | null
+          termination_date?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hrm_employees_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hrm_employees_org_unit_id_fkey"
+            columns: ["org_unit_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_organization_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hrm_employees_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hrm_organization_units: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hrm_organization_units_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_organization_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hrm_positions: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          org_unit_id: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          org_unit_id?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          org_unit_id?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hrm_positions_org_unit_id_fkey"
+            columns: ["org_unit_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_organization_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_id: { Args: never; Returns: string }
+      get_employee_record: {
+        Args: { _user_id: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          email: string
+          employee_code: string
+          employment_status: Database["public"]["Enums"]["employment_status"]
+          first_name: string
+          hire_date: string | null
+          id: string
+          is_active: boolean
+          last_name: string
+          manager_id: string | null
+          org_unit_id: string | null
+          phone: string | null
+          position_id: string | null
+          termination_date: string | null
+          updated_at: string
+          updated_by: string | null
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "hrm_employees"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_manager_chain: {
+        Args: { _employee_user_id: string }
+        Returns: string[]
+      }
+      get_user_org_unit: { Args: { _user_id: string }; Returns: string }
+      get_user_roles: { Args: { _user_id: string }; Returns: string[] }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_manager_of: {
+        Args: { _employee_id: string; _manager_user_id: string }
+        Returns: boolean
+      }
+      user_is_admin: { Args: { _user_id: string }; Returns: boolean }
+      user_is_employee: { Args: { _user_id: string }; Returns: boolean }
+      user_is_hr_manager: { Args: { _user_id: string }; Returns: boolean }
+      user_is_manager: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "hr_manager" | "manager" | "employee"
+      attendance_status: "present" | "absent" | "late" | "half_day" | "on_leave"
+      document_type:
+        | "contract"
+        | "id_document"
+        | "certificate"
+        | "resume"
+        | "other"
+      employment_status: "active" | "inactive" | "on_leave" | "terminated"
+      leave_status: "pending" | "approved" | "rejected" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +411,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "hr_manager", "manager", "employee"],
+      attendance_status: ["present", "absent", "late", "half_day", "on_leave"],
+      document_type: [
+        "contract",
+        "id_document",
+        "certificate",
+        "resume",
+        "other",
+      ],
+      employment_status: ["active", "inactive", "on_leave", "terminated"],
+      leave_status: ["pending", "approved", "rejected", "cancelled"],
+    },
   },
 } as const
