@@ -79,3 +79,31 @@ export type HrmEmployeeDirectoryQuery = Pick<
  * Query result for detail (all columns)
  */
 export type HrmEmployeeDetailQuery = HrmEmployeeRow
+
+// =============================================================================
+// ORGANIZATION UNIT TYPES
+// =============================================================================
+
+/**
+ * Organization Unit row type - matches hrm_organization_units table
+ */
+export interface HrmOrgUnitRow {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  parent_id: string | null
+  is_active: boolean
+  created_at: string
+  created_by: string | null
+  updated_at: string
+  updated_by: string | null
+}
+
+/**
+ * Organization Unit Directory ViewModel - for table listing
+ * Extends row with derived display fields
+ */
+export interface HrmOrgUnitDirectory extends HrmOrgUnitRow {
+  parentOrgUnitName: string | null  // Lookup from parent_id → name
+}
