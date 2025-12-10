@@ -72,6 +72,36 @@ Authentication is now handled **exclusively** via:
 - Security definer functions prevent privilege escalation
 - See `/db/hrm/rls_policies.sql` for complete policy definitions
 
+## HRM UI Screens
+
+### Employee Directory (`/hrm/employees`)
+
+The first HRM UI screen implemented in Phase 2:
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/employees/page.tsx` | Employee Directory page component |
+| `src/services/hrmEmployeeService.ts` | Supabase data access for hrm_employees |
+| `src/hooks/useHrmEmployees.ts` | React hook for loading employees |
+| `src/types/hrm.ts` | TypeScript types for HRM module |
+
+#### Full Name Handling
+
+The `fullName` field is **derived in TypeScript**, not stored in the database:
+
+```typescript
+// In hrmEmployeeService.ts
+const employees = data.map((emp) => ({
+  ...emp,
+  fullName: `${emp.first_name} ${emp.last_name}`,
+}))
+```
+
+This approach:
+- Keeps the database schema clean (no redundant columns)
+- Allows UI flexibility without schema changes
+- Follows the principle of deriving display values from source data
+
 ## Next Steps (Phase 7D)
 
 - Phase 7D: Create test users in Supabase, replace placeholder UUIDs in seed files
