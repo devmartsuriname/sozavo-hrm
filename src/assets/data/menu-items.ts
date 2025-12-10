@@ -34,6 +34,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'mingcute:building-3-line',
     url: '/hrm/org-units',
   },
+  {
+    key: 'hrm-positions',
+    label: 'Positions',
+    icon: 'mingcute:briefcase-line',
+    url: '/hrm/positions',
+  },
   // ====================Authentication===============
 
   {
