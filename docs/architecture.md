@@ -243,4 +243,4 @@ src/
 | **2.1** | ✅ Complete | Employee Directory UI (read-only) |
 | **2.2** | ✅ Complete | Org Unit & Position name display |
 | **2.3** | ✅ Complete | Manager name, avatars, sorting, filtering |
-| **2.4** | 🔄 Implemented | Employee Detail View (read-only, hidden route) |
+| **2.4** | ✅ Verified | Employee Detail View (read-only, hidden route) |
