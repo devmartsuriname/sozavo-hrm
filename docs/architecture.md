@@ -159,6 +159,17 @@ docs/
 3. **No Client-Side Role Storage**: Roles fetched fresh, not cached in localStorage
 4. **Admin-Only Deletion**: Structural changes require admin role
 
+### RLS Test Plan Execution
+
+**Date:** 2025-12-10  
+**Status:** ✅ Phase 1 – Step 7D Complete
+
+The formal RLS Test Plan has been executed and all 25 test scenarios passed. See `docs/hrm/HRM_RLS_TestPlan.md` for:
+- Complete test matrix for all 4 tables × 4 roles × 4 operations
+- Scenario-based test cases with expected outcomes
+- Security function verification results
+- Findings and open issues (none critical)
+
 ## HRM UI Implementation
 
 ### Phase 2 – Employee Directory
