@@ -172,21 +172,44 @@ The formal RLS Test Plan has been executed and all 25 test scenarios passed. See
 
 ## HRM UI Implementation
 
-### Phase 2 – Employee Directory
+### Hidden/Internal Route Pattern
 
-The first HRM UI screen, implemented at `/hrm/employees`:
+Some routes are internal and should not appear in the sidebar navigation. These use the `hidden: true` flag in route definitions:
+
+```typescript
+export type RoutesProps = {
+  path: RouteProps['path']
+  name: string
+  element: RouteProps['element']
+  hidden?: boolean // Internal routes not shown in sidebar
+}
+
+// Example: Employee Detail is a hidden route
+{
+  name: 'Employee Detail',
+  path: '/hrm/employees/:employeeId',
+  element: <HrmEmployeeDetailPage />,
+  hidden: true,
+}
+```
+
+### Phase 2 – Employee Directory & Detail
+
+The HRM employee screens implemented at `/hrm/employees`:
 
 ```
 src/
 ├── app/(admin)/hrm/
 │   └── employees/
-│       └── page.tsx            # Employee Directory page
+│       ├── page.tsx                # Employee Directory page
+│       └── EmployeeDetailPage.tsx  # Employee Detail page (Phase 2.4)
 ├── hooks/
-│   └── useHrmEmployees.ts      # Data loading hook
+│   ├── useHrmEmployees.ts          # Directory data loading hook
+│   └── useHrmEmployeeDetail.ts     # Detail data loading hook
 ├── services/
-│   └── hrmEmployeeService.ts   # Supabase query service
+│   └── hrmEmployeeService.ts       # Supabase query service
 └── types/
-    └── hrm.ts                  # HRM TypeScript types
+    └── hrm.ts                      # HRM TypeScript types (Row/ViewModel pattern)
 ```
 
 #### Design Decisions
@@ -220,3 +243,4 @@ src/
 | **2.1** | ✅ Complete | Employee Directory UI (read-only) |
 | **2.2** | ✅ Complete | Org Unit & Position name display |
 | **2.3** | ✅ Complete | Manager name, avatars, sorting, filtering |
+| **2.4** | 🔄 Implemented | Employee Detail View (read-only, hidden route) |

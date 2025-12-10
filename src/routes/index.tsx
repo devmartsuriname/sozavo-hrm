@@ -5,6 +5,7 @@ const Dashboards = lazy(() => import('@/app/(admin)/dashboards/page'))
 
 // HRM Routes
 const HrmEmployees = lazy(() => import('@/app/(admin)/hrm/employees/page'))
+const HrmEmployeeDetailPage = lazy(() => import('@/app/(admin)/hrm/employees/EmployeeDetailPage'))
 
 // Base UI Routes
 const Accordions = lazy(() => import('@/app/(admin)/base-ui/accordion/page'))
@@ -71,6 +72,7 @@ export type RoutesProps = {
   name: string
   element: RouteProps['element']
   exact?: boolean
+  hidden?: boolean // Internal routes not shown in sidebar
 }
 
 const initialRoutes: RoutesProps[] = [
@@ -309,6 +311,12 @@ const hrmRoutes: RoutesProps[] = [
     name: 'Employee Directory',
     path: '/hrm/employees',
     element: <HrmEmployees />,
+  },
+  {
+    name: 'Employee Detail',
+    path: '/hrm/employees/:employeeId',
+    element: <HrmEmployeeDetailPage />,
+    hidden: true, // Internal route, not shown in sidebar
   },
 ]
 

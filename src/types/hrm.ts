@@ -1,34 +1,67 @@
 /**
  * HRM Module TypeScript Types
- * Used for Employee Directory and related HRM functionality
+ * Row/ViewModel Pattern: Row types match DB schema, ViewModels add derived fields
  */
 
-import type { Database } from '@/integrations/supabase/types'
+// =============================================================================
+// ROW TYPES (match database schema exactly)
+// =============================================================================
 
-// Base employee row type from Supabase
-export type HrmEmployeeRow = Database['public']['Tables']['hrm_employees']['Row']
-
-// Employee directory display type (with derived fullName)
-export interface HrmEmployeeDirectory {
+/**
+ * Base employee row type - matches hrm_employees table
+ */
+export interface HrmEmployeeRow {
   id: string
   employee_code: string
   first_name: string
   last_name: string
-  fullName: string // Derived: first_name + ' ' + last_name
   email: string
   phone: string | null
   org_unit_id: string | null
   position_id: string | null
   manager_id: string | null
   employment_status: string
-  // Derived display fields (from JOINed tables)
-  orgUnitName: string | null  // From hrm_organization_units.name
-  positionTitle: string | null // From hrm_positions.title
-  managerName: string | null   // Derived from hrm_employees (manager_id → fullName)
+  hire_date: string | null
+  termination_date: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
-// Query result type (raw from Supabase, before adding fullName)
-export type HrmEmployeeQueryResult = Pick<
+// =============================================================================
+// VIEW MODEL TYPES (Row + derived display fields)
+// =============================================================================
+
+/**
+ * Employee Directory ViewModel - for table listing
+ * Extends row with derived display fields
+ */
+export interface HrmEmployeeDirectory extends HrmEmployeeRow {
+  fullName: string           // Derived: first_name + ' ' + last_name
+  orgUnitName: string | null // Lookup from hrm_organization_units.name
+  positionTitle: string | null // Lookup from hrm_positions.title
+  managerName: string | null   // Lookup from hrm_employees (manager_id → fullName)
+}
+
+/**
+ * Employee Detail ViewModel - for single employee profile view
+ * Uses same derived fields as directory
+ */
+export interface HrmEmployeeDetail extends HrmEmployeeRow {
+  fullName: string
+  orgUnitName: string | null
+  positionTitle: string | null
+  managerName: string | null
+}
+
+// =============================================================================
+// QUERY RESULT TYPES (for service layer)
+// =============================================================================
+
+/**
+ * Query result for directory (minimal columns)
+ */
+export type HrmEmployeeDirectoryQuery = Pick<
   HrmEmployeeRow,
   | 'id'
   | 'employee_code'
@@ -41,3 +74,8 @@ export type HrmEmployeeQueryResult = Pick<
   | 'manager_id'
   | 'employment_status'
 >
+
+/**
+ * Query result for detail (all columns)
+ */
+export type HrmEmployeeDetailQuery = HrmEmployeeRow

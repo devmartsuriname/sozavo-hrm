@@ -92,6 +92,31 @@ Key verified behaviors:
 
 ## HRM UI Screens
 
+### Type Architecture: Row/ViewModel Pattern
+
+HRM types follow a Row/ViewModel pattern where:
+- **Row types** match the database schema exactly (`HrmEmployeeRow`)
+- **ViewModel types** extend Row types with derived display fields (`HrmEmployeeDirectory`, `HrmEmployeeDetail`)
+
+```typescript
+// Row type - matches DB
+interface HrmEmployeeRow {
+  id: string
+  employee_code: string
+  first_name: string
+  last_name: string
+  // ... all DB columns
+}
+
+// ViewModel - Row + derived fields
+interface HrmEmployeeDirectory extends HrmEmployeeRow {
+  fullName: string        // Derived: first_name + ' ' + last_name
+  orgUnitName: string | null
+  positionTitle: string | null
+  managerName: string | null
+}
+```
+
 ### Employee Directory (`/hrm/employees`)
 
 The first HRM UI screen implemented in Phase 2:
@@ -102,6 +127,18 @@ The first HRM UI screen implemented in Phase 2:
 | `src/services/hrmEmployeeService.ts` | Supabase data access for hrm_employees |
 | `src/hooks/useHrmEmployees.ts` | React hook for loading employees |
 | `src/types/hrm.ts` | TypeScript types for HRM module |
+
+### Employee Detail View (`/hrm/employees/:employeeId`)
+
+Read-only profile view for a single employee (Phase 2 – Step 4):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/employees/EmployeeDetailPage.tsx` | Employee Detail page component |
+| `src/hooks/useHrmEmployeeDetail.ts` | React hook for loading single employee |
+| `fetchEmployeeDetail()` in service | Fetch single employee with derived fields |
+
+The detail route is a **hidden/internal route** (not shown in sidebar), accessible via employee code links from the directory.
 
 #### Derived Fields (TypeScript-only, not in DB)
 
