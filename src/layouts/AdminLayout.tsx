@@ -16,7 +16,19 @@ const AdminLayout = ({ children }: ChildrenType) => {
       <VerticalNavigationBar />
       <AnimationStar />
       <div className="page-content">
-        <Container fluid>{children}</Container>
+        <Container fluid>
+          <Suspense 
+            fallback={
+              <div className="d-flex justify-content-center align-items-center p-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            }
+          >
+            {children}
+          </Suspense>
+        </Container>
         <Footer />
       </div>
     </div>
