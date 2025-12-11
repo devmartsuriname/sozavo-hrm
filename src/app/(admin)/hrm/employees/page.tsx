@@ -7,10 +7,11 @@
 
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
+import { Alert, Button, Card, CardBody, CardHeader, CardTitle, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import { Icon } from '@iconify/react'
 import PageTitle from '@/components/PageTitle'
 import { useHrmEmployees } from '@/hooks/useHrmEmployees'
+import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
 import type { HrmEmployeeDirectory } from '@/types/hrm'
 
 type SortKey = 'employee_code' | 'fullName' | 'orgUnitName' | 'positionTitle' | 'managerName' | 'employment_status'
@@ -27,6 +28,10 @@ const getInitials = (fullName: string): string => {
 
 const EmployeeDirectory = () => {
   const { employees, isLoading, error } = useHrmEmployees()
+  const { isAdmin, isHRManager } = useSupabaseAuth()
+
+  // Role-based create permission
+  const canCreate = isAdmin || isHRManager
 
   // Sorting state
   const [sortKey, setSortKey] = useState<SortKey>('employee_code')
@@ -114,13 +119,26 @@ const EmployeeDirectory = () => {
                   View all employees you have access to based on your role.
                 </p>
               </div>
-              <Form.Control
-                type="text"
-                placeholder="Search employees..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ maxWidth: 250 }}
-              />
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <Form.Control
+                  type="text"
+                  placeholder="Search employees..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ maxWidth: 250 }}
+                />
+                {canCreate && (
+                  <Button
+                    as={Link as any}
+                    to="/hrm/employees/create"
+                    variant="primary"
+                    size="sm"
+                  >
+                    <Icon icon="mdi:plus" className="me-1" width={18} />
+                    Create Employee
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardBody>
               {isLoading && (
