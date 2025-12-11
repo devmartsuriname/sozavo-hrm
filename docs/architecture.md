@@ -193,7 +193,7 @@ export type RoutesProps = {
 }
 ```
 
-### Phase 2 – Employee Directory & Detail
+### Phase 2 – Employee Directory, Detail & Edit
 
 The HRM employee screens implemented at `/hrm/employees`:
 
@@ -202,10 +202,13 @@ src/
 ├── app/(admin)/hrm/
 │   └── employees/
 │       ├── page.tsx                # Employee Directory page
-│       └── EmployeeDetailPage.tsx  # Employee Detail page (Phase 2.4)
+│       ├── EmployeeDetailPage.tsx  # Employee Detail page (Phase 2.4)
+│       └── EmployeeEditPage.tsx    # Employee Edit form (Phase 2.9)
 ├── hooks/
 │   ├── useHrmEmployees.ts          # Directory data loading hook
-│   └── useHrmEmployeeDetail.ts     # Detail data loading hook
+│   ├── useHrmEmployeeDetail.ts     # Detail data loading hook
+│   ├── useUpdateEmployee.ts        # Employee update hook
+│   └── useEmployeeFormOptions.ts   # Form dropdown options hook
 ├── services/
 │   └── hrmEmployeeService.ts       # Supabase query service
 └── types/
@@ -247,7 +250,8 @@ src/
 | **2.5** | ✅ Verified | Organization Units UI (read-only listing, RLS tested) |
 | **2.6** | ✅ Verified | Positions UI (read-only listing, RLS tested with all roles) |
 | **2.7** | ✅ Verified | Position Detail View (read-only, hidden route) |
-| **2.8** | 🔄 In Progress | Organization Unit Detail View (read-only, hidden route) |
+| **2.8** | ✅ Complete | Organization Unit Detail View (read-only, hidden route) |
+| **2.9** | 🔄 In Progress | Employee Edit Form (Admin + HR only) |
 
 ## Row/ViewModel Pattern Standard
 

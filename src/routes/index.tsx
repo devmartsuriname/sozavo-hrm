@@ -6,6 +6,7 @@ const Dashboards = lazy(() => import('@/app/(admin)/dashboards/page'))
 // HRM Routes
 const HrmEmployees = lazy(() => import('@/app/(admin)/hrm/employees/page'))
 const HrmEmployeeDetailPage = lazy(() => import('@/app/(admin)/hrm/employees/EmployeeDetailPage'))
+const HrmEmployeeEditPage = lazy(() => import('@/app/(admin)/hrm/employees/EmployeeEditPage'))
 const HrmOrgUnitsPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitsPage'))
 const HrmOrgUnitDetailPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitDetailPage'))
 const HrmPositionsPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionsPage'))
@@ -320,6 +321,12 @@ const hrmRoutes: RoutesProps[] = [
     name: 'Employee Detail',
     path: '/hrm/employees/:employeeId',
     element: <HrmEmployeeDetailPage />,
+    hidden: true, // Internal route, not shown in sidebar
+  },
+  {
+    name: 'Employee Edit',
+    path: '/hrm/employees/:employeeId/edit',
+    element: <HrmEmployeeEditPage />,
     hidden: true, // Internal route, not shown in sidebar
   },
   {

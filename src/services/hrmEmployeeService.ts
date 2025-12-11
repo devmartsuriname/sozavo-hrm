@@ -161,3 +161,26 @@ export async function fetchEmployeeDetail(
     managerName,
   }
 }
+
+/**
+ * Updates an employee record by ID.
+ * RLS enforces access: only admins and HR managers can update.
+ * Returns the updated employee row or throws an error.
+ */
+export async function updateEmployee(
+  employeeId: string,
+  payload: import('@/types/hrm').HrmEmployeeUpdatePayload
+): Promise<import('@/types/hrm').HrmEmployeeRow> {
+  const { data, error } = await supabase
+    .from('hrm_employees')
+    .update(payload)
+    .eq('id', employeeId)
+    .select('*')
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to update employee: ${error.message}`)
+  }
+
+  return data as import('@/types/hrm').HrmEmployeeRow
+}
