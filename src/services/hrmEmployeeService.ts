@@ -184,3 +184,66 @@ export async function updateEmployee(
 
   return data as import('@/types/hrm').HrmEmployeeRow
 }
+
+/**
+ * Generates a unique employee code based on organization unit.
+ * Pattern: EMP-{ORG_PREFIX}-{SEQUENCE}
+ * e.g., EMP-HR-001, EMP-VHV-002
+ */
+export async function generateEmployeeCode(orgUnitId: string): Promise<string> {
+  // 1. Get org unit code
+  const { data: orgUnit, error: orgError } = await supabase
+    .from('hrm_organization_units')
+    .select('code')
+    .eq('id', orgUnitId)
+    .single()
+
+  if (orgError || !orgUnit) {
+    // Fallback to generic prefix if org unit lookup fails
+    console.warn('Could not fetch org unit code, using GEN prefix')
+  }
+
+  // 2. Extract prefix (last segment of code, uppercase, alphanumeric only)
+  const rawCode = orgUnit?.code || 'GEN'
+  const prefix = rawCode
+    .split('_')
+    .pop()
+    ?.replace(/[^A-Za-z0-9]/g, '')
+    .toUpperCase() || 'GEN'
+
+  // 3. Count existing employees with this prefix pattern
+  const { count, error: countError } = await supabase
+    .from('hrm_employees')
+    .select('*', { count: 'exact', head: true })
+    .like('employee_code', `EMP-${prefix}-%`)
+
+  if (countError) {
+    console.warn('Could not count existing employees:', countError.message)
+  }
+
+  // 4. Generate next sequence number (zero-padded to 3 digits)
+  const sequence = String((count || 0) + 1).padStart(3, '0')
+
+  return `EMP-${prefix}-${sequence}`
+}
+
+/**
+ * Creates a new employee record.
+ * RLS enforces access: only admins and HR managers can insert.
+ * Returns the created employee row or throws an error.
+ */
+export async function createEmployee(
+  payload: import('@/types/hrm').HrmEmployeeCreatePayload
+): Promise<import('@/types/hrm').HrmEmployeeRow> {
+  const { data, error } = await supabase
+    .from('hrm_employees')
+    .insert(payload)
+    .select('*')
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to create employee: ${error.message}`)
+  }
+
+  return data as import('@/types/hrm').HrmEmployeeRow
+}
