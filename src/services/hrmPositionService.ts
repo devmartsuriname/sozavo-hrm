@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client'
-import type { HrmPositionDirectory, HrmPositionRow } from '@/types/hrm'
+import type { HrmPositionDirectory, HrmPositionRow, HrmPositionDetail } from '@/types/hrm'
 
 /**
  * Fetch all positions with org unit name lookup
@@ -41,4 +41,51 @@ export async function fetchPositions(): Promise<HrmPositionDirectory[]> {
     ...pos,
     orgUnitName: pos.org_unit_id ? orgUnitMap.get(pos.org_unit_id) ?? null : null,
   }))
+}
+
+/**
+ * Fetch a single position by ID with org unit name lookup.
+ * Returns null when:
+ * - Position not found
+ * - RLS denies access
+ *
+ * Throws only for genuine query errors.
+ */
+export async function fetchPositionDetail(
+  positionId: string
+): Promise<HrmPositionDetail | null> {
+  // Parallel fetch: single position + org units for name lookup
+  const [positionResult, orgUnitsResult] = await Promise.all([
+    supabase
+      .from('hrm_positions')
+      .select('*')
+      .eq('id', positionId)
+      .maybeSingle(),
+    supabase
+      .from('hrm_organization_units')
+      .select('id, name'),
+  ])
+
+  // Throw for genuine query errors
+  if (positionResult.error) {
+    throw new Error(`Failed to fetch position: ${positionResult.error.message}`)
+  }
+
+  // Return null if not found or RLS denied access
+  if (!positionResult.data) {
+    return null
+  }
+
+  const pos = positionResult.data as HrmPositionRow
+
+  // Build lookup map (gracefully handle RLS blocking)
+  const orgUnitMap = new Map<string, string>()
+  if (!orgUnitsResult.error && orgUnitsResult.data) {
+    orgUnitsResult.data.forEach((ou) => orgUnitMap.set(ou.id, ou.name))
+  }
+
+  return {
+    ...pos,
+    orgUnitName: pos.org_unit_id ? orgUnitMap.get(pos.org_unit_id) ?? null : null,
+  }
 }

@@ -135,3 +135,15 @@ export interface HrmPositionRow {
 export interface HrmPositionDirectory extends HrmPositionRow {
   orgUnitName: string | null  // Lookup from org_unit_id → hrm_organization_units.name
 }
+
+// =============================================================================
+// POSITION DETAIL TYPE
+// =============================================================================
+
+/**
+ * Position Detail ViewModel - for single position profile view
+ * Extends row with derived display fields
+ */
+export interface HrmPositionDetail extends HrmPositionRow {
+  orgUnitName: string | null  // Lookup from org_unit_id → hrm_organization_units.name
+}
