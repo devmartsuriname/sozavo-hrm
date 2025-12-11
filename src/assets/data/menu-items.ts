@@ -40,6 +40,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'mingcute:briefcase-line',
     url: '/hrm/positions',
   },
+  {
+    key: 'hrm-users',
+    label: 'Users & Roles',
+    icon: 'mingcute:shield-user-line',
+    url: '/hrm/users',
+  },
   // ====================Authentication===============
 
   {

@@ -12,6 +12,8 @@ const HrmOrgUnitsPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitsP
 const HrmOrgUnitDetailPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitDetailPage'))
 const HrmPositionsPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionsPage'))
 const HrmPositionDetailPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionDetailPage'))
+const HrmUsersPage = lazy(() => import('@/app/(admin)/hrm/users/UsersPage'))
+const HrmUserDetailPage = lazy(() => import('@/app/(admin)/hrm/users/UserDetailPage'))
 
 // Base UI Routes
 const Accordions = lazy(() => import('@/app/(admin)/base-ui/accordion/page'))
@@ -356,6 +358,17 @@ const hrmRoutes: RoutesProps[] = [
     name: 'Position Detail',
     path: '/hrm/positions/:positionId',
     element: <HrmPositionDetailPage />,
+    hidden: true,
+  },
+  {
+    name: 'Users & Roles',
+    path: '/hrm/users',
+    element: <HrmUsersPage />,
+  },
+  {
+    name: 'User Detail',
+    path: '/hrm/users/:userId',
+    element: <HrmUserDetailPage />,
     hidden: true,
   },
 ]
