@@ -161,16 +161,18 @@ P{phase}-{category}-{number}
 | P2-UI-005 | UI | Create Position Form Modal | Create/Edit modal | ⏳ | P1 |
 | P2-UI-006 | UI | Create Employees List Page | Table with search, filter, sorting, avatars | ✅ | P1 |
 | P2-UI-007 | UI | Create Employee Detail Page | View employee profile (read-only) | ✅ | P1 |
-| P2-UI-008 | UI | Create Employee Form Page | Multi-step employee creation/edit | ⏳ | P1 |
+| P2-UI-008 | UI | Create Employee Form Page | Employee Create/Edit forms using shared EmployeeFormBase component | ✅ | P1 |
 | P2-UI-009 | UI | Create Employee Card Component | Reusable employee display card | ⏳ | P2 |
 | P2-UI-010 | UI | Create Organization Tree Component | Visual org hierarchy | ⏳ | P2 |
 | P2-UI-011 | UI | Implement HRM Data Hooks (custom pattern) | useHrmEmployees, useHrmEmployeeDetail (no React Query) | ✅ | P1 |
-| P2-UI-012 | UI | Add Loading States | Skeleton loaders for all HRM pages | ⏳ | P2 |
-| P2-UI-013 | UI | Add Empty States | Empty state UI for no-data scenarios | ⏳ | P2 |
-| P2-UI-014 | UI | Add Error States | Error boundaries and error UI | ⏳ | P2 |
-| P2-UI-015 | UI | Add Toast Notifications | Success/error feedback for actions | ⏳ | P2 |
+| P2-UI-012 | UI | Add Loading States | Spinner components for all HRM pages | ✅ | P2 |
+| P2-UI-013 | UI | Add Empty States | Alert components for no-data scenarios | ✅ | P2 |
+| P2-UI-014 | UI | Add Error States | Alert error UI components | ✅ | P2 |
+| P2-UI-015 | UI | Add Toast Notifications | react-toastify integration for actions | ✅ | P2 |
 
-**Phase 2 Summary:** 8/25 tasks completed (Steps 1–4 verified), 17 planned
+**Phase 2 Summary:** 13/25 tasks completed (Steps 1–11 verified), 12 planned
+
+> **Note:** `EmployeeFormBase` (`src/components/hrm/EmployeeFormBase.tsx`) is the single source of truth for all employee form logic (create + edit modes), centralizing validation and business rules.
 
 ---
 
@@ -343,21 +345,25 @@ P{phase}-{category}-{number}
 |-------|--------|-------|-----------|
 | 0 | ✅ Complete | 7 | 7 |
 | 1 | ✅ Complete | 35 | 35 |
-| 2 | 🔄 In Progress | 25 | 8 |
+| 2 | 🔄 In Progress | 25 | 13 |
 | 3 | ⏳ Planned | 14 | 0 |
 | 4 | ⏳ Planned | 18 | 0 |
 | 5 | ⏳ Planned | 12 | 0 |
 | 6 | ⏳ Planned | 15 | 0 |
 | 7 | ⏳ Planned | 13 | 0 |
 | 8 | ⏳ Planned | 16 | 0 |
-| **Total** | | **155** | **50** |
+| **Total** | | **155** | **55** |
 
 ---
 
 ## Next Actions
 
-### Phase 2 — Remaining Steps (5+)
-1. Create Organization Units UI (P2-UI-002, P2-UI-003)
-2. Create Positions UI (P2-UI-004, P2-UI-005)
-3. Create Employee Edit Form (P2-UI-008)
-4. Add remaining service definitions (P2-SVC-002, P2-SVC-003, P2-SVC-004)
+### Phase 2 — Remaining Steps
+1. Create Organization Unit Form Modal (P2-UI-003) — CRUD forms for org units
+2. Create Position Form Modal (P2-UI-005) — CRUD forms for positions
+3. Add remaining service definitions (P2-SVC-002, P2-SVC-003, P2-SVC-004)
+
+### Phase 3 — Upcoming
+1. Enhance AuthContext with Roles (P3-RBAC-001)
+2. Create usePermissions Hook (P3-RBAC-002)
+3. Create RoleGuard Component (P3-RBAC-003)
