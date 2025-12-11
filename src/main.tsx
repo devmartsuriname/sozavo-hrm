@@ -7,6 +7,9 @@ import { basePath } from './context/constants.ts'
 // Darkone React Template SCSS (primary styles)
 import './assets/scss/style.scss'
 
+// React-Toastify CSS (required for proper toast sizing and positioning)
+import 'react-toastify/dist/ReactToastify.css'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename={basePath}>
