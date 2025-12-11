@@ -97,7 +97,16 @@ const EmployeeEditPage = () => {
 
   // Handle form field changes
   const handleChange = (field: keyof HrmEmployeeUpdatePayload, value: string | boolean | null) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => {
+      const updated = { ...prev, [field]: value }
+      
+      // Rule A: Auto-set is_active to false when status changes to terminated
+      if (field === 'employment_status' && value === 'terminated') {
+        updated.is_active = false
+      }
+      
+      return updated
+    })
     // Clear validation error for this field
     if (validationErrors[field]) {
       setValidationErrors((prev) => {
@@ -124,6 +133,12 @@ const EmployeeEditPage = () => {
       errors.email = 'Invalid email format'
     }
 
+    // Rule B: Termination date + active status is invalid
+    if (formData.termination_date && formData.employment_status === 'active') {
+      errors.employment_status = 'An employee with a termination date cannot have status "Active".'
+      errors.termination_date = 'Clear this date or change status from "Active".'
+    }
+
     setValidationErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -136,7 +151,15 @@ const EmployeeEditPage = () => {
       return
     }
 
-    const result = await updateEmployee(formData)
+    // Apply business rules to payload
+    const processedPayload = { ...formData }
+
+    // Rule A: Terminated status forces is_active = false
+    if (processedPayload.employment_status === 'terminated') {
+      processedPayload.is_active = false
+    }
+
+    const result = await updateEmployee(processedPayload)
 
     if (result) {
       toast.success('Employee updated successfully')
@@ -149,23 +172,21 @@ const EmployeeEditPage = () => {
     navigate(`/hrm/employees/${employeeId}`)
   }
 
-  // Access denied for non-Admin/HR users
+  // Hard guard for role-based access - check VERY EARLY before any other rendering
   if (status === 'authenticated' && !canEdit) {
     return (
       <>
-        <PageTitle title="Edit Employee" subName="HRM" />
-        <Row>
-          <Col xs={12}>
-            <Alert variant="danger">
-              <Icon icon="mdi:lock-outline" className="me-2" width={20} />
-              Access denied. Only administrators and HR managers can edit employee records.
-            </Alert>
-            <Button variant="secondary" onClick={() => navigate('/hrm/employees')}>
-              <Icon icon="mdi:arrow-left" className="me-1" width={18} />
-              Back to Directory
-            </Button>
-          </Col>
-        </Row>
+        <PageTitle title="Access denied" subName="HRM" />
+        <Alert variant="warning" className="mt-3">
+          You do not have permission to edit employee records. If you believe this is an error, please contact the system administrator.
+        </Alert>
+        <Button
+          variant="secondary"
+          className="mt-2"
+          onClick={() => navigate('/hrm/employees')}
+        >
+          Back to Employee Directory
+        </Button>
       </>
     )
   }
@@ -443,6 +464,7 @@ const EmployeeEditPage = () => {
                       <Form.Select
                         value={formData.employment_status}
                         onChange={(e) => handleChange('employment_status', e.target.value)}
+                        isInvalid={!!validationErrors.employment_status}
                       >
                         {EMPLOYMENT_STATUS_OPTIONS.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -450,19 +472,31 @@ const EmployeeEditPage = () => {
                           </option>
                         ))}
                       </Form.Select>
+                      {validationErrors.employment_status && (
+                        <div className="invalid-feedback d-block">
+                          {validationErrors.employment_status}
+                        </div>
+                      )}
                     </Form.Group>
                   </Col>
                   <Col md={3} className="mb-3">
                     <Form.Group>
                       <Form.Label>Active</Form.Label>
                       <div className="pt-2">
-                        <Form.Check
-                          type="switch"
-                          id="is-active-switch"
-                          label={formData.is_active ? 'Yes' : 'No'}
-                          checked={formData.is_active}
-                          onChange={(e) => handleChange('is_active', e.target.checked)}
-                        />
+                        {formData.employment_status === 'terminated' ? (
+                          <span className="text-muted">
+                            <Icon icon="mdi:lock-outline" className="me-1" width={16} />
+                            Inactive (locked by status 'Terminated')
+                          </span>
+                        ) : (
+                          <Form.Check
+                            type="switch"
+                            id="is-active-switch"
+                            label={formData.is_active ? 'Yes' : 'No'}
+                            checked={formData.is_active}
+                            onChange={(e) => handleChange('is_active', e.target.checked)}
+                          />
+                        )}
                       </div>
                     </Form.Group>
                   </Col>
@@ -483,7 +517,13 @@ const EmployeeEditPage = () => {
                         type="date"
                         value={formData.termination_date || ''}
                         onChange={(e) => handleChange('termination_date', e.target.value || null)}
+                        isInvalid={!!validationErrors.termination_date}
                       />
+                      {validationErrors.termination_date && (
+                        <div className="invalid-feedback d-block">
+                          {validationErrors.termination_date}
+                        </div>
+                      )}
                     </Form.Group>
                   </Col>
                 </Row>

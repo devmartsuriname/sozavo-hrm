@@ -185,6 +185,27 @@ The `updateEmployee` function:
 - Related table lookups gracefully return `null` when RLS blocks access
 - UI displays "Not found or access denied" instead of crashing
 
+#### Business Rules (Employee Edit Form)
+
+The Employee Edit Form enforces the following HR business rules at the frontend level:
+
+1. **Terminated ⇒ Always Inactive**
+   - When `employment_status = 'terminated'`, the `is_active` flag is automatically set to `false`
+   - The Active toggle is locked and displays "Inactive (locked by status 'Terminated')"
+   - This rule is enforced both in the UI and in the payload before submission
+
+2. **Termination Date ⇒ Status Cannot Be Active**
+   - If a `termination_date` is set, the `employment_status` cannot be 'active'
+   - Form validation blocks submission with a clear inline error message
+   - User must either clear the termination date or change status
+
+#### Access Control (Employee Edit Form)
+
+Only **Admin** and **HR Manager** roles can access the Employee Edit page:
+- Edit button on Employee Detail is hidden for Manager and Employee roles
+- Direct URL access to `/hrm/employees/:employeeId/edit` shows "Access denied" view with proper breadcrumbs
+- RLS policies provide a secondary enforcement layer at the database level
+
 ### React Hooks (Custom Pattern, No React Query)
 
 The HRM module uses simple custom hooks for data fetching:
