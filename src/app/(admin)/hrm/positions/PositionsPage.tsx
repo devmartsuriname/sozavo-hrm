@@ -4,6 +4,7 @@
  */
 
 import { Card, Table, Spinner, Alert, Badge } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import { useHrmPositions } from '@/hooks/useHrmPositions'
 import PageTitle from '@/components/PageTitle'
 
@@ -57,7 +58,9 @@ const PositionsPage = () => {
                   {positions.map((position) => (
                     <tr key={position.id}>
                       <td>
-                        <span className="fw-medium">{position.code}</span>
+                        <Link to={`/hrm/positions/${position.id}`} className="text-primary fw-medium">
+                          {position.code}
+                        </Link>
                       </td>
                       <td>{position.title}</td>
                       <td>{position.orgUnitName || '—'}</td>

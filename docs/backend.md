@@ -347,6 +347,48 @@ The `useHrmPositions()` hook follows the same pattern as `useHrmOrgUnits()`:
 
 The UI gracefully handles 0 rows by displaying: "No positions available for your role."
 
+### Position Detail View (`/hrm/positions/:positionId`)
+
+Read-only profile view for a single position (Phase 2 – Step 7):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/positions/PositionDetailPage.tsx` | Position Detail page component |
+| `src/hooks/useHrmPositionDetail.ts` | React hook for loading single position |
+| `fetchPositionDetail()` in service | Fetch single position with derived fields |
+
+The detail route is a **hidden/internal route** (not shown in sidebar), accessible via position code links from the directory.
+
+#### Type Architecture
+
+```typescript
+// Detail ViewModel - Row + derived fields
+interface HrmPositionDetail extends HrmPositionRow {
+  orgUnitName: string | null  // Lookup from org_unit_id
+}
+```
+
+#### Service Function
+
+The `fetchPositionDetail(positionId)` function in `hrmPositionService.ts`:
+- Parallel fetch: single position + org units for name lookup
+- Returns `null` when position not found or RLS denies access
+- Throws only for genuine query errors
+
+#### React Hook
+
+The `useHrmPositionDetail(positionId)` hook:
+- `useState` + `useEffect` with loading/error state
+- Checks authentication status before fetching
+- Returns `{ position, isLoading, error }`
+- Sets user-friendly error message when position not found
+
+#### RLS Behavior (Detail View)
+
+**Access Control:**
+- **Admin, HR Manager**: Can view any position detail
+- **Manager, Employee**: Denied access; UI shows "Position not found or you do not have access"
+
 ## Next Steps
 
 - Phase 2 continues with Employee Edit forms
