@@ -251,7 +251,14 @@ src/
 | **2.6** | ✅ Verified | Positions UI (read-only listing, RLS tested with all roles) |
 | **2.7** | ✅ Verified | Position Detail View (read-only, hidden route) |
 | **2.8** | ✅ Complete | Organization Unit Detail View (read-only, hidden route) |
-| **2.9** | 🔄 In Progress | Employee Edit Form (Admin + HR only) |
+| **2.9** | 🔄 In Progress | Employee Edit Form (Admin + HR only) with UI access guard and HR business rules |
+
+**Employee Edit Form (Phase 2.9):**
+- UI access guard ensures only Admin/HR Manager can access the edit page (Manager/Employee see "Access denied")
+- HR business rules enforce status/termination date consistency at the form level
+- Rule A: Terminated status automatically sets is_active = false (locked in UI)
+- Rule B: Termination date present + Active status is blocked with validation error
+- A future phase will introduce a dedicated HR audit table for employee changes
 
 ## Row/ViewModel Pattern Standard
 
