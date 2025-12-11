@@ -3,7 +3,7 @@
 **Version:** 1.2  
 **Phase:** 1 – Step 7D  
 **Status:** ✅ Executed – All Tests Passed  
-**Last Updated:** 2025-12-10
+**Last Updated:** 2025-12-11
 
 ---
 
@@ -356,6 +356,42 @@ These tests verify the `/hrm/positions` page respects RLS policies.
 - Sidebar entry visible to all roles; data visibility enforced by RLS
 - Empty state displays: "No positions available for your role."
 - Positions table displays Code, Title, Organization Unit, and Active status columns
+
+---
+
+## 4.7 Position Detail View Tests (Phase 2 – Step 7)
+
+These tests verify the `/hrm/positions/:positionId` detail page respects RLS policies.
+
+| Role | Directory Access | Detail Access | `orgUnitName` | Verified |
+|------|------------------|---------------|---------------|----------|
+| Admin | ✅ 4 rows | ✅ Can view any position | ✅ Resolved | ✅ |
+| HR Manager | ✅ 4 rows | ✅ Can view any position | ✅ Resolved | ✅ |
+| Manager | ❌ 0 rows | ❌ "Not found or access denied" | N/A | ✅ |
+| Employee | ❌ 0 rows | ❌ "Not found or access denied" | N/A | ✅ |
+
+**Test Scenarios:**
+
+1. **Directory Navigation (Admin/HR Manager):**
+   - Click position Code link → Position Detail page loads
+   - All 3 info cards display (Basic, Organization & Status, Audit)
+   - `orgUnitName` correctly resolved via parallel-fetch pattern
+   - Back button navigates to `/hrm/positions`
+
+2. **Direct URL Access (Admin/HR Manager):**
+   - Navigate to `/hrm/positions/{valid-uuid}` → Detail page loads
+   - Navigate to `/hrm/positions/{invalid-uuid}` → "Not found" alert
+
+3. **Access Denial (Manager/Employee):**
+   - Directory shows empty state (0 positions)
+   - Direct URL to any position ID → "Not found or access denied" alert
+   - No console errors observed
+
+**Test Notes:**
+- Hidden route not visible in sidebar (by design)
+- UI uses Darkone Card/Alert/Badge/Spinner patterns consistently
+- Loading spinner displays during data fetch
+- No console errors for any role
 
 ---
 
