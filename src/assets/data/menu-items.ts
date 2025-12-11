@@ -43,7 +43,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     key: 'hrm-users',
     label: 'Users & Roles',
-    icon: 'mingcute:shield-user-line',
+    icon: 'mingcute:user-setting-line',
     url: '/hrm/users',
   },
   // ====================Authentication===============
