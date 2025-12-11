@@ -155,3 +155,28 @@ export interface HrmPositionDirectory extends HrmPositionRow {
 export interface HrmPositionDetail extends HrmPositionRow {
   orgUnitName: string | null  // Lookup from org_unit_id → hrm_organization_units.name
 }
+
+// =============================================================================
+// EMPLOYEE UPDATE PAYLOAD (for edit form)
+// =============================================================================
+
+/** Employment status enum type matching DB */
+export type EmploymentStatusType = 'active' | 'inactive' | 'on_leave' | 'terminated'
+
+/**
+ * Payload for updating an employee record.
+ * Excludes non-editable fields (id, employee_code, audit columns, derived fields).
+ */
+export interface HrmEmployeeUpdatePayload {
+  first_name: string
+  last_name: string
+  email: string
+  phone: string | null
+  org_unit_id: string | null
+  position_id: string | null
+  manager_id: string | null
+  employment_status: EmploymentStatusType
+  hire_date: string | null
+  termination_date: string | null
+  is_active: boolean
+}

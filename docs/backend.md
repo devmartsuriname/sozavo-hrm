@@ -148,19 +148,37 @@ Read-only profile view for a single employee (Phase 2 – Step 4):
 
 The detail route is a **hidden/internal route** (not shown in sidebar), accessible via employee code links from the directory.
 
+### Employee Edit Form (`/hrm/employees/:employeeId/edit`)
+
+Edit form for updating employee records (Phase 2 – Step 9):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/employees/EmployeeEditPage.tsx` | Employee Edit form page |
+| `src/hooks/useUpdateEmployee.ts` | Hook for updating employee |
+| `src/hooks/useEmployeeFormOptions.ts` | Hook for loading form dropdowns |
+
+The edit route is a **hidden/internal route** accessible only via the Edit button on Employee Detail page. Access is restricted to Admin and HR Manager roles - Manager and Employee roles see an "Access denied" message.
+
 ### Service Functions
 
-The HRM Employee Service (`src/services/hrmEmployeeService.ts`) provides two main functions:
+The HRM Employee Service (`src/services/hrmEmployeeService.ts`) provides the following functions:
 
 | Function | Description |
 |----------|-------------|
 | `fetchEmployeeDirectory()` | Returns `HrmEmployeeDirectory[]` for table listing |
 | `fetchEmployeeDetail(id)` | Returns `HrmEmployeeDetail \| null` for single employee |
+| `updateEmployee(id, payload)` | Updates employee record, returns `HrmEmployeeRow` |
 
-Both functions use the **parallel-fetch + merge pattern**:
+The read functions use the **parallel-fetch + merge pattern**:
 1. Execute multiple Supabase queries in parallel via `Promise.all()`
 2. Build lookup Maps for related data (org units, positions, employees)
 3. Derive display fields (`fullName`, `orgUnitName`, `positionTitle`, `managerName`)
+
+The `updateEmployee` function:
+- Uses Supabase `.update().eq().select().single()` pattern
+- RLS enforces access: only admins and HR managers can update
+- Returns the updated row or throws an error
 
 **RLS-Aware Behavior:**
 - Service returns `null` when RLS denies access
@@ -175,6 +193,8 @@ The HRM module uses simple custom hooks for data fetching:
 |------|------|---------|
 | `useHrmEmployees()` | `src/hooks/useHrmEmployees.ts` | Load employee directory |
 | `useHrmEmployeeDetail(id)` | `src/hooks/useHrmEmployeeDetail.ts` | Load single employee |
+| `useUpdateEmployee(id)` | `src/hooks/useUpdateEmployee.ts` | Update employee record |
+| `useEmployeeFormOptions()` | `src/hooks/useEmployeeFormOptions.ts` | Load form dropdown options |
 
 Pattern: `useState` + `useEffect` with loading/error state management. React Query is NOT used per project constraints.
 

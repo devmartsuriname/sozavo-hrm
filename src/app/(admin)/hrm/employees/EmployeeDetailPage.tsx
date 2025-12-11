@@ -9,6 +9,7 @@ import { Alert, Badge, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner,
 import { Icon } from '@iconify/react'
 import PageTitle from '@/components/PageTitle'
 import { useHrmEmployeeDetail } from '@/hooks/useHrmEmployeeDetail'
+import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
 
 /** Derive initials from a full name */
 const getInitials = (fullName: string): string => {
@@ -51,9 +52,17 @@ const EmployeeDetailPage = () => {
   const { employeeId } = useParams<{ employeeId: string }>()
   const navigate = useNavigate()
   const { employee, isLoading, error } = useHrmEmployeeDetail(employeeId || '')
+  const { isAdmin, isHRManager } = useSupabaseAuth()
+
+  // Only Admin and HR Manager can edit
+  const canEdit = isAdmin || isHRManager
 
   const handleBack = () => {
     navigate('/hrm/employees')
+  }
+
+  const handleEdit = () => {
+    navigate(`/hrm/employees/${employeeId}/edit`)
   }
 
   // Loading state
@@ -141,6 +150,12 @@ const EmployeeDetailPage = () => {
                     </Badge>
                   </p>
                 </div>
+                {canEdit && (
+                  <Button variant="primary" onClick={handleEdit}>
+                    <Icon icon="mdi:pencil" className="me-1" width={18} />
+                    Edit
+                  </Button>
+                )}
               </div>
             </CardBody>
           </Card>
