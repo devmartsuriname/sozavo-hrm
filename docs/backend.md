@@ -271,21 +271,30 @@ interface HrmOrgUnitRow {
 interface HrmOrgUnitDirectory extends HrmOrgUnitRow {
   parentOrgUnitName: string | null  // Lookup from parent_id
 }
+
+// Detail ViewModel - Row + derived fields
+interface HrmOrgUnitDetail extends HrmOrgUnitRow {
+  parentOrgUnitName: string | null  // Lookup from parent_id
+}
 ```
 
-#### Service Function
+#### Service Functions
 
-The `fetchOrgUnits()` function in `hrmOrgUnitService.ts`:
-- Fetches all org units in a single query
-- Builds a self-join Map for parent name resolution
-- Returns empty array when RLS denies access (no crash)
+The `hrmOrgUnitService.ts` provides two main functions:
 
-#### React Hook
+| Function | Description |
+|----------|-------------|
+| `fetchOrgUnits()` | Returns `HrmOrgUnitDirectory[]` for table listing |
+| `fetchOrgUnitDetail(id)` | Returns `HrmOrgUnitDetail \| null` for single org unit |
 
-The `useHrmOrgUnits()` hook follows the same pattern as `useHrmEmployees()`:
-- `useState` + `useEffect` with loading/error state
-- Checks authentication status before fetching
-- Returns `{ orgUnits, isLoading, error, refetch }`
+Both functions use a self-join pattern for parent name resolution (same table lookup).
+
+#### React Hooks
+
+| Hook | File | Purpose |
+|------|------|---------|
+| `useHrmOrgUnits()` | `src/hooks/useHrmOrgUnits.ts` | Load org unit directory |
+| `useHrmOrgUnitDetail(id)` | `src/hooks/useHrmOrgUnitDetail.ts` | Load single org unit |
 
 #### RLS Behavior
 
@@ -294,6 +303,24 @@ The `useHrmOrgUnits()` hook follows the same pattern as `useHrmEmployees()`:
 - **Manager, Employee**: Denied access via FALSE policy; UI shows empty state message
 
 The UI gracefully handles 0 rows by displaying: "No organization units available for your role."
+
+### Organization Unit Detail View (`/hrm/org-units/:orgUnitId`)
+
+Read-only profile view for a single organization unit (Phase 2 – Step 8):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/org-units/OrgUnitDetailPage.tsx` | Org Unit Detail page component |
+| `src/hooks/useHrmOrgUnitDetail.ts` | React hook for loading single org unit |
+| `fetchOrgUnitDetail()` in service | Fetch single org unit with derived fields |
+
+The detail route is a **hidden/internal route** (not shown in sidebar), accessible via org unit code links from the directory.
+
+#### RLS Behavior (Detail View)
+
+**Access Control:**
+- **Admin, HR Manager**: Can view any org unit detail
+- **Manager, Employee**: Denied access; UI shows "Organization unit not found or you do not have access"
 
 ### Positions (`/hrm/positions`)
 

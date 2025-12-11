@@ -246,7 +246,8 @@ src/
 | **2.4** | ✅ Verified | Employee Detail View (read-only, hidden route) |
 | **2.5** | ✅ Verified | Organization Units UI (read-only listing, RLS tested) |
 | **2.6** | ✅ Verified | Positions UI (read-only listing, RLS tested with all roles) |
-| **2.7** | 🔄 In Progress | Position Detail View (read-only, hidden route) |
+| **2.7** | ✅ Verified | Position Detail View (read-only, hidden route) |
+| **2.8** | 🔄 In Progress | Organization Unit Detail View (read-only, hidden route) |
 
 ## Row/ViewModel Pattern Standard
 
@@ -255,7 +256,7 @@ All HRM entities follow the Row/ViewModel pattern:
 | Entity | Row Type | Directory ViewModel | Detail ViewModel |
 |--------|----------|---------------------|------------------|
 | Employee | `HrmEmployeeRow` | `HrmEmployeeDirectory` | `HrmEmployeeDetail` |
-| Organization Unit | `HrmOrgUnitRow` | `HrmOrgUnitDirectory` | – |
+| Organization Unit | `HrmOrgUnitRow` | `HrmOrgUnitDirectory` | `HrmOrgUnitDetail` |
 | Position | `HrmPositionRow` | `HrmPositionDirectory` | `HrmPositionDetail` |
 
 This pattern separates database schema (Row) from presentation needs (ViewModel with derived fields).

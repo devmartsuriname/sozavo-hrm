@@ -3,6 +3,7 @@
  * Read-only listing of organization units with RLS-aware data fetching
  */
 
+import { Link } from 'react-router-dom'
 import { Card, Table, Spinner, Alert, Badge } from 'react-bootstrap'
 import { useHrmOrgUnits } from '@/hooks/useHrmOrgUnits'
 import PageTitle from '@/components/PageTitle'
@@ -58,7 +59,12 @@ const OrgUnitsPage = () => {
                   {orgUnits.map((unit) => (
                     <tr key={unit.id}>
                       <td>
-                        <span className="fw-medium">{unit.code}</span>
+                        <Link
+                          to={`/hrm/org-units/${unit.id}`}
+                          className="text-primary fw-medium text-decoration-none"
+                        >
+                          {unit.code}
+                        </Link>
                       </td>
                       <td>{unit.name}</td>
                       <td>{unit.description || '—'}</td>

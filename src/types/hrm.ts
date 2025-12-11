@@ -108,6 +108,14 @@ export interface HrmOrgUnitDirectory extends HrmOrgUnitRow {
   parentOrgUnitName: string | null  // Lookup from parent_id → name
 }
 
+/**
+ * Organization Unit Detail ViewModel - for single org unit profile view
+ * Extends row with derived display fields
+ */
+export interface HrmOrgUnitDetail extends HrmOrgUnitRow {
+  parentOrgUnitName: string | null  // Lookup from parent_id → name
+}
+
 // =============================================================================
 // POSITION TYPES
 // =============================================================================
