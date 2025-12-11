@@ -148,17 +148,76 @@ Read-only profile view for a single employee (Phase 2 – Step 4):
 
 The detail route is a **hidden/internal route** (not shown in sidebar), accessible via employee code links from the directory.
 
+### Employee Create Form (`/hrm/employees/create`)
+
+Create form for adding new employees (Phase 2 – Step 10):
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/employees/EmployeeCreatePage.tsx` | Employee Create form page |
+| `src/hooks/useCreateEmployee.ts` | Hook for creating employee |
+| `src/components/hrm/EmployeeFormBase.tsx` | Shared form component (see below) |
+
+Access restricted to Admin and HR Manager roles.
+
+**Auto-Generated Employee Code:** New employees receive a code in the format `EMP-{ORG_PREFIX}-{SEQUENCE}` (e.g., `EMP-HR-005`).
+
+**Default Values:**
+- `employment_status`: 'active'
+- `is_active`: true
+- `hire_date`: current date (YYYY-MM-DD)
+
 ### Employee Edit Form (`/hrm/employees/:employeeId/edit`)
 
 Edit form for updating employee records (Phase 2 – Step 9):
 
 | File | Purpose |
 |------|---------|
-| `src/app/(admin)/hrm/employees/EmployeeEditPage.tsx` | Employee Edit form page |
+| `src/app/(admin)/hrm/employees/EmployeeEditPage.tsx` | Employee Edit form page (thin wrapper) |
 | `src/hooks/useUpdateEmployee.ts` | Hook for updating employee |
 | `src/hooks/useEmployeeFormOptions.ts` | Hook for loading form dropdowns |
 
 The edit route is a **hidden/internal route** accessible only via the Edit button on Employee Detail page. Access is restricted to Admin and HR Manager roles - Manager and Employee roles see an "Access denied" message.
+
+### Shared Form Architecture: EmployeeFormBase
+
+Both Create and Edit pages use the shared `EmployeeFormBase` component as the **single source of truth** for employee form logic (Phase 2 – Step 11):
+
+| File | Purpose |
+|------|---------|
+| `src/components/hrm/EmployeeFormBase.tsx` | Reusable form for create + edit modes |
+
+**Props Interface:**
+```typescript
+interface EmployeeFormBaseProps {
+  mode: 'create' | 'edit'
+  initialData?: EmployeeFormData
+  employeeCode?: string           // Displayed read-only in edit mode
+  currentEmployeeId?: string      // Exclude from manager dropdown
+  onSubmit: (data: EmployeeFormData) => Promise<void>
+  onCancel: () => void
+  isSubmitting: boolean
+  submitError?: string | null
+  orgUnits: SelectOption[]
+  positions: SelectOption[]
+  employees: SelectOption[]       // For manager dropdown
+}
+```
+
+**Centralized in EmployeeFormBase:**
+- Form layout (Contact, Organization, Employment cards)
+- Field-level validation (required fields, email format)
+- Business rules (Rule A: terminated ⇒ inactive, Rule B: termination date + active = error)
+- UI state for locked fields
+
+**Page-Level Responsibilities:**
+| Responsibility | EmployeeCreatePage | EmployeeEditPage |
+|----------------|--------------------|--------------------|
+| Access control guard | ✅ | ✅ |
+| Fetch existing data | — | `useHrmEmployeeDetail` |
+| Default values | Initial form state | From fetched data |
+| Submit handler | `useCreateEmployee` | `useUpdateEmployee` |
+| Success behavior | Toast + redirect to detail | Toast + redirect to detail |
 
 ### Service Functions
 
@@ -274,13 +333,25 @@ All 35 tasks completed and verified:
 - Supabase Auth integration
 - Test users and seed data
 
-### Phase 2 – Steps 1–4: ✅ IMPLEMENTED_AND_VERIFIED
+### Phase 2 – Steps 1–11: ✅ IMPLEMENTED_AND_VERIFIED
 
 Manual role-based testing completed 2025-12-10:
 - **Admin**: Sees all employees with full organization/position details
 - **HR Manager**: Sees all employees with full details
 - **Manager**: Sees only direct reports; URL manipulation → "Not found or access denied"
 - **Employee**: Sees only own record; URL manipulation → "Not found or access denied"
+
+| Step | Feature | Status |
+|------|---------|--------|
+| 2.1-2.3 | Employee Directory (listing, names, UX) | ✅ Verified |
+| 2.4 | Employee Detail View | ✅ Verified |
+| 2.5 | Organization Units UI | ✅ Verified |
+| 2.6 | Positions UI | ✅ Verified |
+| 2.7 | Position Detail View | ✅ Verified |
+| 2.8 | Organization Unit Detail View | ✅ Verified |
+| 2.9 | Employee Edit Form | ✅ Verified |
+| 2.10 | Employee Create Form | ✅ Verified |
+| 2.11 | EmployeeFormBase Refactoring | ✅ Verified |
 
 All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modification.
 

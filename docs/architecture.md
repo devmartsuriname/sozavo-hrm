@@ -193,7 +193,7 @@ export type RoutesProps = {
 }
 ```
 
-### Phase 2 – Employee Directory, Detail & Edit
+### Phase 2 – Employee Directory, Detail, Create & Edit
 
 The HRM employee screens implemented at `/hrm/employees`:
 
@@ -203,10 +203,15 @@ src/
 │   └── employees/
 │       ├── page.tsx                # Employee Directory page
 │       ├── EmployeeDetailPage.tsx  # Employee Detail page (Phase 2.4)
-│       └── EmployeeEditPage.tsx    # Employee Edit form (Phase 2.9)
+│       ├── EmployeeEditPage.tsx    # Employee Edit form wrapper (Phase 2.9/2.11)
+│       └── EmployeeCreatePage.tsx  # Employee Create form wrapper (Phase 2.10)
+├── components/
+│   └── hrm/
+│       └── EmployeeFormBase.tsx    # Shared form component (Phase 2.11)
 ├── hooks/
 │   ├── useHrmEmployees.ts          # Directory data loading hook
 │   ├── useHrmEmployeeDetail.ts     # Detail data loading hook
+│   ├── useCreateEmployee.ts        # Employee create hook
 │   ├── useUpdateEmployee.ts        # Employee update hook
 │   └── useEmployeeFormOptions.ts   # Form dropdown options hook
 ├── services/
@@ -251,14 +256,15 @@ src/
 | **2.6** | ✅ Verified | Positions UI (read-only listing, RLS tested with all roles) |
 | **2.7** | ✅ Verified | Position Detail View (read-only, hidden route) |
 | **2.8** | ✅ Complete | Organization Unit Detail View (read-only, hidden route) |
-| **2.9** | 🔄 In Progress | Employee Edit Form (Admin + HR only) with UI access guard and HR business rules |
+| **2.9** | ✅ Verified | Employee Edit Form (Admin + HR only) with UI access guard |
+| **2.10** | ✅ Verified | Employee Create Form (Admin + HR only, auto-generated code) |
+| **2.11** | ✅ Verified | EmployeeFormBase refactoring (single source of truth) |
 
-**Employee Edit Form (Phase 2.9):**
-- UI access guard ensures only Admin/HR Manager can access the edit page (Manager/Employee see "Access denied")
-- HR business rules enforce status/termination date consistency at the form level
-- Rule A: Terminated status automatically sets is_active = false (locked in UI)
-- Rule B: Termination date present + Active status is blocked with validation error
-- A future phase will introduce a dedicated HR audit table for employee changes
+**Shared Form Architecture (Phase 2.11):**
+- `EmployeeFormBase` is the single source of truth for all employee form logic
+- Both `EmployeeCreatePage` and `EmployeeEditPage` are thin wrappers around `EmployeeFormBase`
+- Business rules (terminated ⇒ inactive, termination date validation) centralized in one component
+- Page-level components handle: access control, data fetching, submit handlers, navigation/toasts
 
 ## Row/ViewModel Pattern Standard
 
