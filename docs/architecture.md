@@ -261,6 +261,7 @@ src/
 | **2.11** | ✅ Verified | EmployeeFormBase refactoring (single source of truth) |
 | **3.1** | ✅ Complete | Users & Roles UI (read-only listing + detail) |
 | **3.2** | ✅ Complete | Role Assignment & User–Employee Linking modal |
+| **3.3** | ✅ Complete | Permission Utilities & RBAC Enforcement |
 
 **Shared Form Architecture (Phase 2.11):**
 - `EmployeeFormBase` is the single source of truth for all employee form logic
@@ -282,6 +283,30 @@ Role Manager modal on User Detail page with:
 - **1:1 mapping enforcement**: Each employee can only be linked to one user
 - **HR Manager read-only mode**: Can view roles and linked employee but cannot modify
 - **Business rule**: Users with ≥1 roles must be linked to an employee record
+
+### Step 3.3: Permission Utilities & RBAC Enforcement
+
+Centralized permission framework for consistent RBAC enforcement:
+
+**usePermissions Hook** (`src/hooks/usePermissions.ts`):
+- `canViewUsers()` – Admin + HR Manager
+- `canModifyRoles()` – Admin only
+- `canViewHRMData()` – Admin + HR Manager (structural tables)
+- `canEditEmployee()` – Admin + HR Manager
+- `canViewEmployee(employeeUserId)` – checks ownership for employee role
+- `hasAnyRole(...roles)` – utility for custom checks
+
+**RoleGuard Component** (`src/components/auth/RoleGuard.tsx`):
+- Conditionally renders children based on `allowedRoles`
+- Returns `fallback` (default: null) if user lacks permission
+
+**Page-Level Access Guards:**
+- Organization Units and Positions pages now check `canViewHRMData()`
+- Non-authorized roles see "You do not have permission" alert
+
+**Sidebar Filtering Status:**
+- ⚠️ Partial – Darkone guardrails prevent modification of protected layout files
+- Menu items remain static; dynamic filtering deferred to future step
 
 ### RBAC Flow
 

@@ -411,12 +411,13 @@ Manual role-based testing completed 2025-12-10:
 
 All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modification.
 
-### Phase 3 – Steps 1–2: ✅ IMPLEMENTED
+### Phase 3 – Steps 1–3: ✅ IMPLEMENTED
 
 | Step | Feature | Status |
 |------|---------|--------|
 | 3.1 | Users & Roles (read-only listing + detail) | ✅ Complete |
 | 3.2 | Role Assignment & User–Employee Linking | ✅ Complete |
+| 3.3 | Permission Utilities & RBAC Enforcement | ✅ Complete |
 
 **Step 3.1 – Read-Only RBAC Visibility:**
 - User Directory (`/hrm/users`) listing all auth users with roles and linked employees
@@ -428,6 +429,63 @@ All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modifi
 - Employee linking dropdown with 1:1 mapping enforcement
 - HR Manager read-only mode (can view but not modify)
 - Business rule: users with roles must be linked to an employee record
+
+**Step 3.3 – Permission Utilities & RBAC Enforcement:**
+- `usePermissions` hook providing centralized permission checks
+- `RoleGuard` component for conditional rendering by role
+- Access guards on Organization Units and Positions pages
+- Menu filtering marked as Partial (Darkone guardrails prevent layout modification)
+
+## Permission Matrix & usePermissions Hook
+
+### Permission Matrix
+
+| Permission | Admin | HR Manager | Manager | Employee |
+|------------|-------|------------|---------|----------|
+| `canViewUsers()` | ✅ | ✅ | ❌ | ❌ |
+| `canModifyRoles()` | ✅ | ❌ | ❌ | ❌ |
+| `canViewHRMData()` | ✅ | ✅ | ❌ | ❌ |
+| `canEditEmployee()` | ✅ | ✅ | ❌ | ❌ |
+| `canViewEmployee()` | ✅ | ✅ | Direct reports | Self only |
+
+### usePermissions Hook
+
+**File:** `src/hooks/usePermissions.ts`
+
+Centralized permission checking utilities:
+
+```typescript
+interface UsePermissionsReturn {
+  // Role flags
+  isAdmin: boolean
+  isHRManager: boolean
+  isManager: boolean
+  isEmployee: boolean
+  userId: string | null
+  
+  // Permission checkers
+  canViewUsers: () => boolean      // Admin + HR Manager
+  canModifyRoles: () => boolean    // Admin only
+  canViewHRMData: () => boolean    // Admin + HR Manager (structural tables)
+  canEditEmployee: () => boolean   // Admin + HR Manager
+  canViewEmployee: (employeeUserId: string | null) => boolean
+  
+  // Utility
+  hasAnyRole: (...roles: AppRole[]) => boolean
+}
+```
+
+### RoleGuard Component
+
+**File:** `src/components/auth/RoleGuard.tsx`
+
+Conditional rendering based on user roles:
+
+```typescript
+<RoleGuard allowedRoles={['admin', 'hr_manager']}>
+  <RestrictedContent />
+</RoleGuard>
+```
 
 ### Users & Roles UI
 

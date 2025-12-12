@@ -2,6 +2,7 @@
  * HRM Position Detail Page
  * Read-only view of a single position's profile
  * Uses Darkone card patterns, respects RLS via authenticated session
+ * Access restricted to Admin and HR Manager roles (Phase 3 – Step 3.3)
  */
 
 import { useParams, useNavigate } from 'react-router-dom'
@@ -9,6 +10,7 @@ import { Alert, Badge, Card, Col, Row, Spinner, Button } from 'react-bootstrap'
 import { Icon } from '@iconify/react'
 import PageTitle from '@/components/PageTitle'
 import { useHrmPositionDetail } from '@/hooks/useHrmPositionDetail'
+import { usePermissions } from '@/hooks/usePermissions'
 
 /** Format date for display */
 const formatDate = (dateStr: string | null): string => {
@@ -30,9 +32,27 @@ const PositionDetailPage = () => {
   const { positionId } = useParams<{ positionId: string }>()
   const navigate = useNavigate()
   const { position, isLoading, error } = useHrmPositionDetail(positionId || '')
+  const { canViewHRMData } = usePermissions()
 
   const handleBack = () => {
     navigate('/hrm/positions')
+  }
+
+  // Access guard: only Admin and HR Manager can view
+  if (!canViewHRMData()) {
+    return (
+      <>
+        <PageTitle title="Position Details" subName="HRM" />
+        <Alert variant="warning">
+          <Icon icon="mdi:alert-circle-outline" className="me-2" width={20} />
+          You do not have permission to view position details.
+        </Alert>
+        <Button variant="secondary" onClick={() => navigate('/hrm/employees')}>
+          <Icon icon="mdi:arrow-left" className="me-1" width={18} />
+          Back to Employees
+        </Button>
+      </>
+    )
   }
 
   // Loading state
