@@ -1,16 +1,144 @@
 /**
  * HRM User Service
- * Provides read-only access to users with their roles and linked employees.
- * Phase 3 – Step 1: RBAC Visibility
+ * Provides access to users with their roles and linked employees.
+ * Phase 3 – Steps 1-2: RBAC Visibility & Role Management
  * 
- * NOTE: This service aggregates data from user_roles and hrm_employees tables.
- * It cannot directly query auth.users due to RLS constraints.
- * Users without assigned roles will NOT appear in the directory.
+ * Step 1: Read-only aggregation from user_roles + hrm_employees
+ * Step 2: RPC-based fetching via get_all_users_with_roles() + role/linking mutations
  */
 
 import { supabase } from '@/integrations/supabase/client'
 import type { AppRole } from '@/types/supabase-auth'
-import type { HrmUserDirectory, HrmUserDetail } from '@/types/hrm-users'
+import type { HrmUserDirectory, HrmUserDetail, HrmUserWithRoles } from '@/types/hrm-users'
+
+// =============================================================================
+// RPC-BASED FETCHING (Phase 3 – Step 2)
+// =============================================================================
+
+/**
+ * Fetch all users with roles via RPC function.
+ * Uses SECURITY DEFINER function to safely access auth.users.
+ * Returns ALL auth users, including those without roles.
+ */
+export async function fetchUsersWithRolesRpc(): Promise<HrmUserWithRoles[]> {
+  const { data, error } = await supabase.rpc('get_all_users_with_roles')
+
+  if (error) {
+    throw new Error(`Failed to fetch users with roles: ${error.message}`)
+  }
+
+  if (!data) return []
+
+  return data.map((row: {
+    user_id: string
+    email: string | null
+    created_at: string | null
+    roles: AppRole[] | null
+    employee_id: string | null
+    employee_code: string | null
+    employee_name: string | null
+  }) => ({
+    userId: row.user_id,
+    email: row.email ?? null,
+    createdAt: row.created_at ?? null,
+    roles: (row.roles ?? []) as AppRole[],
+    employeeId: row.employee_id ?? null,
+    employeeCode: row.employee_code ?? null,
+    employeeName: row.employee_name ?? null,
+  }))
+}
+
+// =============================================================================
+// ROLE MANAGEMENT (Phase 3 – Step 2)
+// =============================================================================
+
+/**
+ * Assign a role to a user.
+ * Inserts into user_roles if the (userId, role) combination does not exist.
+ * RLS: Only admin can insert roles.
+ */
+export async function assignRole(userId: string, role: AppRole): Promise<void> {
+  const { error } = await supabase
+    .from('user_roles')
+    .insert({
+      user_id: userId,
+      role: role,
+    })
+
+  if (error) {
+    // Check for unique constraint violation (role already exists)
+    if (error.code === '23505') {
+      // Role already assigned, not an error
+      return
+    }
+    throw new Error(`Failed to assign role: ${error.message}`)
+  }
+}
+
+/**
+ * Remove a role from a user.
+ * Deletes the entry from user_roles table.
+ * RLS: Only admin can delete roles.
+ */
+export async function removeRole(userId: string, role: AppRole): Promise<void> {
+  const { error } = await supabase
+    .from('user_roles')
+    .delete()
+    .eq('user_id', userId)
+    .eq('role', role)
+
+  if (error) {
+    throw new Error(`Failed to remove role: ${error.message}`)
+  }
+}
+
+// =============================================================================
+// USER–EMPLOYEE LINKING (Phase 3 – Step 2)
+// =============================================================================
+
+/**
+ * Link a user to an employee (1:1 mapping).
+ * First clears any existing user_id on other employees,
+ * then sets user_id on the target employee.
+ * RLS: Only admin/HR manager can update employees.
+ */
+export async function linkUserToEmployee(userId: string, employeeId: string): Promise<void> {
+  // Step 1: Clear any existing link for this user
+  const { error: clearError } = await supabase
+    .from('hrm_employees')
+    .update({ user_id: null })
+    .eq('user_id', userId)
+
+  if (clearError) {
+    throw new Error(`Failed to clear existing employee link: ${clearError.message}`)
+  }
+
+  // Step 2: Set user_id on the target employee
+  const { error: linkError } = await supabase
+    .from('hrm_employees')
+    .update({ user_id: userId })
+    .eq('id', employeeId)
+
+  if (linkError) {
+    throw new Error(`Failed to link user to employee: ${linkError.message}`)
+  }
+}
+
+/**
+ * Unlink a user from their employee record.
+ * Sets user_id = null for the employee currently linked to this user.
+ * RLS: Only admin/HR manager can update employees.
+ */
+export async function unlinkUserFromEmployee(userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('hrm_employees')
+    .update({ user_id: null })
+    .eq('user_id', userId)
+
+  if (error) {
+    throw new Error(`Failed to unlink user from employee: ${error.message}`)
+  }
+}
 
 /**
  * Fetch all users with their roles and linked employee information.
