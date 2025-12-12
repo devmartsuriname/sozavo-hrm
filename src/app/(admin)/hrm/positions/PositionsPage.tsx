@@ -1,15 +1,32 @@
 /**
  * Positions Directory Page
  * Read-only listing of positions with RLS-aware data fetching
+ * Access restricted to Admin and HR Manager roles (Phase 3 – Step 3.3)
  */
 
 import { Card, Table, Spinner, Alert, Badge } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { Icon } from '@iconify/react'
 import { useHrmPositions } from '@/hooks/useHrmPositions'
+import { usePermissions } from '@/hooks/usePermissions'
 import PageTitle from '@/components/PageTitle'
 
 const PositionsPage = () => {
   const { positions, isLoading, error } = useHrmPositions()
+  const { canViewHRMData } = usePermissions()
+
+  // Access guard: only Admin and HR Manager can view
+  if (!canViewHRMData()) {
+    return (
+      <>
+        <PageTitle title="Positions" subName="HRM" />
+        <Alert variant="warning">
+          <Icon icon="mdi:alert-circle-outline" className="me-2" width={20} />
+          You do not have permission to view positions.
+        </Alert>
+      </>
+    )
+  }
 
   return (
     <>

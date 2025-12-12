@@ -1,15 +1,32 @@
 /**
  * Organization Units Directory Page
  * Read-only listing of organization units with RLS-aware data fetching
+ * Access restricted to Admin and HR Manager roles (Phase 3 – Step 3.3)
  */
 
 import { Link } from 'react-router-dom'
 import { Card, Table, Spinner, Alert, Badge } from 'react-bootstrap'
+import { Icon } from '@iconify/react'
 import { useHrmOrgUnits } from '@/hooks/useHrmOrgUnits'
+import { usePermissions } from '@/hooks/usePermissions'
 import PageTitle from '@/components/PageTitle'
 
 const OrgUnitsPage = () => {
   const { orgUnits, isLoading, error } = useHrmOrgUnits()
+  const { canViewHRMData } = usePermissions()
+
+  // Access guard: only Admin and HR Manager can view
+  if (!canViewHRMData()) {
+    return (
+      <>
+        <PageTitle title="Organization Units" subName="HRM" />
+        <Alert variant="warning">
+          <Icon icon="mdi:alert-circle-outline" className="me-2" width={20} />
+          You do not have permission to view organization units.
+        </Alert>
+      </>
+    )
+  }
 
   return (
     <>
