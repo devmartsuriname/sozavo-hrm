@@ -1,6 +1,6 @@
 /**
  * HRM Users & RBAC TypeScript Types
- * For Phase 3 – Step 1: Read-Only RBAC Visibility
+ * For Phase 3 – Steps 1-2: RBAC Visibility & Role Management
  */
 
 import type { AppRole } from '@/types/supabase-auth'
@@ -18,6 +18,24 @@ export interface UserRoleRow {
   role: AppRole
   created_at: string
   created_by: string | null
+}
+
+// =============================================================================
+// RPC RESULT TYPES (from get_all_users_with_roles function)
+// =============================================================================
+
+/**
+ * User with roles - result from RPC get_all_users_with_roles()
+ * Includes auth.users data safely exposed via SECURITY DEFINER
+ */
+export interface HrmUserWithRoles {
+  userId: string
+  email: string | null
+  createdAt: string | null
+  roles: AppRole[]
+  employeeId: string | null
+  employeeCode: string | null
+  employeeName: string | null
 }
 
 // =============================================================================

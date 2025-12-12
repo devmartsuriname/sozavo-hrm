@@ -1,7 +1,7 @@
 /**
  * HRM Users & Roles Directory Page
  * Read-only listing of all users with their roles and linked employees
- * Phase 3 – Step 1: RBAC Visibility
+ * Phase 3 – Steps 1-2: RBAC Visibility & Role Management
  * 
  * Access: Admin and HR Manager only
  */
@@ -13,7 +13,7 @@ import { Icon } from '@iconify/react'
 import PageTitle from '@/components/PageTitle'
 import { useHrmUsers } from '@/hooks/useHrmUsers'
 import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
-import type { HrmUserDirectory } from '@/types/hrm-users'
+import type { HrmUserWithRoles } from '@/types/hrm-users'
 import type { AppRole } from '@/types/supabase-auth'
 
 /** Role badge color mapping */
@@ -69,8 +69,9 @@ const UsersPage = () => {
       result = result.filter((u) => {
         return (
           u.userId.toLowerCase().includes(term) ||
-          (u.linkedEmployeeName?.toLowerCase().includes(term) ?? false) ||
-          (u.linkedEmployeeCode?.toLowerCase().includes(term) ?? false)
+          (u.email?.toLowerCase().includes(term) ?? false) ||
+          (u.employeeName?.toLowerCase().includes(term) ?? false) ||
+          (u.employeeCode?.toLowerCase().includes(term) ?? false)
         )
       })
     }
@@ -169,7 +170,7 @@ const UsersPage = () => {
               {!isLoading && !error && users.length === 0 && (
                 <Alert variant="info">
                   <Icon icon="mdi:information" className="me-2" width={18} />
-                  No users with assigned roles found. Users must have at least one role assignment to appear here.
+                  No users found.
                 </Alert>
               )}
 
@@ -178,7 +179,7 @@ const UsersPage = () => {
                   <Table className="table-striped table-hover table-centered mb-0">
                     <thead>
                       <tr>
-                        <th scope="col">User ID</th>
+                        <th scope="col">Email</th>
                         <th scope="col">Roles</th>
                         <th scope="col">Linked Employee</th>
                         <th scope="col">Employee Code</th>
@@ -189,37 +190,43 @@ const UsersPage = () => {
                       {displayedUsers.map((user) => (
                         <tr key={user.userId}>
                           <td>
-                            <code className="text-muted" style={{ fontSize: '0.8rem' }}>
-                              {user.userId.substring(0, 8)}...
-                            </code>
+                            {user.email || (
+                              <code className="text-muted" style={{ fontSize: '0.8rem' }}>
+                                {user.userId.substring(0, 8)}...
+                              </code>
+                            )}
                           </td>
                           <td>
                             <div className="d-flex gap-1 flex-wrap">
-                              {user.roles.map((role) => (
-                                <span
-                                  key={role}
-                                  className={`badge ${getRoleBadgeClass(role)}`}
-                                >
-                                  {formatRoleLabel(role)}
-                                </span>
-                              ))}
+                              {user.roles.length > 0 ? (
+                                user.roles.map((role) => (
+                                  <span
+                                    key={role}
+                                    className={`badge ${getRoleBadgeClass(role)}`}
+                                  >
+                                    {formatRoleLabel(role)}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-muted fst-italic">No roles</span>
+                              )}
                             </div>
                           </td>
                           <td>
-                            {user.linkedEmployeeId ? (
+                            {user.employeeId ? (
                               <Link
-                                to={`/hrm/employees/${user.linkedEmployeeId}`}
+                                to={`/hrm/employees/${user.employeeId}`}
                                 className="text-primary text-decoration-none"
                               >
-                                {user.linkedEmployeeName || '—'}
+                                {user.employeeName || '—'}
                               </Link>
                             ) : (
                               <span className="text-muted fst-italic">Not linked</span>
                             )}
                           </td>
                           <td>
-                            {user.linkedEmployeeCode ? (
-                              <code>{user.linkedEmployeeCode}</code>
+                            {user.employeeCode ? (
+                              <code>{user.employeeCode}</code>
                             ) : (
                               <span className="text-muted">—</span>
                             )}
