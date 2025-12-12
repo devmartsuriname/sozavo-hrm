@@ -90,6 +90,62 @@ Key verified behaviors:
 - Employees see only their own record
 - All users can view their own role assignment
 
+## Users & Roles RPC Function
+
+### `public.get_all_users_with_roles()`
+
+A SECURITY DEFINER function that safely exposes auth.users with their roles and linked employee records for use by the Users & Roles admin screens.
+
+**Function Signature:**
+```sql
+CREATE OR REPLACE FUNCTION public.get_all_users_with_roles()
+RETURNS TABLE (
+  user_id uuid,
+  email text,
+  created_at timestamptz,
+  roles app_role[],
+  employee_id uuid,
+  employee_code text,
+  employee_name text
+)
+```
+
+**Return Columns:**
+| Column | Type | Description |
+|--------|------|-------------|
+| `user_id` | uuid | Auth user ID from auth.users |
+| `email` | text | User's email address |
+| `created_at` | timestamptz | Account creation timestamp |
+| `roles` | app_role[] | Array of assigned HRM roles |
+| `employee_id` | uuid | Linked employee record ID (nullable) |
+| `employee_code` | text | Linked employee code (nullable) |
+| `employee_name` | text | Linked employee full name (nullable) |
+
+**Security Model:**
+- **SECURITY DEFINER** with `SET search_path = public`
+- Reads from `auth.users`, `public.user_roles`, and `public.hrm_employees`
+- `EXECUTE` granted to `authenticated` users
+- Effective usage restricted to Admin/HR Manager via UI route guards
+- RLS on underlying tables (`user_roles`, `hrm_employees`) still applies
+
+**Source File:** `db/hrm/functions_users_with_roles.sql`
+
+### HRM User Service (`src/services/hrmUserService.ts`)
+
+Service functions for user management and role operations:
+
+| Function | Description |
+|----------|-------------|
+| `fetchUsersWithRolesRpc()` | Uses Supabase RPC to call `get_all_users_with_roles()`. Returns `HrmUserWithRoles[]`. |
+| `assignRole(userId, role)` | Inserts into `public.user_roles` if the (userId, role) pair does not already exist. |
+| `removeRole(userId, role)` | Deletes the given role-row from `public.user_roles`. |
+| `linkUserToEmployee(userId, employeeId)` | Enforces 1:1 mapping: clears `user_id` on any other `hrm_employees` rows for that user, then sets `user_id` on the target employee. |
+| `unlinkUserFromEmployee(userId)` | Sets `user_id = null` for any `hrm_employees` rows with that `user_id`. |
+
+**Business Rule (MVP):**
+- Any user that holds one of the core HRM roles (`admin`, `hr_manager`, `manager`, `employee`) is expected to be a real SoZaVo staff member with a corresponding `hrm_employees` record.
+- External accounts or special roles (like auditors) will be handled post-MVP when the `app_role` enum is extended.
+
 ## HRM UI Screens
 
 ### Type Architecture: Row/ViewModel Pattern
@@ -354,6 +410,40 @@ Manual role-based testing completed 2025-12-10:
 | 2.11 | EmployeeFormBase Refactoring | ✅ Verified |
 
 All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modification.
+
+### Phase 3 – Steps 1–2: ✅ IMPLEMENTED
+
+| Step | Feature | Status |
+|------|---------|--------|
+| 3.1 | Users & Roles (read-only listing + detail) | ✅ Complete |
+| 3.2 | Role Assignment & User–Employee Linking | ✅ Complete |
+
+**Step 3.1 – Read-Only RBAC Visibility:**
+- User Directory (`/hrm/users`) listing all auth users with roles and linked employees
+- User Detail View (`/hrm/users/:userId`) with role badges and employee link info
+- Access restricted to Admin and HR Manager roles
+
+**Step 3.2 – Role Manager Modal:**
+- Role assignment/removal via checkboxes (Admin only)
+- Employee linking dropdown with 1:1 mapping enforcement
+- HR Manager read-only mode (can view but not modify)
+- Business rule: users with roles must be linked to an employee record
+
+### Users & Roles UI
+
+| File | Purpose |
+|------|---------|
+| `src/app/(admin)/hrm/users/UsersPage.tsx` | User Directory page |
+| `src/app/(admin)/hrm/users/UserDetailPage.tsx` | User Detail page (hidden route) |
+| `src/components/hrm/RoleManagerModal.tsx` | Role assignment modal |
+| `src/hooks/useHrmUsers.ts` | Hook for fetching users via RPC |
+| `src/hooks/useHrmUserDetail.ts` | Hook for single user detail |
+| `src/hooks/useRoleManagement.ts` | Hook for role/linking state management |
+
+**Access Control:**
+- **Admin**: Full access to Users & Roles; can assign/remove roles and change employee linking
+- **HR Manager**: Read-only access; can view roles and linked employee but cannot modify
+- **Manager, Employee**: Access denied via route guard
 
 ### Organization Units (`/hrm/org-units`)
 

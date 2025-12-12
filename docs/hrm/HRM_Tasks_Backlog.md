@@ -180,22 +180,24 @@ P{phase}-{category}-{number}
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
-| P3-RBAC-001 | RBAC | Enhance AuthContext with Roles | Add role checking utilities | ⏳ | P1 |
+| P3-RBAC-001 | RBAC | Enhance AuthContext with Roles | Add role checking utilities | ✅ | P1 |
 | P3-RBAC-002 | RBAC | Create usePermissions Hook | Check user permissions in components | ⏳ | P1 |
 | P3-RBAC-003 | RBAC | Create RoleGuard Component | Conditional rendering by role | ⏳ | P1 |
 | P3-RBAC-004 | RBAC | Define Permission Matrix | Document all role-permission mappings | ⏳ | P1 |
-| P3-RBAC-005 | RBAC | Create UserService | CRUD for user management | ⏳ | P1 |
-| P3-RBAC-006 | RBAC | Create RoleService | Role assignment operations | ⏳ | P1 |
-| P3-UI-001 | UI | Create Users List Page | Admin user management | ⏳ | P1 |
+| P3-RBAC-005 | RBAC | Create UserService | CRUD for user management | ✅ | P1 |
+| P3-RBAC-006 | RBAC | Create RoleService | Role assignment operations | ✅ | P1 |
+| P3-UI-001 | UI | Create Users List Page | Admin user management | ✅ | P1 |
 | P3-UI-002 | UI | Create User Form Modal | Create/edit users | ⏳ | P1 |
-| P3-UI-003 | UI | Create Role Assignment Modal | Assign roles to users | ⏳ | P1 |
+| P3-UI-003 | UI | Create Role Assignment Modal | Assign roles to users | ✅ | P1 |
 | P3-UI-004 | UI | Create User Profile Page | Current user profile view/edit | ⏳ | P2 |
-| P3-UI-005 | UI | Add Role Badges to User Lists | Visual role indicators | ⏳ | P2 |
+| P3-UI-005 | UI | Add Role Badges to User Lists | Visual role indicators | ✅ | P2 |
 | P3-UI-006 | UI | Implement Conditional Menu Items | Show/hide menu based on roles | ⏳ | P1 |
 | P3-UI-007 | UI | Add Bulk Role Assignment | Multi-select role operations | ⏳ | P3 |
 | P3-UI-008 | UI | Create Role Summary Dashboard | Overview of role distribution | ⏳ | P3 |
 
-**Phase 3 Summary:** 0/14 tasks completed, 14 planned
+**Phase 3 Summary:** 6/14 tasks completed, 8 planned
+
+> **Note:** Phase 3 Step 3.1 (Read-only Users & Roles) and Step 3.2 (Role Assignment & User–Employee Linking) have been implemented. The `get_all_users_with_roles()` RPC function is the foundation for Users & Roles screens. The Role Manager Modal supports Admin write / HR Manager read-only access, with business rule enforcement for employee linking.
 
 ---
 

@@ -259,12 +259,55 @@ src/
 | **2.9** | ✅ Verified | Employee Edit Form (Admin + HR only) with UI access guard |
 | **2.10** | ✅ Verified | Employee Create Form (Admin + HR only, auto-generated code) |
 | **2.11** | ✅ Verified | EmployeeFormBase refactoring (single source of truth) |
+| **3.1** | ✅ Complete | Users & Roles UI (read-only listing + detail) |
+| **3.2** | ✅ Complete | Role Assignment & User–Employee Linking modal |
 
 **Shared Form Architecture (Phase 2.11):**
 - `EmployeeFormBase` is the single source of truth for all employee form logic
 - Both `EmployeeCreatePage` and `EmployeeEditPage` are thin wrappers around `EmployeeFormBase`
 - Business rules (terminated ⇒ inactive, termination date validation) centralized in one component
 - Page-level components handle: access control, data fetching, submit handlers, navigation/toasts
+
+## Phase 3 – RBAC & User Management
+
+### Step 3.1: Read-Only Users & Roles
+
+User Directory (`/hrm/users`) and User Detail (`/hrm/users/:userId`) pages for viewing all system users, their roles, and linked employees. Access restricted to Admin and HR Manager roles only.
+
+### Step 3.2: Role Assignment & User–Employee Linking
+
+Role Manager modal on User Detail page with:
+- **Role checkboxes**: Admin can add/remove any of the 4 HRM roles
+- **Employee linking dropdown**: Select which employee record is linked to the user
+- **1:1 mapping enforcement**: Each employee can only be linked to one user
+- **HR Manager read-only mode**: Can view roles and linked employee but cannot modify
+- **Business rule**: Users with ≥1 roles must be linked to an employee record
+
+### RBAC Flow
+
+```
+UI Layer:
+┌──────────────┐      ┌─────────────────────────┐      ┌──────────────────────┐
+│  UsersPage   │─────▶│ fetchUsersWithRolesRpc()│─────▶│ RPC: get_all_users   │
+└──────────────┘      └─────────────────────────┘      │   _with_roles()      │
+                                                       └──────────────────────┘
+┌──────────────┐      ┌─────────────────────────┐      ┌──────────────────────┐
+│ UserDetail   │─────▶│ "Manage Roles" button   │─────▶│ RoleManagerModal     │
+│ Page         │      └─────────────────────────┘      └──────────────────────┘
+└──────────────┘                                              │
+                                                              ▼
+Backend Layer:                                    ┌─────────────────────────┐
+┌──────────────────────────────────────────────────│ assignRole / removeRole │
+│ Writes to:                                       │ linkUserToEmployee      │
+│  - public.user_roles (role assignments)          └─────────────────────────┘
+│  - public.hrm_employees (user_id column)
+└──────────────────────────────────────────────────
+```
+
+**Security:**
+- RLS policies on `user_roles` and `hrm_employees` tables remain unchanged
+- `get_all_users_with_roles()` is a SECURITY DEFINER function that safely queries `auth.users`
+- Role changes and user–employee linking are performed via direct writes with RLS enforcement
 
 ## Row/ViewModel Pattern Standard
 
