@@ -2,14 +2,19 @@
  * HRM Employee Detail Page
  * Read-only view of a single employee's profile
  * Uses Darkone card patterns, respects RLS via authenticated session
+ * Phase 4.2: Added Terminate Employee functionality
  */
 
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Alert, Badge, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner, Button } from 'react-bootstrap'
 import { Icon } from '@iconify/react'
+import { toast } from 'react-toastify'
 import PageTitle from '@/components/PageTitle'
 import { useHrmEmployeeDetail } from '@/hooks/useHrmEmployeeDetail'
-import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
+import { usePermissions } from '@/hooks/usePermissions'
+import { useTerminateEmployee } from '@/hooks/useTerminateEmployee'
+import { TerminateEmployeeModal } from '@/components/hrm/TerminateEmployeeModal'
 
 /** Derive initials from a full name */
 const getInitials = (fullName: string): string => {
@@ -51,11 +56,17 @@ const getStatusBadgeClass = (status: string): string => {
 const EmployeeDetailPage = () => {
   const { employeeId } = useParams<{ employeeId: string }>()
   const navigate = useNavigate()
-  const { employee, isLoading, error } = useHrmEmployeeDetail(employeeId || '')
-  const { isAdmin, isHRManager } = useSupabaseAuth()
+  const { employee, isLoading, error, refetch } = useHrmEmployeeDetail(employeeId || '')
+  const { canEditEmployee, canTerminateEmployee } = usePermissions()
+  const { isTerminating, error: terminateError, terminate, clearError } = useTerminateEmployee()
 
-  // Only Admin and HR Manager can edit
-  const canEdit = isAdmin || isHRManager
+  // Modal state
+  const [showTerminateModal, setShowTerminateModal] = useState(false)
+
+  // Permissions
+  const canEdit = canEditEmployee()
+  const canTerminate = canTerminateEmployee()
+  const isTerminated = employee?.employment_status === 'terminated'
 
   const handleBack = () => {
     navigate('/hrm/employees')
@@ -63,6 +74,22 @@ const EmployeeDetailPage = () => {
 
   const handleEdit = () => {
     navigate(`/hrm/employees/${employeeId}/edit`)
+  }
+
+  const handleTerminateClick = () => {
+    clearError()
+    setShowTerminateModal(true)
+  }
+
+  const handleTerminateConfirm = async (terminationDate: string, terminationReason: string | null) => {
+    if (!employeeId) return
+    
+    const success = await terminate(employeeId, terminationDate, terminationReason)
+    if (success) {
+      setShowTerminateModal(false)
+      toast.success('Employee terminated successfully')
+      refetch()
+    }
   }
 
   // Loading state
@@ -100,7 +127,7 @@ const EmployeeDetailPage = () => {
     )
   }
 
-  // Not found state (should not reach here due to error handling, but just in case)
+  // Not found state
   if (!employee) {
     return (
       <>
@@ -124,6 +151,18 @@ const EmployeeDetailPage = () => {
   return (
     <>
       <PageTitle title="Employee Details" subName="HRM" />
+
+      {/* Terminate error alert */}
+      {terminateError && (
+        <Row className="mb-3">
+          <Col xs={12}>
+            <Alert variant="danger" dismissible onClose={clearError}>
+              <Icon icon="mdi:alert-circle-outline" className="me-2" width={20} />
+              {terminateError}
+            </Alert>
+          </Col>
+        </Row>
+      )}
 
       {/* Header with avatar and basic info */}
       <Row className="mb-4">
@@ -150,12 +189,20 @@ const EmployeeDetailPage = () => {
                     </Badge>
                   </p>
                 </div>
-                {canEdit && (
-                  <Button variant="primary" onClick={handleEdit}>
-                    <Icon icon="mdi:pencil" className="me-1" width={18} />
-                    Edit
-                  </Button>
-                )}
+                <div className="d-flex gap-2">
+                  {canEdit && !isTerminated && (
+                    <Button variant="primary" onClick={handleEdit}>
+                      <Icon icon="mdi:pencil" className="me-1" width={18} />
+                      Edit
+                    </Button>
+                  )}
+                  {canTerminate && !isTerminated && (
+                    <Button variant="outline-danger" onClick={handleTerminateClick}>
+                      <Icon icon="mdi:account-remove" className="me-1" width={18} />
+                      Terminate
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardBody>
           </Card>
@@ -267,6 +314,48 @@ const EmployeeDetailPage = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Termination Info Card - Only shown for terminated employees */}
+      {isTerminated && (
+        <Row>
+          <Col xs={12} className="mb-4">
+            <Card className="border-danger">
+              <CardHeader className="bg-danger bg-opacity-10">
+                <CardTitle as="h5" className="mb-0 text-danger">
+                  <Icon icon="mdi:account-remove" className="me-2" width={20} />
+                  Termination Information
+                </CardTitle>
+              </CardHeader>
+              <CardBody>
+                <Row>
+                  <Col md={4} className="mb-3 mb-md-0">
+                    <label className="text-muted small d-block">Termination Date</label>
+                    <span className="fw-medium">{formatDate(employee.termination_date)}</span>
+                  </Col>
+                  <Col md={4} className="mb-3 mb-md-0">
+                    <label className="text-muted small d-block">Terminated By</label>
+                    <span>{employee.terminated_by || '—'}</span>
+                  </Col>
+                  <Col md={4}>
+                    <label className="text-muted small d-block">Reason</label>
+                    <span>{employee.termination_reason || '—'}</span>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      )}
+
+      {/* Terminate Modal */}
+      <TerminateEmployeeModal
+        show={showTerminateModal}
+        onClose={() => setShowTerminateModal(false)}
+        onConfirm={handleTerminateConfirm}
+        employeeName={employee.fullName}
+        employeeCode={employee.employee_code}
+        isTerminating={isTerminating}
+      />
     </>
   )
 }

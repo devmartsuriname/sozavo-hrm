@@ -822,6 +822,50 @@ Both functions check:
 
 ---
 
+## Phase 4.2 — Employee Terminate/Archive (Soft Delete)
+
+**Status:** ✅ Complete  
+**Date:** 2025-12-13
+
+### Database Changes
+
+Added two audit columns to `hrm_employees`:
+- `terminated_by` (UUID, nullable) — References `auth.users`, who performed termination
+- `termination_reason` (TEXT, nullable) — Optional reason for termination
+
+Added manager-scoped UPDATE policy:
+```sql
+CREATE POLICY "hrm_employees_update_manager" ON public.hrm_employees
+FOR UPDATE USING (
+  user_is_manager(auth.uid()) AND org_unit_id = get_user_org_unit(auth.uid())
+)
+WITH CHECK (
+  user_is_manager(auth.uid()) AND org_unit_id = get_user_org_unit(auth.uid())
+);
+```
+
+### Service Layer
+
+| Function | Description |
+|----------|-------------|
+| `terminateEmployee(employeeId, terminationDate, terminationReason, terminatedByUserId)` | Soft delete with audit trail |
+
+### Permissions
+
+| Function | Access |
+|----------|--------|
+| `canTerminateEmployee()` | Admin, HR Manager, Manager (scoped by RLS) |
+
+### UI Components
+
+| Component | Features |
+|-----------|----------|
+| `TerminateEmployeeModal` | Confirmation modal with date picker and reason textarea |
+| `EmployeeDetailPage` | Terminate button, Termination Info Card |
+| `EmployeeDirectory` | Status filter (Active/Terminated/All) |
+
+---
+
 ## Next Steps
 
-- Phase 4.2: Employee Terminate/Archive (Soft Delete + Audit Trail)
+- Phase 4.3: Leave Management Module

@@ -25,6 +25,7 @@ export interface UsePermissionsReturn {
   canViewEmployee: (employeeUserId: string | null) => boolean
   canEditOrgUnit: () => boolean
   canEditPosition: () => boolean
+  canTerminateEmployee: () => boolean
   
   // Utility
   hasAnyRole: (...roles: AppRole[]) => boolean
@@ -136,6 +137,16 @@ export function usePermissions(): UsePermissionsReturn {
   }
   
   /**
+   * Check if user can terminate employee records (soft delete)
+   * Admin, HR Manager, and Manager can terminate
+   * Manager's access is scoped by RLS to their org unit only
+   * Phase 4.2 implementation
+   */
+  const canTerminateEmployee = (): boolean => {
+    return isAdmin || isHRManager || isManager
+  }
+  
+  /**
    * Check if user has any of the specified roles
    * Utility for custom permission checks
    */
@@ -162,6 +173,7 @@ export function usePermissions(): UsePermissionsReturn {
     canViewEmployee,
     canEditOrgUnit,
     canEditPosition,
+    canTerminateEmployee,
     
     // Utility
     hasAnyRole,
