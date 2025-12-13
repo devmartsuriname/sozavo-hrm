@@ -76,16 +76,17 @@ Login as Admin and verify:
 | # | Scenario | Expected | Actual | Status |
 |---|----------|----------|--------|--------|
 | A10 | Click any employee code | ✅ Opens Employee Detail page | | |
-| A11 | Click "Edit" on any employee | ✅ Opens Employee Edit form | | |
-| A12 | Access `/hrm/employees/new` | ✅ Opens Employee Create form | | |
-| A13 | Submit employee form | ✅ Creates/updates employee | | |
+| A11 | Click "Edit" on any employee | ✅ Opens Employee Edit form (UI permission) | | |
+| A12 | Fill edit form and click Save | ✅ Employee record saved successfully (RLS allows UPDATE for admin) | | |
+| A13 | Access `/hrm/employees/new` | ✅ Opens Employee Create form (UI permission) | | |
+| A14 | Fill create form and click Save | ✅ Employee record created successfully (RLS allows INSERT for admin) | | |
 
 #### Structural Data
 
 | # | Scenario | Expected | Actual | Status |
 |---|----------|----------|--------|--------|
-| A14 | Click org unit code | ✅ Opens Org Unit Detail page | | |
-| A15 | Click position code | ✅ Opens Position Detail page | | |
+| A15 | Click org unit code | ✅ Opens Org Unit Detail page | | |
+| A16 | Click position code | ✅ Opens Position Detail page | | |
 
 ---
 
@@ -117,16 +118,19 @@ Login as HR Manager and verify:
 | # | Scenario | Expected | Actual | Status |
 |---|----------|----------|--------|--------|
 | H10 | Click any employee code | ✅ Opens Employee Detail page | | |
-| H11 | Click "Edit" on any employee | ✅ Opens Employee Edit form | | |
-| H12 | Access `/hrm/employees/new` | ✅ Opens Employee Create form | | |
-| H13 | Submit employee form | ✅ Creates/updates employee | | |
+| H11 | Click "Edit" on any employee | ✅ Opens Employee Edit form (UI permission) | | |
+| H12a | Fill edit form and click Save | ✅ Employee record saved successfully (RLS allows UPDATE for hr_manager) | | |
+| H12b | **If save fails unexpectedly** | Document RLS error: `new row violates row-level security policy for table "hrm_employees"` | | |
+| H13 | Access `/hrm/employees/new` | ✅ Opens Employee Create form (UI permission) | | |
+| H14a | Fill create form and click Save | ✅ Employee record created successfully (RLS allows INSERT for hr_manager) | | |
+| H14b | **If save fails unexpectedly** | Document RLS error: `new row violates row-level security policy for table "hrm_employees"` | | |
 
 #### Structural Data
 
 | # | Scenario | Expected | Actual | Status |
 |---|----------|----------|--------|--------|
-| H14 | Click org unit code | ✅ Opens Org Unit Detail page | | |
-| H15 | Click position code | ✅ Opens Position Detail page | | |
+| H15 | Click org unit code | ✅ Opens Org Unit Detail page | | |
+| H16 | Click position code | ✅ Opens Position Detail page | | |
 
 ---
 
@@ -214,11 +218,11 @@ Login as Employee and verify:
 
 | Role | Tests | Passed | Failed | Notes |
 |------|-------|--------|--------|-------|
-| Admin | 15 | | | |
-| HR Manager | 15 | | | |
+| Admin | 16 | | | |
+| HR Manager | 18 | | | |
 | Manager | 14 | | | |
 | Employee | 14 | | | |
-| **Total** | **58** | | | |
+| **Total** | **62** | | | |
 
 ---
 
@@ -243,6 +247,47 @@ Login as Employee and verify:
 | `canViewEmployee()` | Self + managers + Admin + HR | Self + managers + Admin + HR | ✅ No |
 
 **Conclusion:** No permission gaps identified during checklist creation. All permission checks align with documented RBAC model.
+
+---
+
+## RLS vs UI Permission Alignment
+
+This section documents the relationship between frontend UI permission checks (`usePermissions` hook) and backend RLS policies. Both layers should be aligned for consistent behavior.
+
+### Alignment Matrix
+
+| Action | UI Check | RLS Policy | Status |
+|--------|----------|------------|--------|
+| View Employee List | `canViewEmployee()` | `hrm_employees_select_*` | ✅ Aligned |
+| View Employee Detail | `canViewEmployee()` | `hrm_employees_select_*` | ✅ Aligned |
+| Open Employee Edit Form | `canEditEmployee()` | (UI only) | ✅ UI gate |
+| Save Employee Edit | `canEditEmployee()` | `hrm_employees_update_admin`, `hrm_employees_update_hr_manager` | ✅ Aligned |
+| Open Employee Create Form | `canEditEmployee()` | (UI only) | ✅ UI gate |
+| Save Employee Create | `canEditEmployee()` | `hrm_employees_insert_admin`, `hrm_employees_insert_hr_manager` | ✅ Aligned |
+| Assign Roles | `canModifyRoles()` | `user_roles_insert_admin`, `user_roles_update_admin`, `user_roles_delete_admin` | ✅ Aligned |
+| View Users & Roles | `canViewUsers()` | `user_roles_select_*` | ✅ Aligned |
+
+### Expected RLS Error Messages
+
+If a save operation fails due to RLS policy violation (UI allowed but backend denied), the following error message will appear:
+
+```
+new row violates row-level security policy for table "hrm_employees"
+```
+
+**Action if encountered:**
+1. Document in "Actual/Notes" column of the relevant test scenario
+2. File as a permission gap requiring remediation
+3. Verify which RLS policy is blocking the operation using Supabase logs
+
+### UI-Only vs RLS-Enforced Operations
+
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| **UI Permission** | Controls visibility of buttons/forms | "Edit" button hidden for Employee role |
+| **RLS Policy** | Enforces actual data access at database level | UPDATE blocked even if form somehow accessed |
+
+Both layers provide defense-in-depth: UI provides good UX by hiding inaccessible features, RLS provides security by blocking unauthorized operations even if UI is bypassed.
 
 ---
 
