@@ -517,3 +517,37 @@ No hard deletes — employees are archived via status change:
 3. On confirm, `terminateEmployee()` service called
 4. Success → toast + page refresh
 5. Terminated employees show danger badge + Termination Info Card
+
+---
+
+## Phase 4.2.1c — Sidebar Toggle UX Fix
+
+**Status:** ✅ Complete  
+**Date:** 2025-12-13
+
+### Problem
+
+The sidebar toggle lost control after viewport resize because:
+- `LeftSideBarToggle.tsx` useEffect forced `menu.size = 'hidden'` when viewport ≤ 1140px
+- This overwrote user preference stored in localStorage
+- Toggle handler didn't restore `'hidden'` → `'default'`
+
+### Fix
+
+1. **Removed viewport-driven state mutation**: No `changeMenuSize()` calls triggered by `width`
+2. **User preference priority**: `menu.size` is now controlled ONLY by user toggle
+3. **Toggle behavior fixed**: When `size === 'hidden'`, toggle restores to `'default'`
+4. **Backdrop-only responsive behavior**: Mobile navigation uses backdrop overlay without changing sidebar state
+
+### Design Decision
+
+Sidebar visibility is a **user preference**, not a breakpoint decision. Responsive behavior may control backdrop/overlay but never permanently changes `menu.size`.
+
+### Verification Scenarios
+
+| Scenario | Expected Result |
+|----------|-----------------|
+| Pinned → resize to mobile → resize back | Still pinned |
+| Condensed → resize to mobile → toggle → resize back | Condensed restored |
+| Toggle when hidden | Restores to default |
+| No hover-only mode | Only if user explicitly chose hidden |

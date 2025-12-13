@@ -1,6 +1,5 @@
 import IconifyIcon from '@/components/wrapper/IconifyIcon'
 import { useLayoutContext } from '@/context/useLayoutContext'
-import useViewPort from '@/hooks/useViewPort'
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -11,26 +10,31 @@ const LeftSideBarToggle = () => {
     toggleBackdrop,
   } = useLayoutContext()
   const { pathname } = useLocation()
-  const { width } = useViewPort()
   const isFirstRender = useRef(true)
 
   const handleMenuSize = () => {
-    if (size === 'hidden') toggleBackdrop()
-    if (size === 'condensed') changeMenuSize('default')
-    else if (size === 'default') changeMenuSize('condensed')
+    // User toggle has absolute priority over any other state
+    if (size === 'hidden') {
+      // Restore from hidden to default
+      changeMenuSize('default')
+    } else if (size === 'condensed') {
+      changeMenuSize('default')
+    } else if (size === 'default') {
+      changeMenuSize('condensed')
+    }
   }
 
+  // Only toggle backdrop on route change when sidebar is hidden (mobile nav)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false
-    } else if (size === 'hidden') {
+      return
+    }
+    
+    if (size === 'hidden') {
       toggleBackdrop()
     }
-
-    if (width <= 1140) {
-      if (size !== 'hidden') changeMenuSize('hidden')
-    }
-  }, [pathname, width])
+  }, [pathname])
 
   return (
     <div className="topbar-item">
