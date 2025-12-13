@@ -378,6 +378,25 @@ The Employee Directory page implements local UX enhancements:
 
 These operate on the in-memory array after Supabase returns data, respecting RLS visibility.
 
+### HRM Form Validation Standard
+
+All HRM forms use the following validation feedback pattern (established Phase 4.1):
+
+```tsx
+<Form.Control
+  isInvalid={!!errors.fieldName}  // Applies .is-invalid Bootstrap class
+  // ...
+/>
+{errors.fieldName && (
+  <div className="invalid-feedback d-block">{errors.fieldName}</div>
+)}
+```
+
+- **`isInvalid` prop**: Applies Bootstrap's `.is-invalid` styling to inputs
+- **Manual `d-block`**: Error messages use `<div className="invalid-feedback d-block">` instead of `Form.Control.Feedback`
+- **Accessibility**: `aria-describedby` not implemented (matches Darkone demo pattern)
+- **Files**: `EmployeeFormBase.tsx`, `OrgUnitEditPage.tsx`, `PositionEditPage.tsx`
+
 ## Implementation Status
 
 ### Phase 1: ✅ COMPLETE
