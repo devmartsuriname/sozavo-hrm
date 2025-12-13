@@ -1,0 +1,51 @@
+{
+  "name": "Sparkline KPI Card",
+  "chartType": "area",
+  "sourceFile": "src/app/(admin)/dashboards/components/Cards.tsx",
+  "sourceLines": "8-59",
+  
+  "series": {
+    "example": [{ "data": [25, 66, 41, 89, 63, 25, 44] }],
+    "description": "Single series with 7 data points (last 7 days)"
+  },
+  
+  "apexOptions": {
+    "chart": {
+      "type": "area",
+      "sparkline": { "enabled": true },
+      "height": 56,
+      "width": 80
+    },
+    "stroke": {
+      "width": 2,
+      "curve": "smooth"
+    },
+    "fill": {
+      "type": "gradient",
+      "gradient": {
+        "shadeIntensity": 1,
+        "opacityFrom": 0.45,
+        "opacityTo": 0.05,
+        "stops": [50, 100, 100, 100]
+      }
+    },
+    "colors": ["#0acf97"],
+    "tooltip": {
+      "fixed": { "enabled": false },
+      "x": { "show": false },
+      "marker": { "show": false }
+    }
+  },
+  
+  "hrmSwapNotes": {
+    "dataSource": "Query hrm_employees or hrm_leave_requests with date grouping",
+    "seriesMapping": "Array of daily counts for last 7 days",
+    "colorOptions": {
+      "success": "#0acf97",
+      "primary": "#3e60d5",
+      "warning": "#ffc35a",
+      "danger": "#fa5c7c"
+    },
+    "example": "SELECT COUNT(*) FROM hrm_employees WHERE DATE(created_at) >= NOW() - INTERVAL '7 days' GROUP BY DATE(created_at)"
+  }
+}

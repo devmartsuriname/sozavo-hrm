@@ -1,0 +1,65 @@
+{
+  "name": "Revenue Bar+Area Combo",
+  "chartType": "mixed",
+  "sourceFile": "src/app/(admin)/dashboards/components/Chart.tsx",
+  "sourceLines": "8-135",
+  
+  "series": {
+    "example": [
+      { "name": "Page Views", "type": "bar", "data": [8107, 11117, 8500, 4536, 8023, 8500, 9250, 8530, 12150, 15230, 8200, 8500] },
+      { "name": "Clicks", "type": "area", "data": [23, 35, 16, 46, 65, 14, 5, 47, 79, 86, 34, 56] },
+      { "name": "Revenue", "type": "area", "data": [440, 505, 414, 671, 227, 413, 200, 410, 350, 550, 280, 480] }
+    ],
+    "description": "Three series: one bar chart (primary metric) and two area charts (secondary metrics)"
+  },
+  
+  "categories": {
+    "example": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "description": "12 months for annual view, or custom date range"
+  },
+  
+  "apexOptions": {
+    "chart": {
+      "type": "bar",
+      "stacked": false,
+      "toolbar": { "show": false }
+    },
+    "plotOptions": {
+      "bar": { "columnWidth": "50%", "borderRadius": 5 }
+    },
+    "stroke": {
+      "width": [0, 2, 2]
+    },
+    "fill": {
+      "opacity": [1, 0.25, 0.25],
+      "type": ["solid", "gradient", "gradient"]
+    },
+    "colors": ["#3e60d5", "#47ad77", "#fa5c7c"],
+    "xaxis": {
+      "categories": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    },
+    "yaxis": [
+      { "title": { "text": "Views" } },
+      { "opposite": true, "title": { "text": "Revenue" } }
+    ],
+    "legend": {
+      "position": "top",
+      "horizontalAlign": "center"
+    }
+  },
+  
+  "hrmSwapNotes": {
+    "seriesMapping": {
+      "bar": "Monthly attendance count (primary)",
+      "area1": "Monthly leave requests (secondary)",
+      "area2": "Monthly new hires (secondary)"
+    },
+    "categories": "Month names or date labels",
+    "colorOptions": {
+      "attendance": "#3e60d5",
+      "leave": "#ffc35a",
+      "hires": "#47ad77"
+    },
+    "queryExample": "SELECT DATE_TRUNC('month', created_at) as month, COUNT(*) FROM hrm_attendance_records GROUP BY month ORDER BY month"
+  }
+}
