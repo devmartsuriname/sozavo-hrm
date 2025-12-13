@@ -78,6 +78,12 @@ export async function fetchEmployeeDirectory(): Promise<HrmEmployeeDirectory[]> 
         updated_at: '',
         terminated_by: null,
         termination_reason: null,
+        // Phase 4.2.1 fields
+        terminated_at: null,
+        reactivated_by: null,
+        reactivated_at: null,
+        reactivation_reason: null,
+        // Derived fields
         fullName: `${emp.first_name} ${emp.last_name}`,
         orgUnitName: emp.org_unit_id ? orgUnitMap.get(emp.org_unit_id) ?? null : null,
         positionTitle: emp.position_id ? positionMap.get(emp.position_id) ?? null : null,
@@ -253,28 +259,49 @@ export async function createEmployee(
 /**
  * Terminates an employee (soft delete with audit trail).
  * Sets employment_status='terminated', is_active=false, termination_date, 
- * terminated_by, and termination_reason.
+ * terminated_by, termination_reason, and terminated_at.
+ * 
+ * SECURITY: User ID is derived server-side from supabase.auth.getUser()
+ * Never accepts userId as a parameter to prevent client-side spoofing.
  * 
  * RLS enforces access:
  * - Admins: can terminate any employee
  * - HR Managers: can terminate any employee
  * - Managers: can only terminate employees in their org unit
  * 
- * Phase 4.2 implementation.
+ * Phase 4.2.1 implementation - server-validated.
  */
 export async function terminateEmployee(
   employeeId: string,
   terminationDate: string,
-  terminationReason: string | null,
-  terminatedByUserId: string
+  terminationReason: string | null
 ): Promise<import('@/types/hrm').HrmEmployeeRow> {
+  // SECURITY: Get user ID from server, not from client
+  const { data: authData, error: authError } = await supabase.auth.getUser()
+  if (authError || !authData?.user?.id) {
+    throw new Error('Authentication required to terminate an employee.')
+  }
+  const userId = authData.user.id
+
+  // Validate termination_date is provided and not in the future
+  if (!terminationDate) {
+    throw new Error('Termination date is required.')
+  }
+  const termDate = new Date(terminationDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  if (termDate > today) {
+    throw new Error('Termination date cannot be in the future.')
+  }
+
   const payload: HrmEmployeeTerminatePayload = {
     employment_status: 'terminated',
     termination_date: terminationDate,
     is_active: false,
-    terminated_by: terminatedByUserId,
+    terminated_by: userId,                    // Server-derived
     termination_reason: terminationReason,
-    updated_by: terminatedByUserId,
+    terminated_at: new Date().toISOString(),  // Immutable timestamp for cooldown
+    updated_by: userId,                       // Server-derived
   }
 
   const { data, error } = await supabase
@@ -286,6 +313,74 @@ export async function terminateEmployee(
 
   if (error) {
     throw new Error(`Failed to terminate employee: ${error.message}`)
+  }
+
+  return data as import('@/types/hrm').HrmEmployeeRow
+}
+
+/**
+ * Reactivates a terminated employee.
+ * Sets employment_status='active', is_active=true, reactivated_by, 
+ * reactivated_at, and reactivation_reason.
+ * 
+ * SECURITY: User ID is derived server-side from supabase.auth.getUser()
+ * Never accepts userId as a parameter to prevent client-side spoofing.
+ * 
+ * IMPORTANT: Does NOT clear terminated_by, termination_reason, termination_date, terminated_at.
+ * Termination history remains immutable for audit compliance.
+ * 
+ * DB trigger enforces:
+ * - Managers cannot reactivate (blocked at DB level)
+ * - HR Managers must provide reactivation_reason
+ * - Cooldown: if terminated_at < 5 min ago, reason required (even for Admin)
+ * 
+ * Phase 4.2.1 implementation.
+ */
+export async function reactivateEmployee(
+  employeeId: string,
+  reactivationReason: string | null
+): Promise<import('@/types/hrm').HrmEmployeeRow> {
+  // SECURITY: Get user ID from server, not from client
+  const { data: authData, error: authError } = await supabase.auth.getUser()
+  if (authError || !authData?.user?.id) {
+    throw new Error('Authentication required to reactivate an employee.')
+  }
+  const userId = authData.user.id
+
+  // Defensive check: Fetch employee to verify terminated status
+  const { data: existingEmployee, error: fetchError } = await supabase
+    .from('hrm_employees')
+    .select('employment_status')
+    .eq('id', employeeId)
+    .single()
+
+  if (fetchError || !existingEmployee) {
+    throw new Error('Employee not found or access denied.')
+  }
+
+  if (existingEmployee.employment_status !== 'terminated') {
+    throw new Error('Only terminated employees can be reactivated.')
+  }
+
+  const payload: import('@/types/hrm').HrmEmployeeReactivatePayload = {
+    employment_status: 'active',
+    is_active: true,
+    reactivated_by: userId,                    // Server-derived
+    reactivated_at: new Date().toISOString(),
+    reactivation_reason: reactivationReason,
+    updated_by: userId,                        // Server-derived
+    // NOTE: Do NOT modify terminated_by, termination_reason, termination_date, terminated_at
+  }
+
+  const { data, error } = await supabase
+    .from('hrm_employees')
+    .update(payload)
+    .eq('id', employeeId)
+    .select('*')
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to reactivate employee: ${error.message}`)
   }
 
   return data as import('@/types/hrm').HrmEmployeeRow

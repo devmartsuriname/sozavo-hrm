@@ -29,6 +29,12 @@ export interface HrmEmployeeRow {
   // Phase 4.2 termination audit fields
   terminated_by: string | null
   termination_reason: string | null
+  // Phase 4.2.1 termination timestamp (immutable, for cooldown)
+  terminated_at: string | null
+  // Phase 4.2.1 reactivation audit fields
+  reactivated_by: string | null
+  reactivated_at: string | null
+  reactivation_reason: string | null
 }
 
 // =============================================================================
@@ -251,5 +257,21 @@ export interface HrmEmployeeTerminatePayload {
   is_active: false
   terminated_by: string
   termination_reason: string | null
+  terminated_at: string  // Phase 4.2.1: immutable timestamp for cooldown
+  updated_by: string
+}
+
+/**
+ * Payload for reactivating a terminated employee.
+ * Phase 4.2.1 implementation.
+ * 
+ * IMPORTANT: Does NOT clear terminated_by, termination_reason, termination_date, terminated_at
+ */
+export interface HrmEmployeeReactivatePayload {
+  employment_status: 'active'
+  is_active: true
+  reactivated_by: string
+  reactivated_at: string
+  reactivation_reason: string | null
   updated_by: string
 }

@@ -262,6 +262,19 @@ src/
 | **3.1** | ✅ Complete | Users & Roles UI (read-only listing + detail) |
 | **3.2** | ✅ Complete | Role Assignment & User–Employee Linking modal |
 | **3.3** | ✅ Complete | Permission Utilities & RBAC Enforcement |
+| **4.2.1** | ✅ Complete | Reactivation + Audit Guardrails (server-validated, DB trigger) |
+
+### Phase 4.2.1 — Reactivation + Audit Guardrails
+
+**DB Changes:**
+- Added `terminated_at` for immutable cooldown timestamp
+- Added `reactivated_by`, `reactivated_at`, `reactivation_reason` for audit
+- Created `enforce_employee_update_guardrails()` trigger
+
+**Security Model:**
+- `terminateEmployee()` / `reactivateEmployee()` use `supabase.auth.getUser()` internally
+- No userId parameters accepted - prevents client-side spoofing
+- DB trigger blocks managers from reactivating or modifying terminated records
 
 **Shared Form Architecture (Phase 2.11):**
 - `EmployeeFormBase` is the single source of truth for all employee form logic

@@ -2,7 +2,7 @@
  * HRM Employee Detail Page
  * Read-only view of a single employee's profile
  * Uses Darkone card patterns, respects RLS via authenticated session
- * Phase 4.2: Added Terminate Employee functionality
+ * Phase 4.2.1: Added Reactivate Employee functionality with unified history card
  */
 
 import { useState } from 'react'
@@ -14,7 +14,9 @@ import PageTitle from '@/components/PageTitle'
 import { useHrmEmployeeDetail } from '@/hooks/useHrmEmployeeDetail'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useTerminateEmployee } from '@/hooks/useTerminateEmployee'
+import { useReactivateEmployee } from '@/hooks/useReactivateEmployee'
 import { TerminateEmployeeModal } from '@/components/hrm/TerminateEmployeeModal'
+import { ReactivateEmployeeModal } from '@/components/hrm/ReactivateEmployeeModal'
 
 /** Derive initials from a full name */
 const getInitials = (fullName: string): string => {
@@ -39,6 +41,22 @@ const formatDate = (dateStr: string | null): string => {
   }
 }
 
+/** Format datetime for display */
+const formatDateTime = (dateStr: string | null): string => {
+  if (!dateStr) return '—'
+  try {
+    return new Date(dateStr).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return dateStr
+  }
+}
+
 /** Get status badge variant */
 const getStatusBadgeClass = (status: string): string => {
   switch (status) {
@@ -57,15 +75,18 @@ const EmployeeDetailPage = () => {
   const { employeeId } = useParams<{ employeeId: string }>()
   const navigate = useNavigate()
   const { employee, isLoading, error, refetch } = useHrmEmployeeDetail(employeeId || '')
-  const { canEditEmployee, canTerminateEmployee } = usePermissions()
-  const { isTerminating, error: terminateError, terminate, clearError } = useTerminateEmployee()
+  const { canEditEmployee, canTerminateEmployee, canReactivateEmployee, isHRManager, isAdmin } = usePermissions()
+  const { isTerminating, error: terminateError, terminate, clearError: clearTerminateError } = useTerminateEmployee()
+  const { isReactivating, error: reactivateError, reactivate, clearError: clearReactivateError } = useReactivateEmployee()
 
-  // Modal state
+  // Modal states
   const [showTerminateModal, setShowTerminateModal] = useState(false)
+  const [showReactivateModal, setShowReactivateModal] = useState(false)
 
   // Permissions
   const canEdit = canEditEmployee()
   const canTerminate = canTerminateEmployee()
+  const canReactivate = canReactivateEmployee()
   const isTerminated = employee?.employment_status === 'terminated'
 
   const handleBack = () => {
@@ -77,8 +98,13 @@ const EmployeeDetailPage = () => {
   }
 
   const handleTerminateClick = () => {
-    clearError()
+    clearTerminateError()
     setShowTerminateModal(true)
+  }
+
+  const handleReactivateClick = () => {
+    clearReactivateError()
+    setShowReactivateModal(true)
   }
 
   const handleTerminateConfirm = async (terminationDate: string, terminationReason: string | null) => {
@@ -88,6 +114,17 @@ const EmployeeDetailPage = () => {
     if (success) {
       setShowTerminateModal(false)
       toast.success('Employee terminated successfully')
+      refetch()
+    }
+  }
+
+  const handleReactivateConfirm = async (reactivationReason: string | null) => {
+    if (!employeeId) return
+    
+    const success = await reactivate(employeeId, reactivationReason)
+    if (success) {
+      setShowReactivateModal(false)
+      toast.success('Employee reactivated successfully')
       refetch()
     }
   }
@@ -148,6 +185,9 @@ const EmployeeDetailPage = () => {
     )
   }
 
+  // Check if employee has reactivation history
+  const hasReactivationHistory = !!employee.reactivated_at
+
   return (
     <>
       <PageTitle title="Employee Details" subName="HRM" />
@@ -156,9 +196,21 @@ const EmployeeDetailPage = () => {
       {terminateError && (
         <Row className="mb-3">
           <Col xs={12}>
-            <Alert variant="danger" dismissible onClose={clearError}>
+            <Alert variant="danger" dismissible onClose={clearTerminateError}>
               <Icon icon="mdi:alert-circle-outline" className="me-2" width={20} />
               {terminateError}
+            </Alert>
+          </Col>
+        </Row>
+      )}
+
+      {/* Reactivate error alert */}
+      {reactivateError && (
+        <Row className="mb-3">
+          <Col xs={12}>
+            <Alert variant="danger" dismissible onClose={clearReactivateError}>
+              <Icon icon="mdi:alert-circle-outline" className="me-2" width={20} />
+              {reactivateError}
             </Alert>
           </Col>
         </Row>
@@ -200,6 +252,12 @@ const EmployeeDetailPage = () => {
                     <Button variant="outline-danger" onClick={handleTerminateClick}>
                       <Icon icon="mdi:account-remove" className="me-1" width={18} />
                       Terminate
+                    </Button>
+                  )}
+                  {canReactivate && isTerminated && (
+                    <Button variant="outline-success" onClick={handleReactivateClick}>
+                      <Icon icon="mdi:account-reactivate" className="me-1" width={18} />
+                      Reactivate
                     </Button>
                   )}
                 </div>
@@ -315,32 +373,66 @@ const EmployeeDetailPage = () => {
         </Col>
       </Row>
 
-      {/* Termination Info Card - Only shown for terminated employees */}
-      {isTerminated && (
+      {/* Termination & Reactivation History Card - Only shown for terminated or reactivated employees */}
+      {(isTerminated || hasReactivationHistory) && (
         <Row>
           <Col xs={12} className="mb-4">
-            <Card className="border-danger">
-              <CardHeader className="bg-danger bg-opacity-10">
-                <CardTitle as="h5" className="mb-0 text-danger">
-                  <Icon icon="mdi:account-remove" className="me-2" width={20} />
-                  Termination Information
+            <Card className={isTerminated ? 'border-danger' : 'border-success'}>
+              <CardHeader className={isTerminated ? 'bg-danger bg-opacity-10' : 'bg-success bg-opacity-10'}>
+                <CardTitle as="h5" className={`mb-0 ${isTerminated ? 'text-danger' : 'text-success'}`}>
+                  <Icon icon="mdi:history" className="me-2" width={20} />
+                  Termination & Reactivation History
                 </CardTitle>
               </CardHeader>
               <CardBody>
-                <Row>
-                  <Col md={4} className="mb-3 mb-md-0">
+                {/* Termination Section */}
+                <h6 className="text-muted mb-3">
+                  <Icon icon="mdi:account-remove" className="me-2" width={18} />
+                  Termination Details
+                </h6>
+                <Row className="mb-4">
+                  <Col md={3} className="mb-3 mb-md-0">
                     <label className="text-muted small d-block">Termination Date</label>
                     <span className="fw-medium">{formatDate(employee.termination_date)}</span>
                   </Col>
-                  <Col md={4} className="mb-3 mb-md-0">
+                  <Col md={3} className="mb-3 mb-md-0">
+                    <label className="text-muted small d-block">Terminated At</label>
+                    <span>{formatDateTime(employee.terminated_at)}</span>
+                  </Col>
+                  <Col md={3} className="mb-3 mb-md-0">
                     <label className="text-muted small d-block">Terminated By</label>
                     <span>{employee.terminated_by || '—'}</span>
                   </Col>
-                  <Col md={4}>
+                  <Col md={3}>
                     <label className="text-muted small d-block">Reason</label>
                     <span>{employee.termination_reason || '—'}</span>
                   </Col>
                 </Row>
+
+                {/* Reactivation Section - Only shown if reactivated */}
+                {hasReactivationHistory && (
+                  <>
+                    <hr />
+                    <h6 className="text-success mb-3">
+                      <Icon icon="mdi:account-reactivate" className="me-2" width={18} />
+                      Reactivation Details
+                    </h6>
+                    <Row>
+                      <Col md={4} className="mb-3 mb-md-0">
+                        <label className="text-muted small d-block">Reactivated At</label>
+                        <span className="fw-medium">{formatDateTime(employee.reactivated_at)}</span>
+                      </Col>
+                      <Col md={4} className="mb-3 mb-md-0">
+                        <label className="text-muted small d-block">Reactivated By</label>
+                        <span>{employee.reactivated_by || '—'}</span>
+                      </Col>
+                      <Col md={4}>
+                        <label className="text-muted small d-block">Reason</label>
+                        <span>{employee.reactivation_reason || '—'}</span>
+                      </Col>
+                    </Row>
+                  </>
+                )}
               </CardBody>
             </Card>
           </Col>
@@ -355,6 +447,17 @@ const EmployeeDetailPage = () => {
         employeeName={employee.fullName}
         employeeCode={employee.employee_code}
         isTerminating={isTerminating}
+      />
+
+      {/* Reactivate Modal */}
+      <ReactivateEmployeeModal
+        show={showReactivateModal}
+        onClose={() => setShowReactivateModal(false)}
+        onConfirm={handleReactivateConfirm}
+        employeeName={employee.fullName}
+        employeeCode={employee.employee_code}
+        isReactivating={isReactivating}
+        requireReason={isHRManager && !isAdmin}
       />
     </>
   )

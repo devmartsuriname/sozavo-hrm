@@ -26,6 +26,7 @@ export interface UsePermissionsReturn {
   canEditOrgUnit: () => boolean
   canEditPosition: () => boolean
   canTerminateEmployee: () => boolean
+  canReactivateEmployee: () => boolean  // Phase 4.2.1: Admin + HR Manager only
   
   // Utility
   hasAnyRole: (...roles: AppRole[]) => boolean
@@ -147,6 +148,15 @@ export function usePermissions(): UsePermissionsReturn {
   }
   
   /**
+   * Check if user can reactivate terminated employees
+   * Admin and HR Manager only — Managers explicitly denied (enforced at DB level)
+   * Phase 4.2.1 implementation
+   */
+  const canReactivateEmployee = (): boolean => {
+    return isAdmin || isHRManager
+  }
+  
+  /**
    * Check if user has any of the specified roles
    * Utility for custom permission checks
    */
@@ -174,6 +184,7 @@ export function usePermissions(): UsePermissionsReturn {
     canEditOrgUnit,
     canEditPosition,
     canTerminateEmployee,
+    canReactivateEmployee,
     
     // Utility
     hasAnyRole,
