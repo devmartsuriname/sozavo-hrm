@@ -26,6 +26,9 @@ export interface HrmEmployeeRow {
   is_active: boolean
   created_at: string
   updated_at: string
+  // Phase 4.2 termination audit fields
+  terminated_by: string | null
+  termination_reason: string | null
 }
 
 // =============================================================================
@@ -232,4 +235,21 @@ export interface HrmPositionUpdatePayload {
   description: string | null
   is_active: boolean
   updated_by: string | null
+}
+
+// =============================================================================
+// EMPLOYEE TERMINATE PAYLOAD (for soft delete/archive)
+// =============================================================================
+
+/**
+ * Payload for terminating an employee (soft delete with audit trail).
+ * Phase 4.2 implementation.
+ */
+export interface HrmEmployeeTerminatePayload {
+  employment_status: 'terminated'
+  termination_date: string
+  is_active: false
+  terminated_by: string
+  termination_reason: string | null
+  updated_by: string
 }

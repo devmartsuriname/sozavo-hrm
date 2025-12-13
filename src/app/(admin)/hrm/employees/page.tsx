@@ -2,7 +2,8 @@
  * HRM Employee Directory Page
  * Read-only table listing employees from hrm_employees
  * Uses Darkone table patterns, respects RLS via authenticated session
- * Features: initials avatar, sorting, filtering, manager name display
+ * Features: initials avatar, sorting, filtering, manager name display, status filter
+ * Phase 4.2: Added status filter (All / Active / Terminated)
  */
 
 import { useState, useMemo } from 'react'
@@ -16,6 +17,7 @@ import type { HrmEmployeeDirectory } from '@/types/hrm'
 
 type SortKey = 'employee_code' | 'fullName' | 'orgUnitName' | 'positionTitle' | 'managerName' | 'employment_status'
 type SortDirection = 'asc' | 'desc'
+type StatusFilter = 'all' | 'active' | 'terminated'
 
 /** Derive initials from a full name */
 const getInitials = (fullName: string): string => {
@@ -39,6 +41,7 @@ const EmployeeDirectory = () => {
 
   // Filter state
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
 
   // Handle header click for sorting
   const handleSort = (key: SortKey) => {
@@ -53,6 +56,13 @@ const EmployeeDirectory = () => {
   // Filtered and sorted employees
   const displayedEmployees = useMemo(() => {
     let result = [...employees]
+
+    // Filter by status
+    if (statusFilter === 'active') {
+      result = result.filter((emp) => emp.employment_status !== 'terminated')
+    } else if (statusFilter === 'terminated') {
+      result = result.filter((emp) => emp.employment_status === 'terminated')
+    }
 
     // Filter by search term (case-insensitive partial match)
     if (searchTerm.trim()) {
@@ -78,7 +88,7 @@ const EmployeeDirectory = () => {
     })
 
     return result
-  }, [employees, searchTerm, sortKey, sortDirection])
+  }, [employees, searchTerm, statusFilter, sortKey, sortDirection])
 
   // Render sort indicator
   const renderSortIcon = (key: SortKey) => {
@@ -120,6 +130,17 @@ const EmployeeDirectory = () => {
                 </p>
               </div>
               <div className="d-flex align-items-center gap-2 flex-wrap">
+                {/* Status Filter */}
+                <Form.Select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                  style={{ maxWidth: 150 }}
+                  size="sm"
+                >
+                  <option value="active">Active Only</option>
+                  <option value="terminated">Terminated Only</option>
+                  <option value="all">All Employees</option>
+                </Form.Select>
                 <Form.Control
                   type="text"
                   placeholder="Search employees..."
@@ -222,9 +243,9 @@ const EmployeeDirectory = () => {
                       ))}
                     </tbody>
                   </Table>
-                  {displayedEmployees.length === 0 && searchTerm && (
+                  {displayedEmployees.length === 0 && (searchTerm || statusFilter !== 'all') && (
                     <p className="text-center text-muted py-3 mb-0">
-                      No employees match your search.
+                      No employees match your filters.
                     </p>
                   )}
                 </div>

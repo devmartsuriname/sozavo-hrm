@@ -30,7 +30,9 @@ export type Database = {
           org_unit_id: string | null
           phone: string | null
           position_id: string | null
+          terminated_by: string | null
           termination_date: string | null
+          termination_reason: string | null
           updated_at: string
           updated_by: string | null
           user_id: string | null
@@ -50,7 +52,9 @@ export type Database = {
           org_unit_id?: string | null
           phone?: string | null
           position_id?: string | null
+          terminated_by?: string | null
           termination_date?: string | null
+          termination_reason?: string | null
           updated_at?: string
           updated_by?: string | null
           user_id?: string | null
@@ -70,7 +74,9 @@ export type Database = {
           org_unit_id?: string | null
           phone?: string | null
           position_id?: string | null
+          terminated_by?: string | null
           termination_date?: string | null
+          termination_reason?: string | null
           updated_at?: string
           updated_by?: string | null
           user_id?: string | null
@@ -252,7 +258,9 @@ export type Database = {
           org_unit_id: string | null
           phone: string | null
           position_id: string | null
+          terminated_by: string | null
           termination_date: string | null
+          termination_reason: string | null
           updated_at: string
           updated_by: string | null
           user_id: string | null

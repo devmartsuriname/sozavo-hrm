@@ -373,12 +373,13 @@ P{phase}-{category}-{number}
 | 2 | 🔄 In Progress | 25 | 13 |
 | 3 | ⏳ Planned | 14 | 0 |
 | 4.1 | ✅ Complete | 10 | 10 |
+| 4.2 | ✅ Complete | 6 | 6 |
 | 4 | ⏳ Planned | 18 | 0 |
 | 5 | ⏳ Planned | 12 | 0 |
 | 6 | ⏳ Planned | 15 | 0 |
 | 7 | ⏳ Planned | 13 | 0 |
 | 8 | ⏳ Planned | 16 | 0 |
-| **Total** | | **165** | **65** |
+| **Total** | | **171** | **71** |
 
 ---
 

@@ -3,7 +3,7 @@
  * Fetches a single employee by ID using authenticated Supabase session
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSupabaseAuth } from '@/context/SupabaseAuthContext'
 import { fetchEmployeeDetail } from '@/services/hrmEmployeeService'
 import type { HrmEmployeeDetail } from '@/types/hrm'
@@ -12,6 +12,7 @@ interface UseHrmEmployeeDetailResult {
   employee: HrmEmployeeDetail | null
   isLoading: boolean
   error: string | null
+  refetch: () => void
 }
 
 export function useHrmEmployeeDetail(employeeId: string): UseHrmEmployeeDetailResult {
@@ -19,6 +20,11 @@ export function useHrmEmployeeDetail(employeeId: string): UseHrmEmployeeDetailRe
   const [employee, setEmployee] = useState<HrmEmployeeDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refetchTrigger, setRefetchTrigger] = useState(0)
+
+  const refetch = useCallback(() => {
+    setRefetchTrigger(prev => prev + 1)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +56,7 @@ export function useHrmEmployeeDetail(employeeId: string): UseHrmEmployeeDetailRe
     }
 
     fetchData()
-  }, [status, employeeId])
+  }, [status, employeeId, refetchTrigger])
 
-  return { employee, isLoading, error }
+  return { employee, isLoading, error, refetch }
 }

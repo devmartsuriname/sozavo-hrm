@@ -466,3 +466,36 @@ Edit pages follow Darkone detail page layout:
 - Full-width form container (`<Col xs={12}>`)
 - Action buttons in separate Row with `mb-4` spacing
 - Card-based form sections
+
+---
+
+## Phase 4.2 — Employee Terminate/Archive
+
+**Status:** ✅ Complete  
+**Date:** 2025-12-13
+
+### Soft Delete Pattern
+
+No hard deletes — employees are archived via status change:
+- `employment_status` → `'terminated'`
+- `is_active` → `false`
+- `termination_date` → user-provided date
+- `terminated_by` → current user ID (audit)
+- `termination_reason` → optional text (audit)
+
+### Permission: `canTerminateEmployee()`
+
+| Role | Access |
+|------|--------|
+| Admin | All employees |
+| HR Manager | All employees |
+| Manager | Own org unit only (RLS) |
+| Employee | None |
+
+### UI Flow
+
+1. User clicks "Terminate" on Employee Detail page
+2. Modal opens with date picker and optional reason
+3. On confirm, `terminateEmployee()` service called
+4. Success → toast + page refresh
+5. Terminated employees show danger badge + Termination Info Card

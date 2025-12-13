@@ -5,7 +5,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client'
-import type { HrmEmployeeDirectory, HrmEmployeeDetail, HrmEmployeeDirectoryQuery } from '@/types/hrm'
+import type { HrmEmployeeDirectory, HrmEmployeeDetail, HrmEmployeeDirectoryQuery, HrmEmployeeTerminatePayload } from '@/types/hrm'
 
 /**
  * Fetches employees for the directory listing with org unit and position names.
@@ -76,6 +76,8 @@ export async function fetchEmployeeDirectory(): Promise<HrmEmployeeDirectory[]> 
         is_active: true,
         created_at: '',
         updated_at: '',
+        terminated_by: null,
+        termination_reason: null,
         fullName: `${emp.first_name} ${emp.last_name}`,
         orgUnitName: emp.org_unit_id ? orgUnitMap.get(emp.org_unit_id) ?? null : null,
         positionTitle: emp.position_id ? positionMap.get(emp.position_id) ?? null : null,
@@ -243,6 +245,47 @@ export async function createEmployee(
 
   if (error) {
     throw new Error(`Failed to create employee: ${error.message}`)
+  }
+
+  return data as import('@/types/hrm').HrmEmployeeRow
+}
+
+/**
+ * Terminates an employee (soft delete with audit trail).
+ * Sets employment_status='terminated', is_active=false, termination_date, 
+ * terminated_by, and termination_reason.
+ * 
+ * RLS enforces access:
+ * - Admins: can terminate any employee
+ * - HR Managers: can terminate any employee
+ * - Managers: can only terminate employees in their org unit
+ * 
+ * Phase 4.2 implementation.
+ */
+export async function terminateEmployee(
+  employeeId: string,
+  terminationDate: string,
+  terminationReason: string | null,
+  terminatedByUserId: string
+): Promise<import('@/types/hrm').HrmEmployeeRow> {
+  const payload: HrmEmployeeTerminatePayload = {
+    employment_status: 'terminated',
+    termination_date: terminationDate,
+    is_active: false,
+    terminated_by: terminatedByUserId,
+    termination_reason: terminationReason,
+    updated_by: terminatedByUserId,
+  }
+
+  const { data, error } = await supabase
+    .from('hrm_employees')
+    .update(payload)
+    .eq('id', employeeId)
+    .select('*')
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to terminate employee: ${error.message}`)
   }
 
   return data as import('@/types/hrm').HrmEmployeeRow
