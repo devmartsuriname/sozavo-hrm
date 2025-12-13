@@ -222,7 +222,7 @@ const OrgUnitEditPage = () => {
       {/* Edit Form */}
       <Form onSubmit={handleSubmit}>
         <Row>
-          <Col lg={8}>
+          <Col xs={12}>
             <Card className="mb-4">
               <Card.Header>
                 <h5 className="card-title mb-0">
@@ -303,8 +303,10 @@ const OrgUnitEditPage = () => {
                 </Form.Group>
               </Card.Body>
             </Card>
-
-            {/* Action Buttons */}
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12} className="mb-4">
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit" disabled={isUpdating}>
                 {isUpdating ? (
