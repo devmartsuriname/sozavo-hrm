@@ -323,6 +323,16 @@ Test users verified:
 - `manager@sozavo.sr` – Team visibility only, no structural data access
 - `employee@sozavo.sr` – Self-service only
 
+### Phase 3.5: Admin Cleanup & Demo Library
+
+**Step 3.5.1 – Inventory:** Complete audit of all Darkone demo modules (41+ routes, 60+ components).
+
+**Step 3.5.2 – Demo Library Creation:** Documentation-based library preserving reusable demo assets:
+- `/docs/demo-library/` – Master index and integration notes
+- Dashboard widgets, ApexCharts configs (JSON), maps, UI patterns
+- HRM metric mappings for Phase 6 dashboard integration
+- No runtime code changes – documentation only
+
 ### RBAC Flow
 
 ```

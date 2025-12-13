@@ -418,6 +418,28 @@ All screens use Darkone UI patterns (Card, Table, Alert, Spinner) without modifi
 | 3.1 | Users & Roles (read-only listing + detail) | ✅ Complete |
 | 3.2 | Role Assignment & User–Employee Linking | ✅ Complete |
 | 3.3 | Permission Utilities & RBAC Enforcement | ✅ Complete |
+| 3.4 | RBAC QA Pass | ✅ Complete |
+| 3.5.1 | Admin Cleanup Inventory | ✅ Complete |
+| 3.5.2 | Demo Library Creation | ✅ Complete |
+
+## Demo Library Reference
+
+A documentation-based library of reusable Darkone demo components has been created for future HRM feature integration.
+
+**Location:** `/docs/demo-library/`
+
+| Category | File | Purpose |
+|----------|------|---------|
+| Dashboard | `dashboard/darkone-dashboard-widgets.md` | KPI cards, sparklines, charts |
+| Charts | `charts/*.json` | ApexCharts configurations |
+| Maps | `maps/world-map-login-locations.md` | Login location visualization |
+| UI Widgets | `ui-widgets/stat-cards.md` | Badge and status patterns |
+| Forms | `forms/forms-reference.md` | Form component reference |
+| Tables | `tables/tables-reference.md` | Table implementations |
+| Icons | `icons/icons-reference.md` | Icon sets reference |
+| Layouts | `layouts/layouts-reference.md` | Layout variants |
+
+See `docs/demo-library/README.md` for integration patterns and HRM metric mappings.
 
 **Step 3.1 – Read-Only RBAC Visibility:**
 - User Directory (`/hrm/users`) listing all auth users with roles and linked employees

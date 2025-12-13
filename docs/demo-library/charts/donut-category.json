@@ -1,0 +1,63 @@
+{
+  "name": "Category Donut Chart",
+  "chartType": "donut",
+  "sourceFile": "src/app/(admin)/dashboards/components/SaleChart.tsx",
+  "sourceLines": "6-50",
+  
+  "series": {
+    "example": [44, 55, 41, 17],
+    "description": "Array of numbers representing each category's value or percentage"
+  },
+  
+  "labels": {
+    "example": ["Direct", "Affiliate", "Sponsored", "E-mail"],
+    "description": "Category labels matching series order"
+  },
+  
+  "apexOptions": {
+    "chart": {
+      "type": "donut",
+      "height": 231
+    },
+    "colors": ["#3e60d5", "#6c757d", "#47ad77", "#ffc35a"],
+    "legend": {
+      "show": false
+    },
+    "dataLabels": {
+      "enabled": false
+    },
+    "plotOptions": {
+      "pie": {
+        "donut": {
+          "size": "70%"
+        }
+      }
+    },
+    "responsive": [
+      {
+        "breakpoint": 576,
+        "options": {
+          "chart": { "height": 250 }
+        }
+      }
+    ]
+  },
+  
+  "hrmSwapNotes": {
+    "primaryUseCase": "Leave distribution by type",
+    "seriesMapping": {
+      "index0": "Annual Leave count",
+      "index1": "Sick Leave count",
+      "index2": "Casual Leave count",
+      "index3": "Unpaid Leave count"
+    },
+    "labelMapping": ["Annual Leave", "Sick Leave", "Casual Leave", "Unpaid Leave"],
+    "colorSuggestion": {
+      "annual": "#3e60d5",
+      "sick": "#fa5c7c",
+      "casual": "#47ad77",
+      "unpaid": "#6c757d"
+    },
+    "queryExample": "SELECT leave_type, COUNT(*) as count FROM hrm_leave_requests WHERE status = 'approved' GROUP BY leave_type"
+  }
+}
