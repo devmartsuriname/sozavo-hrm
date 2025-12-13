@@ -89,3 +89,40 @@ export async function fetchPositionDetail(
     orgUnitName: pos.org_unit_id ? orgUnitMap.get(pos.org_unit_id) ?? null : null,
   }
 }
+
+/**
+ * Update a position by ID.
+ * RLS enforces access: Admin/HR Manager full access, Manager scoped to own org unit.
+ * 
+ * @param positionId - The UUID of the position to update
+ * @param payload - The update payload (title, description, is_active, updated_by)
+ * @returns Updated position row or null if not found/access denied
+ * @throws Error for genuine query errors
+ */
+export async function updatePosition(
+  positionId: string,
+  payload: {
+    title: string
+    description: string | null
+    is_active: boolean
+    updated_by: string | null
+  }
+): Promise<HrmPositionRow | null> {
+  const { data, error } = await supabase
+    .from('hrm_positions')
+    .update({
+      title: payload.title,
+      description: payload.description,
+      is_active: payload.is_active,
+      updated_by: payload.updated_by,
+    })
+    .eq('id', positionId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to update position: ${error.message}`)
+  }
+
+  return data as HrmPositionRow
+}

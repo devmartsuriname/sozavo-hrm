@@ -23,6 +23,8 @@ export interface UsePermissionsReturn {
   canViewHRMData: () => boolean
   canEditEmployee: () => boolean
   canViewEmployee: (employeeUserId: string | null) => boolean
+  canEditOrgUnit: () => boolean
+  canEditPosition: () => boolean
   
   // Utility
   hasAnyRole: (...roles: AppRole[]) => boolean
@@ -37,9 +39,11 @@ export interface UsePermissionsReturn {
  * |-----------------|-------|------------|---------|----------|
  * | canViewUsers    | ✅    | ✅         | ❌      | ❌       |
  * | canModifyRoles  | ✅    | ❌         | ❌      | ❌       |
- * | canViewHRMData  | ✅    | ✅         | ❌      | ❌       |
+ * | canViewHRMData  | ✅    | ✅         | Scoped  | ❌       |
  * | canEditEmployee | ✅    | ✅         | ❌      | ❌       |
  * | canViewEmployee | ✅    | ✅         | Direct  | Self     |
+ * | canEditOrgUnit  | ✅    | ✅         | Scoped  | ❌       |
+ * | canEditPosition | ✅    | ✅         | Scoped  | ❌       |
  */
 export function usePermissions(): UsePermissionsReturn {
   const { 
@@ -114,6 +118,24 @@ export function usePermissions(): UsePermissionsReturn {
   }
   
   /**
+   * Check if user can edit organization unit records
+   * Admin and HR Manager have full access
+   * Manager has scoped access (enforced by RLS - own org unit only)
+   */
+  const canEditOrgUnit = (): boolean => {
+    return isAdmin || isHRManager || isManager
+  }
+  
+  /**
+   * Check if user can edit position records
+   * Admin and HR Manager have full access
+   * Manager has scoped access (enforced by RLS - positions in own org unit only)
+   */
+  const canEditPosition = (): boolean => {
+    return isAdmin || isHRManager || isManager
+  }
+  
+  /**
    * Check if user has any of the specified roles
    * Utility for custom permission checks
    */
@@ -138,6 +160,8 @@ export function usePermissions(): UsePermissionsReturn {
     canViewHRMData,
     canEditEmployee,
     canViewEmployee,
+    canEditOrgUnit,
+    canEditPosition,
     
     // Utility
     hasAnyRole,

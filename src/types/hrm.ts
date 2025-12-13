@@ -202,3 +202,34 @@ export interface HrmEmployeeCreatePayload {
   created_by: string | null
   updated_by: string | null
 }
+
+// =============================================================================
+// ORG UNIT UPDATE PAYLOAD (for edit form)
+// =============================================================================
+
+/**
+ * Payload for updating an organization unit record.
+ * Excludes non-editable fields (id, code - immutable, audit columns).
+ */
+export interface HrmOrgUnitUpdatePayload {
+  name: string
+  description: string | null
+  parent_id: string | null
+  is_active: boolean
+  updated_by: string | null
+}
+
+// =============================================================================
+// POSITION UPDATE PAYLOAD (for edit form)
+// =============================================================================
+
+/**
+ * Payload for updating a position record.
+ * Excludes non-editable fields (id, code - immutable, org_unit_id - read-only, audit columns).
+ */
+export interface HrmPositionUpdatePayload {
+  title: string
+  description: string | null
+  is_active: boolean
+  updated_by: string | null
+}

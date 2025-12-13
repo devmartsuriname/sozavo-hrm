@@ -10,8 +10,10 @@ const HrmEmployeeEditPage = lazy(() => import('@/app/(admin)/hrm/employees/Emplo
 const HrmEmployeeCreatePage = lazy(() => import('@/app/(admin)/hrm/employees/EmployeeCreatePage'))
 const HrmOrgUnitsPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitsPage'))
 const HrmOrgUnitDetailPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitDetailPage'))
+const HrmOrgUnitEditPage = lazy(() => import('@/app/(admin)/hrm/org-units/OrgUnitEditPage'))
 const HrmPositionsPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionsPage'))
 const HrmPositionDetailPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionDetailPage'))
+const HrmPositionEditPage = lazy(() => import('@/app/(admin)/hrm/positions/PositionEditPage'))
 const HrmUsersPage = lazy(() => import('@/app/(admin)/hrm/users/UsersPage'))
 const HrmUserDetailPage = lazy(() => import('@/app/(admin)/hrm/users/UserDetailPage'))
 
@@ -111,6 +113,12 @@ const hrmRoutes: RoutesProps[] = [
     hidden: true,
   },
   {
+    name: 'Org Unit Edit',
+    path: '/hrm/org-units/:orgUnitId/edit',
+    element: <HrmOrgUnitEditPage />,
+    hidden: true,
+  },
+  {
     name: 'Positions',
     path: '/hrm/positions',
     element: <HrmPositionsPage />,
@@ -119,6 +127,12 @@ const hrmRoutes: RoutesProps[] = [
     name: 'Position Detail',
     path: '/hrm/positions/:positionId',
     element: <HrmPositionDetailPage />,
+    hidden: true,
+  },
+  {
+    name: 'Position Edit',
+    path: '/hrm/positions/:positionId/edit',
+    element: <HrmPositionEditPage />,
     hidden: true,
   },
   {
