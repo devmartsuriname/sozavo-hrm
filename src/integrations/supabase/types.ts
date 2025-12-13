@@ -30,6 +30,10 @@ export type Database = {
           org_unit_id: string | null
           phone: string | null
           position_id: string | null
+          reactivated_at: string | null
+          reactivated_by: string | null
+          reactivation_reason: string | null
+          terminated_at: string | null
           terminated_by: string | null
           termination_date: string | null
           termination_reason: string | null
@@ -52,6 +56,10 @@ export type Database = {
           org_unit_id?: string | null
           phone?: string | null
           position_id?: string | null
+          reactivated_at?: string | null
+          reactivated_by?: string | null
+          reactivation_reason?: string | null
+          terminated_at?: string | null
           terminated_by?: string | null
           termination_date?: string | null
           termination_reason?: string | null
@@ -74,6 +82,10 @@ export type Database = {
           org_unit_id?: string | null
           phone?: string | null
           position_id?: string | null
+          reactivated_at?: string | null
+          reactivated_by?: string | null
+          reactivation_reason?: string | null
+          terminated_at?: string | null
           terminated_by?: string | null
           termination_date?: string | null
           termination_reason?: string | null
@@ -258,6 +270,10 @@ export type Database = {
           org_unit_id: string | null
           phone: string | null
           position_id: string | null
+          reactivated_at: string | null
+          reactivated_by: string | null
+          reactivation_reason: string | null
+          terminated_at: string | null
           terminated_by: string | null
           termination_date: string | null
           termination_reason: string | null

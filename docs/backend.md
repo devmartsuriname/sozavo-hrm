@@ -410,6 +410,21 @@ All 35 tasks completed and verified:
 
 ### Phase 2 – Steps 1–11: ✅ IMPLEMENTED_AND_VERIFIED
 
+### Phase 4.2.1 – Reactivation + Audit Guardrails: ✅ COMPLETE
+
+**New DB Columns:**
+- `terminated_at` (TIMESTAMPTZ) - Immutable timestamp for cooldown logic
+- `reactivated_by`, `reactivated_at`, `reactivation_reason` - Reactivation audit fields
+
+**New Trigger:** `trg_employee_update_guardrails` enforces:
+- Manager cannot update orphan employees (`org_unit_id IS NULL`)
+- Manager cannot change `org_unit_id`
+- Manager cannot modify terminated records
+- HR Manager must provide `reactivation_reason`
+- Cooldown: if `terminated_at` < 5 min ago, reason required (even for Admin)
+
+**Security:** Both `terminateEmployee()` and `reactivateEmployee()` derive `userId` server-side via `supabase.auth.getUser()` - no client-side spoofing possible.
+
 Manual role-based testing completed 2025-12-10:
 - **Admin**: Sees all employees with full organization/position details
 - **HR Manager**: Sees all employees with full details
