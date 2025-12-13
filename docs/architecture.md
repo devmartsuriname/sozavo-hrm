@@ -308,6 +308,21 @@ Centralized permission framework for consistent RBAC enforcement:
 - ⚠️ Partial – Darkone guardrails prevent modification of protected layout files
 - Menu items remain static; dynamic filtering deferred to future step
 
+### Step 3.4: RBAC QA Pass
+
+Comprehensive RBAC validation with documented test scenarios:
+
+- **QA Checklist Created:** `docs/hrm/HRM_RBAC_QA_Checklist.md`
+- **58 test scenarios** covering all 4 roles across all HRM features
+- **Permission gap analysis** confirmed no misconfigurations
+- **Known limitations** documented (sidebar filtering, RLS-derived fields)
+
+Test users verified:
+- `admin@sozavo.sr` – Full access to all features
+- `hr.manager@sozavo.sr` – Read-only role management, full employee access
+- `manager@sozavo.sr` – Team visibility only, no structural data access
+- `employee@sozavo.sr` – Self-service only
+
 ### RBAC Flow
 
 ```
