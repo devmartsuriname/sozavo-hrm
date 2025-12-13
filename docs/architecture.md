@@ -367,6 +367,43 @@ Backend Layer:                                    ┌─────────
 - `get_all_users_with_roles()` is a SECURITY DEFINER function that safely queries `auth.users`
 - Role changes and user–employee linking are performed via direct writes with RLS enforcement
 
+## HRM Form Validation Standard
+
+All HRM forms use a consistent validation feedback pattern:
+
+```tsx
+// Input with isInvalid prop (applies .is-invalid class)
+<Form.Control
+  type="text"
+  name="fieldName"
+  isInvalid={!!errors.fieldName}
+  // ...
+/>
+
+// Error message with manual d-block class (NOT Form.Control.Feedback)
+{errors.fieldName && (
+  <div className="invalid-feedback d-block">{errors.fieldName}</div>
+)}
+```
+
+**Key Points:**
+- `isInvalid={!!errors.fieldName}` on `Form.Control` applies Bootstrap's `.is-invalid` styling
+- Error messages use `<div className="invalid-feedback d-block">` instead of `Form.Control.Feedback`
+- The `d-block` class ensures visibility regardless of sibling element state
+- This pattern is consistent with Darkone demo forms and `docs/demo-library/forms/forms-reference.md`
+
+**Accessibility Note:**
+- `aria-describedby` is not implemented for input-to-error linking
+- This matches Bootstrap's default `Form.Control.Feedback` behavior
+- Acceptable for current admin module; may be enhanced for strict WCAG 2.1 AA compliance in future
+
+**Files Using This Pattern:**
+- `src/components/hrm/EmployeeFormBase.tsx`
+- `src/app/(admin)/hrm/org-units/OrgUnitEditPage.tsx`
+- `src/app/(admin)/hrm/positions/PositionEditPage.tsx`
+
+---
+
 ## Row/ViewModel Pattern Standard
 
 All HRM entities follow the Row/ViewModel pattern:
