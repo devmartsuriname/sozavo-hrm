@@ -1,7 +1,7 @@
 # SoZaVo HRM System — Tasks Backlog
 
-> **Version:** 1.1  
-> **Last Updated:** 2025-12-10  
+> **Version:** 1.2  
+> **Last Updated:** 2025-12-13
 > **Status:** Active Planning Document
 
 ---
@@ -207,6 +207,25 @@ P{phase}-{category}-{number}
 
 ## Phase 4 — Leave & Attendance Management
 
+### Phase 4.1 — Organization Unit & Position Edit Forms
+
+| ID | Category | Title | Description | Status | Priority |
+|----|----------|-------|-------------|--------|----------|
+| P4.1-RLS-001 | RLS | Manager-Scoped Org Unit UPDATE | RLS policy for managers to edit own org unit | ✅ | P1 |
+| P4.1-RLS-002 | RLS | Manager-Scoped Position UPDATE | RLS policy for managers to edit positions in own org unit | ✅ | P1 |
+| P4.1-SVC-001 | SVC | updateOrgUnit Service | Supabase update function with RLS | ✅ | P1 |
+| P4.1-SVC-002 | SVC | updatePosition Service | Supabase update function with RLS | ✅ | P1 |
+| P4.1-UI-001 | UI | OrgUnitEditPage | Edit form with role guard and validation | ✅ | P1 |
+| P4.1-UI-002 | UI | PositionEditPage | Edit form with role guard and validation | ✅ | P1 |
+| P4.1-UI-003 | UI | Immutable Code Fields | Code read-only after creation | ✅ | P1 |
+| P4.1-UI-004 | UI | canEditOrgUnit Permission | usePermissions hook extension | ✅ | P1 |
+| P4.1-UI-005 | UI | canEditPosition Permission | usePermissions hook extension | ✅ | P1 |
+| P4.1-UI-006 | UI | Layout Parity Fix | Full-width forms, mb-4 button spacing | ✅ | P2 |
+
+**Phase 4.1 Summary:** 10/10 tasks completed ✅
+
+---
+
 ### Leave Management Tasks
 
 | ID | Category | Title | Description | Status | Priority |
@@ -235,7 +254,7 @@ P{phase}-{category}-{number}
 | P4-UI-011 | UI | Create Attendance Report Page | Monthly/weekly reports | ⏳ | P2 |
 | P4-UI-012 | UI | Create Attendance Summary Widget | Dashboard widget | ⏳ | P2 |
 
-**Phase 4 Summary:** 0/18 tasks completed, 18 planned
+**Phase 4 (Leave & Attendance) Summary:** 0/18 tasks completed, 18 planned
 
 ---
 
@@ -353,12 +372,13 @@ P{phase}-{category}-{number}
 | 1 | ✅ Complete | 35 | 35 |
 | 2 | 🔄 In Progress | 25 | 13 |
 | 3 | ⏳ Planned | 14 | 0 |
+| 4.1 | ✅ Complete | 10 | 10 |
 | 4 | ⏳ Planned | 18 | 0 |
 | 5 | ⏳ Planned | 12 | 0 |
 | 6 | ⏳ Planned | 15 | 0 |
 | 7 | ⏳ Planned | 13 | 0 |
 | 8 | ⏳ Planned | 16 | 0 |
-| **Total** | | **155** | **55** |
+| **Total** | | **165** | **65** |
 
 ---
 

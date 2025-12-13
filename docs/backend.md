@@ -738,6 +738,90 @@ The admin sidebar has been cleaned to show only HRM-relevant navigation:
 - Demo components remain in `src/app/(admin)/dashboards/components/` for Demo Library reference
 - All patterns documented in `/docs/demo-library/`
 
+## Phase 4.1 — Organization Unit & Position Edit Forms
+
+**Status:** ✅ Complete  
+**Date:** 2025-12-13
+
+Phase 4.1 added manager-scoped edit forms for Organization Units and Positions.
+
+### Scope
+
+| Entity | Routes | Permissions |
+|--------|--------|-------------|
+| Organization Units | `/hrm/org-units/:orgUnitId/edit` | Admin, HR Manager, Manager (own org unit only) |
+| Positions | `/hrm/positions/:positionId/edit` | Admin, HR Manager, Manager (own org unit only) |
+
+### RLS Policy Updates
+
+Two new UPDATE policies added using `get_user_org_unit()` function:
+
+```sql
+-- Managers can UPDATE org units within their org unit only
+CREATE POLICY "hrm_organization_units_update_manager" ON public.hrm_organization_units
+FOR UPDATE USING (
+  user_is_manager(auth.uid()) AND id = get_user_org_unit(auth.uid())
+)
+WITH CHECK (
+  user_is_manager(auth.uid()) AND id = get_user_org_unit(auth.uid())
+);
+
+-- Managers can UPDATE positions within their org unit only
+CREATE POLICY "hrm_positions_update_manager" ON public.hrm_positions
+FOR UPDATE USING (
+  user_is_manager(auth.uid()) AND org_unit_id = get_user_org_unit(auth.uid())
+)
+WITH CHECK (
+  user_is_manager(auth.uid()) AND org_unit_id = get_user_org_unit(auth.uid())
+);
+```
+
+### Business Rules
+
+1. **Immutable Code Rule**: The `code` field on Organization Units and Positions is read-only after creation. Displayed as disabled input with "Cannot be changed" helper text.
+
+2. **Permission Hierarchy**:
+   - **Admin/HR Manager**: Can edit any org unit or position
+   - **Manager**: Can only edit org unit/positions within their own org unit (RLS enforced)
+   - **Employee**: Access denied (UI and RLS)
+
+### Service Layer
+
+| Service | Function | Description |
+|---------|----------|-------------|
+| `hrmOrgUnitService.ts` | `fetchOrgUnitDetail()` | Fetch single org unit for edit form |
+| `hrmOrgUnitService.ts` | `updateOrgUnit()` | Supabase `.update()` with RLS enforcement |
+| `hrmPositionService.ts` | `fetchPositionDetail()` | Fetch single position for edit form |
+| `hrmPositionService.ts` | `updatePosition()` | Supabase `.update()` with RLS enforcement |
+
+### Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `useUpdateOrgUnit.ts` | State management for org unit update |
+| `useUpdatePosition.ts` | State management for position update |
+
+### UI Components
+
+| Page | Route | Features |
+|------|-------|----------|
+| `OrgUnitEditPage.tsx` | `/hrm/org-units/:orgUnitId/edit` | Role guard, immutable code, validation |
+| `PositionEditPage.tsx` | `/hrm/positions/:positionId/edit` | Role guard, immutable code, org unit dropdown |
+
+### Permissions (usePermissions Hook)
+
+```typescript
+canEditOrgUnit: (orgUnitId: string) => boolean
+canEditPosition: (positionOrgUnitId: string | null) => boolean
+```
+
+Both functions check:
+- Admin/HR Manager: Always `true`
+- Manager: `true` only if entity's `org_unit_id` matches manager's org unit
+- Employee: Always `false`
+
+---
+
 ## Next Steps
 
-- Phase 4: Leave & Attendance Management
+- Phase 4.2: Employee Terminate/Archive (Soft Delete + Audit Trail)
