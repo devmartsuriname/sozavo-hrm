@@ -698,6 +698,27 @@ The `useHrmPositionDetail(positionId)` hook:
 - **Admin, HR Manager**: Can view any position detail
 - **Manager, Employee**: Denied access; UI shows "Position not found or you do not have access"
 
+## Admin Navigation Cleanup (Phase 3.5.3)
+
+The admin sidebar has been cleaned to show only HRM-relevant navigation:
+
+**Visible Menu Items:**
+- Dashboard (clean Welcome/System Status view)
+- HRM: Employees, Organization Units, Positions, Users & Roles
+
+**Removed from Sidebar:**
+- Authentication pages (routes preserved for login flow)
+- Error pages (routes preserved for 404 handling)
+- All demo modules (Base UI, Charts, Forms, Tables, Icons, Maps, Layouts)
+
+**Dashboard Changes:**
+- Removed: Demo KPI cards with fake revenue/order data
+- Added: WelcomeCard (user email + role badge), SystemStatus (static health blocks), QuickLinks (HRM module shortcuts)
+
+**Preserved for Reuse:**
+- Demo components remain in `src/app/(admin)/dashboards/components/` for Demo Library reference
+- All patterns documented in `/docs/demo-library/`
+
 ## Next Steps
 
-- Phase 2 continues with Employee Edit forms
+- Phase 4: Leave & Attendance Management

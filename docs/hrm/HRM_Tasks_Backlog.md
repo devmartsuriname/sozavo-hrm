@@ -197,11 +197,11 @@ P{phase}-{category}-{number}
 | P3-QA-001 | QA | RBAC QA & Test Data | Comprehensive RBAC validation checklist with 58 test scenarios | ✅ | P1 |
 | P3.5-001 | ENV | Admin Cleanup Inventory | Identify all demo modules for cleanup | ✅ | P1 |
 | P3.5-002 | ENV | Demo Library Creation | Create docs/demo-library/ with reusable asset documentation | ✅ | P1 |
-| P3.5-003 | UI | Admin Sidebar Cleanup | Remove demo modules from active sidebar | ⏳ | P1 |
+| P3.5-003 | UI | Admin Sidebar Cleanup | Remove demo modules from active sidebar, de-demo dashboard | ✅ | P1 |
 
-**Phase 3 Summary:** 12/18 tasks completed, 1 partial, 5 planned
+**Phase 3 Summary:** 13/18 tasks completed, 1 partial, 4 planned
 
-> **Note:** Phase 3 Steps 3.1–3.4 are complete. Step 3.3 introduced `usePermissions` hook and `RoleGuard` component for centralized RBAC enforcement. Step 3.4 added `HRM_RBAC_QA_Checklist.md` with 58 scenario-based test cases for all 4 roles. Conditional Menu Items (P3-UI-006) is marked Partial because Darkone theme guardrails prevent modification of protected layout/sidebar files; dynamic menu filtering is deferred to a future step with a guardrail-compliant approach.
+> **Note:** Phase 3 Steps 3.1–3.5 are complete. Step 3.3 introduced `usePermissions` hook and `RoleGuard` component for centralized RBAC enforcement. Step 3.4 added `HRM_RBAC_QA_Checklist.md` with 58 scenario-based test cases for all 4 roles. Step 3.5.3 cleaned the sidebar to HRM-only navigation and replaced demo dashboard with WelcomeCard/SystemStatus/QuickLinks components. Conditional Menu Items (P3-UI-006) is marked Partial because Darkone theme guardrails prevent modification of protected layout/sidebar files; dynamic menu filtering is deferred to a future step with a guardrail-compliant approach.
 
 ---
 

@@ -333,6 +333,14 @@ Test users verified:
 - HRM metric mappings for Phase 6 dashboard integration
 - No runtime code changes – documentation only
 
+**Step 3.5.3 – Admin Sidebar Cleanup & Dashboard De-Demo:** HRM-only production navigation:
+- **Sidebar:** Reduced to Dashboard + HRM modules only (Employees, Org Units, Positions, Users & Roles)
+- **Routes:** Removed all demo route arrays (Base UI, Charts, Forms, Tables, Icons, Maps, Layouts)
+- **Dashboard:** Replaced fake KPI widgets with clean Welcome/SystemStatus/QuickLinks components
+- **Auth:** Login routes preserved for functionality, removed from sidebar navigation
+- Demo components preserved in codebase for Demo Library reference
+- Restore point documented: `docs/hrm/RestorePoint_Phase3.5_Step3.5.3_AdminCleanup.md`
+
 ### RBAC Flow
 
 ```
