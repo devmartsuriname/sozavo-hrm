@@ -1,7 +1,10 @@
 # Darkone Demo Library
 
+> ⚠️ **ARCHIVED FOR REUSE — Do not delete without review**
+
 > **Purpose:** Preserve reusable Darkone demo components for future HRM features  
 > **Created:** Phase 3.5 – Step 3.5.2  
+> **Updated:** Phase 3.5 – Step 3.5.3 (demo routes removed from active app)  
 > **Status:** Documentation Only (no runtime impact)
 
 ---
