@@ -415,3 +415,54 @@ All HRM entities follow the Row/ViewModel pattern:
 | Position | `HrmPositionRow` | `HrmPositionDirectory` | `HrmPositionDetail` |
 
 This pattern separates database schema (Row) from presentation needs (ViewModel with derived fields).
+
+---
+
+## Phase 4.1 — Organization Unit & Position Edit Forms
+
+**Status:** ✅ Complete  
+**Date:** 2025-12-13
+
+### New Routes
+
+| Route | Component | Hidden | Access |
+|-------|-----------|--------|--------|
+| `/hrm/org-units/:orgUnitId/edit` | `OrgUnitEditPage` | `true` | Admin, HR Manager, Manager (scoped) |
+| `/hrm/positions/:positionId/edit` | `PositionEditPage` | `true` | Admin, HR Manager, Manager (scoped) |
+
+### RLS Scoping for Managers
+
+Phase 4.1 introduced manager-scoped UPDATE policies using `get_user_org_unit()`:
+
+```
+Manager Role Access Control:
+┌─────────────────────┐     ┌─────────────────────────────┐
+│ OrgUnitEditPage     │────▶│ RLS: id = get_user_org_unit │
+└─────────────────────┘     └─────────────────────────────┘
+
+┌─────────────────────┐     ┌─────────────────────────────────────┐
+│ PositionEditPage    │────▶│ RLS: org_unit_id = get_user_org_unit│
+└─────────────────────┘     └─────────────────────────────────────┘
+```
+
+### Permission Functions
+
+Added to `usePermissions.ts`:
+
+| Function | Description |
+|----------|-------------|
+| `canEditOrgUnit(orgUnitId)` | Check if current user can edit org unit |
+| `canEditPosition(positionOrgUnitId)` | Check if current user can edit position |
+
+### Business Rules
+
+1. **Immutable Code**: Code field is read-only after creation (prevents breaking references)
+2. **Role-Based Edit Visibility**: Edit button shown only when `canEditOrgUnit/canEditPosition` returns `true`
+3. **RLS Enforcement**: Backend UPDATE fails for managers editing outside their org unit
+
+### Layout Consistency
+
+Edit pages follow Darkone detail page layout:
+- Full-width form container (`<Col xs={12}>`)
+- Action buttons in separate Row with `mb-4` spacing
+- Card-based form sections
