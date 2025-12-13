@@ -77,3 +77,42 @@ export async function fetchOrgUnitDetail(orgUnitId: string): Promise<HrmOrgUnitD
     parentOrgUnitName: orgUnit.parent_id ? orgUnitMap.get(orgUnit.parent_id) ?? null : null,
   }
 }
+
+/**
+ * Update an organization unit by ID.
+ * RLS enforces access: Admin/HR Manager full access, Manager scoped to own org unit.
+ * 
+ * @param orgUnitId - The UUID of the org unit to update
+ * @param payload - The update payload (name, description, parent_id, is_active, updated_by)
+ * @returns Updated org unit row or null if not found/access denied
+ * @throws Error for genuine query errors
+ */
+export async function updateOrgUnit(
+  orgUnitId: string,
+  payload: {
+    name: string
+    description: string | null
+    parent_id: string | null
+    is_active: boolean
+    updated_by: string | null
+  }
+): Promise<HrmOrgUnitRow | null> {
+  const { data, error } = await supabase
+    .from('hrm_organization_units')
+    .update({
+      name: payload.name,
+      description: payload.description,
+      parent_id: payload.parent_id,
+      is_active: payload.is_active,
+      updated_by: payload.updated_by,
+    })
+    .eq('id', orgUnitId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to update organization unit: ${error.message}`)
+  }
+
+  return data as HrmOrgUnitRow
+}

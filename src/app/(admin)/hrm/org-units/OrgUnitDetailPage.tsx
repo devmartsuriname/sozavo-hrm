@@ -32,10 +32,14 @@ const OrgUnitDetailPage = () => {
   const { orgUnitId } = useParams<{ orgUnitId: string }>()
   const navigate = useNavigate()
   const { orgUnit, isLoading, error } = useHrmOrgUnitDetail(orgUnitId || '')
-  const { canViewHRMData } = usePermissions()
+  const { canViewHRMData, canEditOrgUnit } = usePermissions()
 
   const handleBack = () => {
     navigate('/hrm/org-units')
+  }
+
+  const handleEdit = () => {
+    navigate(`/hrm/org-units/${orgUnitId}/edit`)
   }
 
   // Access guard: only Admin and HR Manager can view
@@ -139,6 +143,12 @@ const OrgUnitDetailPage = () => {
                     </Badge>
                   </p>
                 </div>
+                {canEditOrgUnit() && (
+                  <Button variant="primary" onClick={handleEdit}>
+                    <Icon icon="mdi:pencil" className="me-1" width={18} />
+                    Edit
+                  </Button>
+                )}
               </div>
             </Card.Body>
           </Card>

@@ -32,10 +32,14 @@ const PositionDetailPage = () => {
   const { positionId } = useParams<{ positionId: string }>()
   const navigate = useNavigate()
   const { position, isLoading, error } = useHrmPositionDetail(positionId || '')
-  const { canViewHRMData } = usePermissions()
+  const { canViewHRMData, canEditPosition } = usePermissions()
 
   const handleBack = () => {
     navigate('/hrm/positions')
+  }
+
+  const handleEdit = () => {
+    navigate(`/hrm/positions/${positionId}/edit`)
   }
 
   // Access guard: only Admin and HR Manager can view
@@ -139,6 +143,12 @@ const PositionDetailPage = () => {
                     </Badge>
                   </p>
                 </div>
+                {canEditPosition() && (
+                  <Button variant="primary" onClick={handleEdit}>
+                    <Icon icon="mdi:pencil" className="me-1" width={18} />
+                    Edit
+                  </Button>
+                )}
               </div>
             </Card.Body>
           </Card>
