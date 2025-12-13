@@ -281,9 +281,28 @@ The HRM Employee Service (`src/services/hrmEmployeeService.ts`) provides the fol
 
 | Function | Description |
 |----------|-------------|
-| `fetchEmployeeDirectory()` | Returns `HrmEmployeeDirectory[]` for table listing |
+| `fetchEmployeeDirectory(options?)` | Returns `HrmEmployeeDirectory[]` for table listing. Accepts `{ includeTerminated?: boolean }` option to filter at query level (default: true = return all). |
 | `fetchEmployeeDetail(id)` | Returns `HrmEmployeeDetail \| null` for single employee |
 | `updateEmployee(id, payload)` | Updates employee record, returns `HrmEmployeeRow` |
+| `terminateEmployee(id, date, reason)` | Soft-deletes employee with audit trail. User ID derived server-side. |
+| `reactivateEmployee(id, reason)` | Reactivates terminated employee. User ID derived server-side. Preserves termination history. |
+
+### Query Options (Phase 4.2.1a)
+
+The `fetchEmployeeDirectory()` function accepts an optional options object:
+
+```typescript
+interface FetchEmployeeDirectoryOptions {
+  includeTerminated?: boolean  // Default: true (return all employees)
+}
+
+// Usage examples:
+fetchEmployeeDirectory()                              // Returns all employees (default)
+fetchEmployeeDirectory({ includeTerminated: true })   // Returns all employees (explicit)
+fetchEmployeeDirectory({ includeTerminated: false })  // Excludes terminated employees at query level
+```
+
+This enables future export features to use the same query logic with consistent filtering.
 
 The read functions use the **parallel-fetch + merge pattern**:
 1. Execute multiple Supabase queries in parallel via `Promise.all()`

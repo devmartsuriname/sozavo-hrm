@@ -226,6 +226,34 @@ P{phase}-{category}-{number}
 
 ---
 
+### Phase 4.2.1 — Employee Termination & Reactivation
+
+| ID | Category | Title | Description | Status | Priority |
+|----|----------|-------|-------------|--------|----------|
+| P4.2.1-DB-001 | DB | Add terminated_at column | Immutable termination timestamp for cooldown | ✅ | P0 |
+| P4.2.1-DB-002 | DB | Add reactivation audit fields | reactivated_by, reactivated_at, reactivation_reason | ✅ | P0 |
+| P4.2.1-DB-003 | DB | Create employee update guardrails trigger | Manager blocks, HR reason requirement, 5-min cooldown | ✅ | P0 |
+| P4.2.1-SVC-001 | SVC | Refactor terminateEmployee() | Server-side user resolution, no userId parameter | ✅ | P0 |
+| P4.2.1-SVC-002 | SVC | Create reactivateEmployee() | Server-side user resolution, immutable termination history | ✅ | P0 |
+| P4.2.1-SVC-003 | SVC | Add includeTerminated option | fetchEmployeeDirectory({ includeTerminated?: boolean }) | ✅ | P1 |
+| P4.2.1-UI-001 | UI | Create ReactivateEmployeeModal | Darkone-consistent modal with reason field | ✅ | P1 |
+| P4.2.1-UI-002 | UI | Unified Termination & Reactivation History card | Single read-only audit card on EmployeeDetailPage | ✅ | P1 |
+| P4.2.1-UI-003 | UI | canReactivateEmployee permission | Admin/HR Manager only | ✅ | P1 |
+
+**Phase 4.2.1 Summary:** 9/9 tasks completed ✅
+
+---
+
+### Phase 4.3 — Export & Future Features (Planned)
+
+| ID | Category | Title | Description | Status | Priority |
+|----|----------|-------|-------------|--------|----------|
+| P4.3-EXPORT-001 | UI | Export Employees (CSV/PDF) | Export employee list with Include Terminated option | ⏳ | P2 |
+
+**Phase 4.3 Summary:** 0/1 tasks completed, 1 planned (Admin/HR only)
+
+---
+
 ### Leave Management Tasks
 
 | ID | Category | Title | Description | Status | Priority |
