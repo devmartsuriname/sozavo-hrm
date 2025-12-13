@@ -8,8 +8,19 @@ import { supabase } from '@/integrations/supabase/client'
 import type { HrmEmployeeDirectory, HrmEmployeeDetail, HrmEmployeeDirectoryQuery, HrmEmployeeTerminatePayload } from '@/types/hrm'
 
 /**
+ * Options for fetching employee directory.
+ * @param includeTerminated - If false, excludes terminated employees. Defaults to true (return all).
+ */
+export interface FetchEmployeeDirectoryOptions {
+  includeTerminated?: boolean
+}
+
+/**
  * Fetches employees for the directory listing with org unit and position names.
  * Uses parallel queries + TypeScript merge pattern (no FK constraints in DB).
+ * 
+ * @param options.includeTerminated - If false, filters out terminated employees at query level.
+ *                                    Defaults to true (return all employees).
  * 
  * RLS policies determine which employees the current user can see:
  * - Admins/HR Managers: all employees + can read org units/positions
@@ -21,13 +32,24 @@ import type { HrmEmployeeDirectory, HrmEmployeeDetail, HrmEmployeeDirectoryQuery
  * - orgUnitName: from hrm_organization_units.name
  * - positionTitle: from hrm_positions.title
  */
-export async function fetchEmployeeDirectory(): Promise<HrmEmployeeDirectory[]> {
-  // Parallel fetch: employees, org units, positions
+export async function fetchEmployeeDirectory(
+  options?: FetchEmployeeDirectoryOptions
+): Promise<HrmEmployeeDirectory[]> {
+  // Build employee query with optional terminated filter
+  let employeeQuery = supabase
+    .from('hrm_employees')
+    .select('id, employee_code, first_name, last_name, email, phone, org_unit_id, position_id, manager_id, employment_status, hire_date, termination_date, is_active, created_at, updated_at')
+  
+  // Apply filter at query level if includeTerminated is explicitly false
+  if (options?.includeTerminated === false) {
+    employeeQuery = employeeQuery.neq('employment_status', 'terminated')
+  }
+  
+  employeeQuery = employeeQuery.order('employee_code', { ascending: true })
+
+  // Parallel fetch: employees (with filter), org units, positions
   const [employeesResult, orgUnitsResult, positionsResult] = await Promise.all([
-    supabase
-      .from('hrm_employees')
-      .select('id, employee_code, first_name, last_name, email, phone, org_unit_id, position_id, manager_id, employment_status, hire_date, termination_date, is_active, created_at, updated_at')
-      .order('employee_code', { ascending: true }),
+    employeeQuery,
     supabase
       .from('hrm_organization_units')
       .select('id, name'),

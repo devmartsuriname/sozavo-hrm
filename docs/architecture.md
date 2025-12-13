@@ -240,6 +240,11 @@ src/
    - **Column Sorting**: Clickable headers with asc/desc toggle and icon indicators
    - Operates on in-memory array, no additional DB queries
 
+5. **Query-Level Filtering** (Phase 4.2.1a):
+   - `fetchEmployeeDirectory({ includeTerminated?: boolean })` option
+   - Filters terminated employees at Supabase query level (not client-side)
+   - Enables consistent behavior for future export features (CSV/PDF)
+
 ## Migration Path
 
 | Phase | Status | Description |
