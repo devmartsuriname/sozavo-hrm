@@ -194,10 +194,11 @@ P{phase}-{category}-{number}
 | P3-UI-006 | UI | Implement Conditional Menu Items | Show/hide menu based on roles | ⚠️ Partial | P1 |
 | P3-UI-007 | UI | Add Bulk Role Assignment | Multi-select role operations | ⏳ | P3 |
 | P3-UI-008 | UI | Create Role Summary Dashboard | Overview of role distribution | ⏳ | P3 |
+| P3-QA-001 | QA | RBAC QA & Test Data | Comprehensive RBAC validation checklist with 58 test scenarios | ✅ | P1 |
 
-**Phase 3 Summary:** 9/14 tasks completed, 1 partial, 4 planned
+**Phase 3 Summary:** 10/15 tasks completed, 1 partial, 4 planned
 
-> **Note:** Phase 3 Steps 3.1, 3.2, and 3.3 are complete. Step 3.3 introduced `usePermissions` hook and `RoleGuard` component for centralized RBAC enforcement. Conditional Menu Items (P3-UI-006) is marked Partial because Darkone theme guardrails prevent modification of protected layout/sidebar files; dynamic menu filtering is deferred to a future step with a guardrail-compliant approach.
+> **Note:** Phase 3 Steps 3.1–3.4 are complete. Step 3.3 introduced `usePermissions` hook and `RoleGuard` component for centralized RBAC enforcement. Step 3.4 added `HRM_RBAC_QA_Checklist.md` with 58 scenario-based test cases for all 4 roles. Conditional Menu Items (P3-UI-006) is marked Partial because Darkone theme guardrails prevent modification of protected layout/sidebar files; dynamic menu filtering is deferred to a future step with a guardrail-compliant approach.
 
 ---
 
