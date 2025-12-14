@@ -244,23 +244,47 @@ P{phase}-{category}-{number}
 
 ---
 
+### Phase 4.3 — Leave Management Database & Guardrails
+
+| ID | Category | Title | Description | Status | Priority |
+|----|----------|-------|-------------|--------|----------|
+| P4.3-DB-001 | DB | Create hrm_leave_types table | Leave type definitions with RLS | ✅ | P0 |
+| P4.3-DB-002 | DB | Create hrm_leave_requests table | Leave requests with audit fields | ✅ | P0 |
+| P4.3-FUNC-001 | DB | Create get_employee_id() function | Get employee ID from user ID | ✅ | P0 |
+| P4.3-FUNC-002 | DB | Create is_leave_request_owner() function | Check request ownership | ✅ | P0 |
+| P4.3-FUNC-003 | DB | Create can_approve_leave_request() function | Check approval permissions | ✅ | P0 |
+| P4.3-TRIG-001 | DB | Create unified leave_requests_before_write trigger | Audit + guardrails + overlap prevention | ✅ | P0 |
+| P4.3-RLS-001 | RLS | Create hrm_leave_types RLS policies | Role-based access (16 policies) | ✅ | P0 |
+| P4.3-RLS-002 | RLS | Create hrm_leave_requests RLS policies | Role-based access (16 policies) | ✅ | P0 |
+| P4.3-SEED-001 | DB | Seed initial leave types | 8 leave types (annual, sick, etc.) | ✅ | P1 |
+| P4.3-DOC-001 | DOC | Create RestorePoint document | Schema snapshot + rollback SQL | ✅ | P1 |
+| P4.3-DOC-002 | DOC | Update backend.md | Phase 4.3 documentation | ✅ | P1 |
+| P4.3-DOC-003 | DOC | Update architecture.md | Phase 4.3 decisions | ✅ | P1 |
+
+**Phase 4.3 Summary:** 12/12 tasks completed ✅
+
+> **Migration Executed:** 2025-12-14  
+> **Verification:** Tables exist, RLS enabled, 1 unified BEFORE trigger on hrm_leave_requests, 8 leave types seeded, 32 RLS policies active.
+
+---
+
 ### Phase 4.3 — Export & Future Features (Planned)
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
 | P4.3-EXPORT-001 | UI | Export Employees (CSV/PDF) | Export employee list with Include Terminated option | ⏳ | P2 |
 
-**Phase 4.3 Summary:** 0/1 tasks completed, 1 planned (Admin/HR only)
+**Phase 4.3 Export Summary:** 0/1 tasks completed, 1 planned (Admin/HR only)
 
 ---
 
-### Leave Management Tasks
+### Leave Management Service & UI Tasks
 
 | ID | Category | Title | Description | Status | Priority |
 |----|----------|-------|-------------|--------|----------|
 | P4-LEAVE-001 | LEAVE | Create LeaveTypeService | CRUD for leave types | ⏳ | P1 |
 | P4-LEAVE-002 | LEAVE | Create LeaveRequestService | Leave request operations | ⏳ | P1 |
-| P4-LEAVE-003 | LEAVE | Define Leave Types | Leave type definitions | ⏳ | P1 |
+| P4-LEAVE-003 | LEAVE | Create Leave Types (Row/ViewModel) | TypeScript types for leave | ⏳ | P1 |
 | P4-LEAVE-004 | LEAVE | Create Leave Balance Calculator | Track remaining leave days | ⏳ | P1 |
 | P4-UI-001 | UI | Create Leave Types Admin Page | Manage leave type definitions | ⏳ | P1 |
 | P4-UI-002 | UI | Create Leave Request Form | Employee leave application | ⏳ | P1 |

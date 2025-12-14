@@ -117,6 +117,132 @@ export type Database = {
           },
         ]
       }
+      hrm_leave_requests: {
+        Row: {
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          created_at: string
+          created_by: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision_reason: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["leave_status"]
+          submitted_at: string
+          total_days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_reason?: string | null
+          employee_id: string
+          end_date: string
+          id?: string
+          leave_type_id: string
+          reason?: string | null
+          start_date: string
+          status?: Database["public"]["Enums"]["leave_status"]
+          submitted_at?: string
+          total_days: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_reason?: string | null
+          employee_id?: string
+          end_date?: string
+          id?: string
+          leave_type_id?: string
+          reason?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["leave_status"]
+          submitted_at?: string
+          total_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hrm_leave_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hrm_leave_requests_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "hrm_leave_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hrm_leave_types: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          default_days: number
+          description: string | null
+          id: string
+          is_active: boolean
+          is_paid: boolean
+          name: string
+          requires_approval: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          default_days?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_paid?: boolean
+          name: string
+          requires_approval?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          default_days?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_paid?: boolean
+          name?: string
+          requires_approval?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       hrm_organization_units: {
         Row: {
           code: string
@@ -240,6 +366,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_approve_leave_request: {
+        Args: { _leave_request_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_all_users_with_roles: {
         Args: never
         Returns: {
@@ -253,6 +383,7 @@ export type Database = {
         }[]
       }
       get_current_user_id: { Args: never; Returns: string }
+      get_employee_id: { Args: { _user_id: string }; Returns: string }
       get_employee_record: {
         Args: { _user_id: string }
         Returns: {
@@ -299,6 +430,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_leave_request_owner: {
+        Args: { _leave_request_id: string; _user_id: string }
         Returns: boolean
       }
       is_manager_of: {
