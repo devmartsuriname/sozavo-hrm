@@ -900,6 +900,104 @@ WITH CHECK (
 
 ---
 
+## Phase 4.3: Leave Management
+
+**Status:** ✅ Complete  
+**Date:** 2025-12-14
+
+### Database Schema
+
+**New Tables:**
+- `hrm_leave_types` — Leave type definitions (Annual, Sick, Unpaid, etc.)
+- `hrm_leave_requests` — Employee leave requests with full audit trail
+
+**New Security Functions:**
+- `get_employee_id(user_id)` — Get employee.id from auth user
+- `is_leave_request_owner(user_id, request_id)` — Check request ownership
+- `can_approve_leave_request(user_id, request_id)` — Check approval permission
+
+**Key Columns in `hrm_leave_requests`:**
+| Column | Type | Description |
+|--------|------|-------------|
+| `employee_id` | UUID | FK to hrm_employees (CASCADE) |
+| `leave_type_id` | UUID | FK to hrm_leave_types |
+| `start_date` / `end_date` | DATE | Leave period |
+| `total_days` | NUMERIC(5,1) | Duration in days |
+| `status` | leave_status | pending/approved/rejected/cancelled |
+| `submitted_at` | TIMESTAMPTZ | Submission timestamp (immutable) |
+| `decided_by` / `decided_at` | UUID/TIMESTAMPTZ | Decision audit |
+| `cancelled_by` / `cancelled_at` | UUID/TIMESTAMPTZ | Cancellation audit |
+
+### Unified Trigger: `leave_requests_before_write()`
+
+**ONE single BEFORE INSERT OR UPDATE trigger** for audit normalization, guardrails, and overlap prevention.
+
+**Audit Normalization (DB-Authoritative):**
+- INSERT: Sets `created_by`, `created_at`, `submitted_at`, forces `status='pending'`
+- UPDATE: Preserves immutable fields (`created_by`, `created_at`, `submitted_at`)
+- Sets `decided_by/at` on approval/rejection, `cancelled_by/at` on cancellation
+
+**Guardrails:**
+| Rule | Description |
+|------|-------------|
+| No linked employee | Non-Admin/HR blocked if `get_employee_id()` is NULL |
+| Self-approval block | Cannot approve/reject own request |
+| Manager direct-report check | Managers can only approve/reject direct reports |
+| HR Manager reject reason | Must provide `decision_reason` when rejecting |
+| Employee cancel-only | Can only cancel pending requests, no edits |
+| Manager field restrictions | Can only change status + decision_reason |
+| Post-decision immutability | Non-Admin/HR cannot modify finalized requests |
+
+**Overlap Prevention:**
+- Blocks INSERT if dates overlap with existing APPROVED leave
+- Blocks pending→approved if overlap exists
+- Blocks date changes on APPROVED requests if overlap exists
+
+### RLS Policies
+
+**hrm_leave_types:**
+| Role | SELECT | INSERT | UPDATE | DELETE |
+|------|--------|--------|--------|--------|
+| Admin | All | ✅ | ✅ | ✅ |
+| HR Manager | All | ✅ | ✅ | ❌ |
+| Manager | Active only | ❌ | ❌ | ❌ |
+| Employee | Active only | ❌ | ❌ | ❌ |
+
+**hrm_leave_requests:**
+| Role | SELECT | INSERT | UPDATE | DELETE |
+|------|--------|--------|--------|--------|
+| Admin | All | ✅ | ✅ | ✅ |
+| HR Manager | All | ✅ | ✅ | ✅ |
+| Manager | Direct reports | ❌ | via trigger | ❌ |
+| Employee | Own only | Own only | via trigger | ❌ |
+
+### Status Transition Matrix
+
+| Current Status | → pending | → approved | → rejected | → cancelled |
+|----------------|-----------|------------|------------|-------------|
+| pending | — | Admin/HR/Manager | Admin/HR/Manager | Employee (owner) |
+| approved | ❌ | — | ❌ | Admin/HR only |
+| rejected | ❌ | Admin/HR only | — | ❌ |
+| cancelled | ❌ | Admin/HR only | ❌ | — |
+
+### Seed Data
+
+8 initial leave types seeded: annual, sick, unpaid, maternity, paternity, bereavement, study, compassionate.
+
+### Files Created
+
+| File | Purpose |
+|------|---------|
+| `db/hrm/functions_leave.sql` | Security definer functions |
+| `db/hrm/schema_leave.sql` | Table definitions |
+| `db/hrm/triggers_leave.sql` | Unified trigger function + attachment |
+| `db/hrm/rls_leave.sql` | RLS policies |
+| `db/hrm/seed_leave_types.sql` | Initial leave types |
+| `docs/hrm/RestorePoint_Phase4_Step4.3_LeaveManagement.md` | Rollback documentation |
+
+---
+
 ## Next Steps
 
-- Phase 4.3: Leave Management Module
+- Phase 4.3 UI: Leave Type CRUD pages
+- Phase 4.3 UI: Leave Request submission + approval workflow

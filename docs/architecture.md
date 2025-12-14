@@ -551,3 +551,81 @@ Sidebar visibility is a **user preference**, not a breakpoint decision. Responsi
 | Condensed → resize to mobile → toggle → resize back | Condensed restored |
 | Toggle when hidden | Restores to default |
 | No hover-only mode | Only if user explicitly chose hidden |
+
+---
+
+## Phase 4.3 — Leave Management
+
+**Status:** ✅ Complete (DB Layer)  
+**Date:** 2025-12-14
+
+### Architecture
+
+```
+db/hrm/
+├── functions_leave.sql     # Security definer functions
+├── schema_leave.sql        # hrm_leave_types + hrm_leave_requests tables
+├── triggers_leave.sql      # Unified before-write trigger
+├── rls_leave.sql           # RLS policies for leave tables
+└── seed_leave_types.sql    # Initial leave type data
+```
+
+### Trigger-First Enforcement Model
+
+Phase 4.3 introduces a **unified trigger pattern** for complex business rules:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│            leave_requests_before_write() TRIGGER                │
+├─────────────────────────────────────────────────────────────────┤
+│ A) AUDIT NORMALIZATION                                          │
+│    - INSERT: Set created_by, submitted_at, force status=pending │
+│    - UPDATE: Preserve immutable fields, set decision/cancel     │
+├─────────────────────────────────────────────────────────────────┤
+│ B) GUARDRAILS                                                   │
+│    - No linked employee check                                   │
+│    - Self-approval block                                        │
+│    - Manager direct-report enforcement                          │
+│    - HR Manager rejection reason requirement                    │
+│    - Employee cancel-only restriction                           │
+│    - Post-decision immutability                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ C) OVERLAP PREVENTION                                           │
+│    - Block on INSERT                                            │
+│    - Block on pending → approved                                │
+│    - Block on date changes to APPROVED requests                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Key Design Decisions
+
+1. **ONE trigger per table**: Deterministic execution order
+2. **DB-authoritative audit**: `created_by`, `submitted_at` set by trigger, immutable on UPDATE
+3. **Unified decision fields**: `decided_by/at` for both approve and reject
+4. **Overlap prevention**: Blocks at INSERT and approval transition
+
+### Migration Execution Order
+
+```bash
+1. functions_leave.sql    # Create security functions first
+2. schema_leave.sql       # Create tables
+3. triggers_leave.sql     # Create trigger function + attach
+4. rls_leave.sql          # Enable RLS + policies
+5. seed_leave_types.sql   # Seed initial data
+```
+
+### Verification Checklist
+
+| Test | Expected |
+|------|----------|
+| Employee INSERT for self | ✅ RLS allows |
+| Employee INSERT for other | ❌ RLS blocks |
+| Employee cancel pending | ✅ Trigger allows |
+| Employee edit dates | ❌ Trigger blocks |
+| Manager approve direct report | ✅ RLS + trigger allow |
+| Manager approve non-report | ❌ Trigger blocks |
+| Manager approve self | ❌ Trigger blocks |
+| HR reject without reason | ❌ Trigger blocks |
+| Overlap on INSERT | ❌ Trigger blocks |
+| Overlap on approve | ❌ Trigger blocks |
+| Audit fields tampered | ✅ Trigger overwrites |
